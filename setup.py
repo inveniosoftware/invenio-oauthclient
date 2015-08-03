@@ -56,7 +56,7 @@ test_requirements = [
 class PyTest(TestCommand):
     """PyTest Test."""
 
-    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
+    user_options = [('pytest-args=', 'a', 'Arguments to pass to py.test')]
 
     def initialize_options(self):
         """Init pytest."""
@@ -114,7 +114,7 @@ setup(
             'Sphinx>=1.3',
             'sphinx_rtd_theme>=0.1.7'
         ],
-        "github": [
+        'github': [
             'github3.py>=0.9',
         ],
         'tests': test_requirements
@@ -127,7 +127,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        "Programming Language :: Python :: 2",
+        'Programming Language :: Python :: 2',
         # 'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         # 'Programming Language :: Python :: 3',

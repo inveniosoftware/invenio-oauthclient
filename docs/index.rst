@@ -30,7 +30,7 @@
 .. automodule:: invenio_oauthclient
 
 Contents
---------
+========
 
 .. toctree::
    :maxdepth: 2
@@ -38,42 +38,42 @@ Contents
 .. _module_oauthclient_conf:
 
 Configuration
--------------
+=============
 
 .. automodule:: invenio_oauthclient.config
 
 Contrib
--------
+=======
 
 GitHub
-^^^^^^
+------
 .. automodule:: invenio_oauthclient.contrib.github
 
 ORCID
-^^^^^
+-----
 .. automodule:: invenio_oauthclient.contrib.orcid
 
 CERN
-^^^^
+----
 .. automodule:: invenio_oauthclient.contrib.cern
 
 API
-----
+===
 
 Handlers
-^^^^^^^^
+--------
 
 .. automodule:: invenio_oauthclient.handlers
    :members:
 
 Models
-^^^^^^
+------
 
 .. automodule:: invenio_oauthclient.models
    :members:
 
 Views
-^^^^^
+-----
 
 .. automodule:: invenio_oauthclient.views.client
    :members:
@@ -82,25 +82,25 @@ Views
    :members:
 
 Forms
-^^^^^
+-----
 
 .. automodule:: invenio_oauthclient.forms
    :members:
 
 Utils
-^^^^^
+-----
 
 .. automodule:: invenio_oauthclient.utils
    :members:
 
 Registries
-^^^^^^^^^^
+----------
 
 .. automodule:: invenio_oauthclient.client
    :members:
 
 Errors
-^^^^^^
+------
 
 .. automodule:: invenio_oauthclient.errors
    :members:

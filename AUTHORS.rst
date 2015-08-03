@@ -26,4 +26,15 @@ Authors
 
 Invenio module that provides OAuth web authorization support.
 
-- CERN <info@invenio-software.org>
+- Eirini Psallida <eirini.psallida@cern.ch>
+- Esteban J. G. Gabancho <esteban.gabancho@gmail.com>
+- Georgios Papoutsakis <georgios.papoutsakis@cern.ch>
+- Jan Aage Lavik <jan.age.lavik@cern.ch>
+- Javier Martin Montull <javier.martin.montull@cern.ch>
+- Jiri Kuncar <jiri.kuncar@cern.ch>
+- Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
+- Leonardo Rossi <leonardo.r@cern.ch>
+- Marco Neumann <marco@crepererum.net>
+- Nicolas Harraudeau <nicolas.harraudeau@cern.ch>
+- Pamfilos Fokianos <pamfilos.fokianos@cern.ch>
+- Tibor Simko <tibor.simko@cern.ch>
