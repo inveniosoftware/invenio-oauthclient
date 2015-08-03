@@ -27,7 +27,7 @@
 
        import copy
 
-       from invenio.modules.oauthclient.contrib import cern
+       from invenio_oauthclient.contrib import cern
 
        CERN_REMOTE_APP = copy.deepcopy(cern.REMOTE_APP)
        CERN_REMOTE_APP["params"].update(dict(request_token_params={
@@ -128,14 +128,14 @@ REMOTE_APP = dict(
     title="CERN",
     description="Connecting to CERN Organization.",
     icon="",
-    authorized_handler="invenio.modules.oauthclient.handlers"
+    authorized_handler="invenio_oauthclient.handlers"
                        ":authorized_signup_handler",
-    disconnect_handler="invenio.modules.oauthclient.handlers"
+    disconnect_handler="invenio_oauthclient.handlers"
                        ":disconnect_handler",
     signup_handler=dict(
-        info="invenio.modules.oauthclient.contrib.cern:account_info",
-        setup="invenio.modules.oauthclient.contrib.cern:account_setup",
-        view="invenio.modules.oauthclient.handlers:signup_handler",
+        info="invenio_oauthclient.contrib.cern:account_info",
+        setup="invenio_oauthclient.contrib.cern:account_setup",
+        view="invenio_oauthclient.handlers:signup_handler",
     ),
     params=dict(
         base_url="https://oauth.web.cern.ch/",

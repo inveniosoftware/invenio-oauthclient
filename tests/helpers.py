@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,12 +24,23 @@ from invenio.testsuite import InvenioTestCase
 
 
 class OAuth2ClientTestCase(InvenioTestCase):
-    """
-    Helper test case to make oauth client testing easier
-    """
+
+    """Helper test case to make oauth client testing easier."""
+
+    @property
+    def config(self):
+        cfg = super(OAuth2ClientTestCase, self).config
+        cfg['PACKAGES'] = [
+            'invenio_oauthclient',
+            'invenio_accounts',
+            'invenio.base',
+        ]
+        cfg['DEBUG'] = False
+        return cfg
+
     def mock_response(self, app=None, data=None):
-        """ Mock the oauth response from a remote application """
-        from invenio.modules.oauthclient.client import oauth
+        """Mock the oauth response from a remote application."""
+        from invenio_oauthclient.client import oauth
 
         # Mock oauth remote application
         oauth.remote_apps[app].handle_oauth2_response = MagicMock(

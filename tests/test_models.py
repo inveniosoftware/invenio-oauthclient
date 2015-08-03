@@ -26,14 +26,14 @@ from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 class BaseTestCase(InvenioTestCase):
     def setUp(self):
-        from ..models import RemoteAccount, RemoteToken
+        from invenio_oauthclient.models import RemoteAccount, RemoteToken
         RemoteToken.query.delete()
         RemoteAccount.query.delete()
         db.session.commit()
         db.session.expunge_all()
 
     def tearDown(self):
-        from ..models import RemoteAccount, RemoteToken
+        from invenio_oauthclient.models import RemoteAccount, RemoteToken
         RemoteToken.query.delete()
         RemoteAccount.query.delete()
         db.session.commit()
@@ -43,7 +43,7 @@ class BaseTestCase(InvenioTestCase):
 
 class RemoteAccountTestCase(BaseTestCase):
     def test_get_create(self):
-        from ..models import RemoteAccount
+        from invenio_oauthclient.models import RemoteAccount
 
         created_acc = RemoteAccount.create(1, "dev", dict(somekey="somevalue"))
         assert created_acc
@@ -83,7 +83,7 @@ class RemoteTokenTestCase(BaseTestCase):
         db.session.expunge_all()
 
     def test_get_create(self):
-        from ..models import RemoteAccount, RemoteToken
+        from invenio_oauthclient.models import RemoteAccount, RemoteToken
 
         t = RemoteToken.create(self.u1, "dev", "mytoken", "mysecret")
         assert t
@@ -110,7 +110,7 @@ class RemoteTokenTestCase(BaseTestCase):
         assert RemoteToken.query.count() == 0
 
     def test_get_regression(self):
-        from ..models import RemoteToken
+        from invenio_oauthclient.models import RemoteToken
 
         t3 = RemoteToken.create(self.u2, "dev", "mytoken", "mysecret")
         t4 = RemoteToken.create(self.u3, "dev", "mytoken", "mysecret")

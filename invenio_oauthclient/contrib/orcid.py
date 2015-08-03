@@ -25,7 +25,7 @@
 
    .. code-block:: python
 
-       from invenio.modules.oauthclient.contrib import orcid
+       from invenio_oauthclient.contrib import orcid
        OAUTHCLIENT_REMOTE_APPS = dict(
            orcid=orcid.REMOTE_APP,
        )
@@ -86,14 +86,14 @@ REMOTE_APP = dict(
     title='ORCID',
     description='Connecting Research and Researchers.',
     icon='',
-    authorized_handler="invenio.modules.oauthclient.handlers"
+    authorized_handler="invenio_oauthclient.handlers"
                        ":authorized_signup_handler",
-    disconnect_handler="invenio.modules.oauthclient.contrib.orcid"
+    disconnect_handler="invenio_oauthclient.contrib.orcid"
                        ":disconnect_handler",
     signup_handler=dict(
-        info="invenio.modules.oauthclient.contrib.orcid:account_info",
-        setup="invenio.modules.oauthclient.contrib.orcid:account_setup",
-        view="invenio.modules.oauthclient.handlers:signup_handler",
+        info="invenio_oauthclient.contrib.orcid:account_info",
+        setup="invenio_oauthclient.contrib.orcid:account_setup",
+        view="invenio_oauthclient.handlers:signup_handler",
     ),
     params=dict(
         request_token_params={'scope': '/authenticate',
@@ -131,8 +131,8 @@ def account_info(remote, resp):
 
 def disconnect_handler(remote, *args, **kwargs):
     """Handle unlinking of remote account."""
-    from invenio.modules.oauthclient.utils import oauth_unlink_external_id
-    from invenio.modules.oauthclient.models import RemoteAccount
+    from invenio_oauthclient.utils import oauth_unlink_external_id
+    from invenio_oauthclient.models import RemoteAccount
 
     if not current_user.is_authenticated():
         return current_app.login_manager.unauthorized()
@@ -152,7 +152,7 @@ def disconnect_handler(remote, *args, **kwargs):
 @session_manager
 def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
-    from invenio.modules.oauthclient.utils import oauth_link_external_id
+    from invenio_oauthclient.utils import oauth_link_external_id
     from invenio.ext.sqlalchemy import db
 
     # Retrieve ORCID from response.

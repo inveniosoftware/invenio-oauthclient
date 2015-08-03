@@ -31,12 +31,13 @@ from invenio.ext.sqlalchemy import db
 
 from invenio.testsuite import make_test_suite, run_test_suite
 
+from invenio_oauthclient.contrib.orcid import REMOTE_APP, account_info
+
 from mock import MagicMock
 
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from .helpers import OAuth2ClientTestCase
-from ..contrib.orcid import REMOTE_APP, account_info
 
 
 class OrcidTestCase(OAuth2ClientTestCase):
@@ -75,7 +76,7 @@ class OrcidTestCase(OAuth2ClientTestCase):
 
     def setUp(self):
         """Setup test."""
-        from invenio.modules.oauthclient.models import RemoteToken, \
+        from invenio_oauthclient.models import RemoteToken, \
             RemoteAccount
         from invenio_accounts.models import UserEXT, User
         RemoteToken.query.delete()
@@ -90,7 +91,7 @@ class OrcidTestCase(OAuth2ClientTestCase):
 
     def tearDown(self):
         """Tear down test."""
-        from invenio.modules.oauthclient.models import RemoteToken, \
+        from invenio_oauthclient.models import RemoteToken, \
             RemoteAccount
         from invenio_accounts.models import UserEXT, User
         RemoteToken.query.delete()
@@ -105,7 +106,7 @@ class OrcidTestCase(OAuth2ClientTestCase):
 
     def mock_response(self, app='test', data=None):
         """Mock the oauth response to use the remote."""
-        from invenio.modules.oauthclient.client import oauth
+        from invenio_oauthclient.client import oauth
 
         # Mock oauth remote application
         oauth.remote_apps[app].handle_oauth2_response = MagicMock(
@@ -113,13 +114,13 @@ class OrcidTestCase(OAuth2ClientTestCase):
         )
 
     def _get_state(self):
-        from invenio.modules.oauthclient.views.client import serializer
+        from invenio_oauthclient.views.client import serializer
         return serializer.dumps({'app': 'orcid', 'sid': session.sid,
                                  'next': None, })
 
     def test_account_info(self):
         """Test account info extraction."""
-        from invenio.modules.oauthclient.client import oauth
+        from invenio_oauthclient.client import oauth
         # Ensure remote apps have been loaded (due to before first
         # request)
         self.client.get(url_for("oauthclient.login", remote_app='orcid'))
@@ -158,7 +159,7 @@ class OrcidTestCase(OAuth2ClientTestCase):
         from invenio_accounts.models import UserEXT, User
 
         with self.app.test_client() as c:
-            from invenio.modules.oauthclient.testsuite.fixture import orcid_bio
+            from .fixture import orcid_bio
 
             # Ensure remote apps have been loaded (due to before first
             # request)
@@ -239,7 +240,7 @@ class OrcidTestCase(OAuth2ClientTestCase):
     def test_authorized_already_authenticated(self):
         """Test authorized callback with sign-up."""
         from invenio_accounts.models import UserEXT, User
-        from invenio.modules.oauthclient.testsuite.fixture import orcid_bio
+        from .fixture import orcid_bio
 
         # User logins
         self.login("tester", "tester")

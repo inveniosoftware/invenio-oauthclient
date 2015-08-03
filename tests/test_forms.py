@@ -26,9 +26,9 @@ from sqlalchemy.exc import SQLAlchemyError
 
 class FormTestCase(InvenioTestCase):
 
-    @patch('invenio.modules.oauthclient.forms.User')
+    @patch('invenio_oauthclient.forms.User')
     def test_validate_email(self, User):
-        from invenio.modules.oauthclient.forms import EmailSignUpForm
+        from invenio_oauthclient.forms import EmailSignUpForm
 
         self.assertFalse(EmailSignUpForm(email='invalidemail').validate())
 

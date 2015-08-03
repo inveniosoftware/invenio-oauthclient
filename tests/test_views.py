@@ -31,6 +31,7 @@ from .helpers import OAuth2ClientTestCase
 
 
 class RemoteAccountTestCase(OAuth2ClientTestCase):
+
     def setUp(self):
         params = lambda x: dict(
             request_token_params={'scope': ''},
@@ -63,7 +64,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
         self.handled_args = None
         self.handled_kwargs = None
 
-        from invenio.modules.oauthclient.models import RemoteToken, \
+        from invenio_oauthclient.models import RemoteToken, \
             RemoteAccount
         RemoteToken.query.delete()
         RemoteAccount.query.delete()
@@ -75,7 +76,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
         self.handled_args = None
         self.handled_kwargs = None
 
-        from invenio.modules.oauthclient.models import RemoteToken, \
+        from invenio_oauthclient.models import RemoteToken, \
             RemoteAccount
         RemoteToken.query.delete()
         RemoteAccount.query.delete()
@@ -96,7 +97,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
 
     def mock_response(self, app='test', data=None):
         """ Mock the oauth response to use the remote """
-        from invenio.modules.oauthclient.client import oauth
+        from invenio_oauthclient.client import oauth
 
         # Mock oauth remote application
         oauth.remote_apps[app].handle_oauth2_response = MagicMock(
@@ -108,7 +109,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
         )
 
     def test_redirect_uri(self):
-        from invenio.modules.oauthclient.views.client import serializer
+        from invenio_oauthclient.views.client import serializer
 
         # Test redirect
         resp = self.client.get(
@@ -176,7 +177,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
             self.mock_response(app='test')
             self.mock_response(app='test_invalid')
 
-            from invenio.modules.oauthclient.views.client import serializer
+            from invenio_oauthclient.views.client import serializer
 
             state = serializer.dumps({
                 'app': 'test',
@@ -217,7 +218,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
 
     def test_invalid_authorized_response(self):
         from simplejson import JSONDecodeError
-        from invenio.modules.oauthclient.client import oauth
+        from invenio_oauthclient.client import oauth
 
         # Fake an authorized request
         with self.app.test_client() as c:
@@ -229,7 +230,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 side_effect=JSONDecodeError('Expecting value', '', 0)
             )
 
-            from invenio.modules.oauthclient.views.client import serializer
+            from invenio_oauthclient.views.client import serializer
 
             state = serializer.dumps({
                 'app': 'test',
@@ -249,9 +250,9 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
             )
 
 
-    @patch('invenio.modules.oauthclient.views.client.session')
+    @patch('invenio_oauthclient.views.client.session')
     def test_state_token(self, session):
-        from invenio.modules.oauthclient.views.client import serializer
+        from invenio_oauthclient.views.client import serializer
 
         # Mock session id
         session.sid = '1234'
@@ -309,11 +310,11 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
         ))
 
     @patch('invenio.ext.session.interface.SessionInterface.save_session')
-    @patch('invenio.modules.oauthclient.views.client.session')
+    @patch('invenio_oauthclient.views.client.session')
     def test_token_getter_setter(self, session, save_session):
-        from invenio.modules.oauthclient.models import RemoteToken
-        from invenio.modules.oauthclient.handlers import token_getter
-        from invenio.modules.oauthclient.client import oauth
+        from invenio_oauthclient.models import RemoteToken
+        from invenio_oauthclient.handlers import token_getter
+        from invenio_oauthclient.client import oauth
 
         # Mock user
         user = MagicMock()
@@ -385,9 +386,9 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 assert t is None
 
     @patch('invenio.ext.session.interface.SessionInterface.save_session')
-    @patch('invenio.modules.oauthclient.views.client.session')
+    @patch('invenio_oauthclient.views.client.session')
     def test_rejected(self, session, save_session):
-        from invenio.modules.oauthclient.client import oauth
+        from invenio_oauthclient.client import oauth
 
         # Mock user id
         user = MagicMock()
@@ -419,7 +420,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 # Imitate that the user authorized our request in the remote
                 # application (however, the remote app will son reply with an
                 # error)
-                from invenio.modules.oauthclient.views.client import serializer
+                from invenio_oauthclient.views.client import serializer
                 state = serializer.dumps({
                     'app': 'full', 'sid': '1234',  'next': None,
                 })
@@ -432,7 +433,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
 
     def test_settings_view(self):
         # Create a remove account (linked account)
-        from invenio.modules.oauthclient.models import RemoteAccount
+        from invenio_oauthclient.models import RemoteAccount
         RemoteAccount.create(1, 'testid', None)
 
         self.assert401(self.client.get(url_for('oauthclient_settings.index'),

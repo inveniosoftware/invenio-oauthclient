@@ -26,6 +26,7 @@ from invenio.config import SECRET_KEY as secret_key
 from invenio.ext.sqlalchemy import db
 from invenio_accounts.models import User
 
+
 class TextEncryptedType(EncryptedType):
 
     impl = db.Text

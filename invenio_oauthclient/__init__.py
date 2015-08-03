@@ -70,7 +70,9 @@ flow with ORCID:
    .. code-block:: http
 
       HTTP/1.1 302 FOUND
-      Location: https://orcid.org/oauth/authorize?response_type=code&client_id=<CLIENT KEY>&redirect_uri=https://localhost/oauth/authorized/orcid/&scope=/authenticate&state=...
+      Location: https://orcid.org/oauth/authorize?response_type=code&\
+      client_id=<CLIENT KEY>&redirect_uri=https://localhost/oauth/\
+      authorized/orcid/&scope=/authenticate&state=...
 
   Note, following query parameters in the authorize URL:
 
@@ -99,7 +101,8 @@ flow with ORCID:
    .. code-block:: http
 
        HTTP/1.1 302 FOUND
-       Location: https://localhost/oauth/authorized/orcid/?code=<CODE>&state=...
+       Location: https://localhost/oauth/authorized/orcid/?code=<CODE>&\
+       state=...
 
    Included in the redirect is a one-time *auth code* which is typically only
    valid for short time (seconds), as well as the ``state`` token initially
@@ -137,18 +140,21 @@ flow with ORCID:
 
 Further reading:
 
-- `RFC6749 - The OAuth 2.0 Authorization Framework <http://tools.ietf.org/html/rfc6749>`_
+- `RFC6749 - The OAuth 2.0 Authorization Framework
+  <http://tools.ietf.org/html/rfc6749>`_
 
-- `OAuth 2 Simplified <http://aaronparecki.com/articles/2012/07/29/1/oauth2-simplified>`_
+- `OAuth 2 Simplified
+  <http://aaronparecki.com/articles/2012/07/29/1/oauth2-simplified>`_
 
-- `Flask-OAuthlib <http://flask-oauthlib.readthedocs.org/en/latest/client.html>`_
+- `Flask-OAuthlib
+  <http://flask-oauthlib.readthedocs.org/en/latest/client.html>`_
 
 - `OAuthlib <http://oauthlib.readthedocs.org/en/latest/>`_
 
 Usage
 -----
 
-1. Edit your configuration. Ensure ``invenio.modules.oauthclient`` is included
+1. Edit your configuration. Ensure ``invenio_oauthclient`` is included
    in ``PACKAGES`` (by default it's included).
 
 
@@ -158,7 +164,7 @@ Usage
 
     PACKAGES = [
         # ...
-        'invenio.modules.oauthclient',
+        'invenio_oauthclient',
         # ...
     ]
 
@@ -169,3 +175,9 @@ Usage
 See :ref:`module_oauthclient_conf` for how to define remote applications in
 ``OAUTHCLIENT_REMOTE_APPS``.
 """
+
+from __future__ import absolute_import, print_function, unicode_literals
+
+from .version import __version__
+
+__all__ = ('__version__', )

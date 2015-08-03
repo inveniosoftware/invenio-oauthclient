@@ -51,7 +51,7 @@ def do_upgrade():
         op.create_table(
             'remoteTOKEN',
             db.Column('id_remote_account', db.Integer(display_width=15),
-                    nullable=False),
+                      nullable=False),
             db.Column('token_type', db.String(length=40), nullable=False),
             db.Column('access_token', db.Text(), nullable=False),
             db.Column('secret', db.Text(), nullable=False),
