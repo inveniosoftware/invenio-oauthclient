@@ -159,7 +159,7 @@ REMOTE_SANDBOX_APP["params"].update(dict(
 ))
 
 REMOTE_APP_RESOURCE_API_URL = "https://oauthresource.web.cern.ch/api/Me"
-REMOTE_APP_RESOURCE_SCHEMA = "http://schemas.xmlsoap.org/claims"
+REMOTE_APP_RESOURCE_SCHEMA = "http://schemas.xmlsoap.org/claims/"
 
 
 def fetch_groups(groups):
@@ -184,7 +184,8 @@ def get_dict_from_response(response):
     """Prepare new mapping with 'Value's groupped by 'Type'."""
     result = {}
     for i in response.data:
-        k = i['Type']
+        #strip the schema from the key
+        k = i['Type'].replace(REMOTE_APP_RESOURCE_SCHEMA,'')
         result.setdefault(k, list())
         result[k].append(i['Value'])
     return result
@@ -195,21 +196,29 @@ def account_info(remote, resp):
     # Query CERN Resources to get user info and groups
     response = remote.get(REMOTE_APP_RESOURCE_API_URL)
     res = get_dict_from_response(response)
-    email = res['{0}/{1}'.format(REMOTE_APP_RESOURCE_SCHEMA,
-                                 'EmailAddress')][0]
-    common_name = res['{0}/{1}'.format(REMOTE_APP_RESOURCE_SCHEMA,
-                                       'CommonName')][0]
-    return dict(email=email, nickname=common_name)
+
+    email = res['EmailAddress'][0]
+    common_name = res['CommonName'][0]
+
+    return dict(email=email.lower(), nickname=common_name)
 
 
 def account_setup(remote, token):
     """Perform additional setup after user have been logged in."""
+    from invenio.ext.sqlalchemy import db
+
     response = remote.get(REMOTE_APP_RESOURCE_API_URL)
+    user = token.remote_account.user
 
     if response.status == requests.codes.ok:
         res = get_dict_from_response(response)
-        current_user.info['group'] = fetch_groups(res['{0}/{1}'.format(
-            REMOTE_APP_RESOURCE_SCHEMA, 'Group'
-        )])
+        current_user.info['group'] = fetch_groups(res['Group'])
         current_user.modified = True
         current_user.save()
+
+        if user and not any([user.family_name, user.given_names]):
+            user.family_name = res['Lastname'][0]
+            user.given_names = res['Firstname'][0]
+
+            db.session.add(user)
+            current_user.reload()

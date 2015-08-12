@@ -88,6 +88,10 @@ def oauth_register(account_info, form_data=None):
         email = form_data.get("email")
 
     if email:
+        note = '1'
+        if cfg['CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT']:
+            note = '2'
+
         if not User.query.filter_by(email=email).first():
             # Email does not already exists. so we can proceed to register
             # user.
@@ -95,8 +99,7 @@ def oauth_register(account_info, form_data=None):
                 nickname=account_info.get('nickname', ''),
                 email=email,
                 password=None,
-                # email has to be validated
-                note='2',
+                note=note
             )
 
             try:
@@ -107,7 +110,7 @@ def oauth_register(account_info, form_data=None):
                 return None
 
             # verify the email
-            if cfg['CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT']:
+            if note == '2':
                 u.verify_email()
 
             return UserInfo(u.id)
