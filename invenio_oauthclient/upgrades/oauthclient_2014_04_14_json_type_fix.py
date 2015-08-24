@@ -17,7 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.modules.upgrader.api import op
+from invenio_upgrader.api import op
 from sqlalchemy.dialects import mysql
 
 depends_on = [u'oauthclient_2014_03_02_initial']

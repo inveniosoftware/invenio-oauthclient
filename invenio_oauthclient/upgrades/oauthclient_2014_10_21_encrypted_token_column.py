@@ -18,7 +18,7 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.legacy.dbquery import run_sql
-from invenio.modules.upgrader.api import op
+from invenio_upgrader.api import op
 
 
 depends_on = [u'oauthclient_2014_08_25_extra_data_nullable']

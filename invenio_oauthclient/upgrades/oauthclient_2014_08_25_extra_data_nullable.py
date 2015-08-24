@@ -18,7 +18,7 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from sqlalchemy.dialects import mysql
-from invenio.modules.upgrader.api import op
+from invenio_upgrader.api import op
 
 
 depends_on = ['oauthclient_2014_04_14_json_type_fix']

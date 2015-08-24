@@ -41,6 +41,7 @@ requirements = [
     # FIXME new oauthlib release after 0.7.2 has some compatible problems with
     # the used Flask-Oauthlib version.
     'oauthlib==0.7.2',
+    'invenio-upgrader>=0.1.0',
 ]
 
 test_requirements = [
