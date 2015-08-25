@@ -23,7 +23,7 @@
 include *.py
 include *.rst
 include *.txt
-include .dockerignore .editorconfig
+include .dockerignore .editorconfig .travis.yml
 include LICENSE
 include pytest.ini
 include tox.ini
