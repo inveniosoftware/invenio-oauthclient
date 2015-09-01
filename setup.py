@@ -34,6 +34,7 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 requirements = [
+    'Babel>=1.3',
     'Flask>=0.10.1',
     'six>=1.7.2',
     'invenio-accounts>=0.1.0',
@@ -45,12 +46,13 @@ requirements = [
 ]
 
 test_requirements = [
-    'pytest>=2.7.0',
-    'pytest-cov>=1.8.0',
-    'pytest-pep8>=1.0.6',
     'coverage>=3.7.1',
     'flask-testing>=0.4.1',
     'httpretty>=0.8.10',
+    'pytest>=2.7.0',
+    'pytest-cov>=1.8.0',
+    'pytest-pep8>=1.0.6',
+    'unittest2>=1.1.0',
 ]
 
 

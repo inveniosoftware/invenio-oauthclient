@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of Invenio-OAuthClient
+# This file is part of Invenio
 # Copyright (C) 2015 CERN
 #
 # Invenio is free software; you can redistribute it and/or
@@ -21,8 +21,11 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
+
 notifications:
   email: false
+
+sudo: false
 
 services:
   - mysql
@@ -35,26 +38,24 @@ cache:
   - pip
 
 env:
-  - REQUIREMENTS=lowest REXTRAS=docs,test
-  - REQUIREMENTS=release REXTRAS=docs,test
-  - REQUIREMENTS=devel REXTRAS=docs,test
+  - REQUIREMENTS=lowest REXTRAS=docs,tests
+  - REQUIREMENTS=release REXTRAS=docs,tests
+  - REQUIREMENTS=devel REXTRAS=docs,tests
 
 python:
   - "2.7"
 
 before_install:
-  - "sudo apt-get update"
-  - "sudo apt-get install python-dev"
   - "travis_retry pip install --upgrade pip"
-  - "travis_retry pip install mock"
+  - "travis_retry pip install yajl mock twine wheel"
   - "python requirements.py --extras=$REXTRAS --level=min > .travis-lowest-requirements.txt"
   - "python requirements.py --extras=$REXTRAS --level=pypi > .travis-release-requirements.txt"
   - "python requirements.py --extras=$REXTRAS --level=dev > .travis-devel-requirements.txt"
 
 install:
-  - "travis_retry pip install unittest2"
-  - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external --quiet"
-  - "travis_retry pip install -e .[$REXTRAS] --quiet --process-dependency-links"
+  - "travis_retry pip install -e git+https://github.com/inveniosoftware/invenio.git#egg=Invenio"
+  - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external"
+  - "travis_retry pip install -e .[$REXTRAS]"
 
 before_script:
   - "inveniomanage database init --yes-i-know || echo ':('"
@@ -66,3 +67,13 @@ script:
 
 after_success:
   - coveralls
+
+deploy:
+  provider: pypi
+  user: jirikuncar
+  password:
+    secure: rTqKzvL7g0LMzIiyGIUog9I8ZpS7BVCxA9EuL5H8xRZDQ/OeEr1p1MXVSa3udFuyB8IAJ02ZZ+u8DgA9EqvnssJjqifgCN75xK4f5HhcDwIz69lPDL47iK15Pc0zOYL6QL8Hk/ZMqGCSZ87GquxG3LTD7VuEeqQLn5uitdq7mMmLu8HYDIHLXHwEJsJ9hA0wPmgR1jytG5q/NNdIFzUPTgfwmvR+pC//jjKQE8re+dU16aUiXJPv67UjitX9laM9bEnL5s7FA7bRrY174OmrIayRn9khBJTQfR5ilyhGMiaDWF2G6g5MXXJggC4NCrTx3jRFDODJFdii+BMCx3CUe57ax1QtfZ2oeNBfH15gVAUtjyXwAULy+mr/neGYKjWxUMuPXI90TVFqTiAmGyMGvxn3OHQc5fXo9xh3sHfimXGEebDo6yrBxzUylTrM3C8evOjC51Wml603/iTszenX/vTpBYVgkNWVldqiHgNj2W9cDpkVi3o/KCigZhq3r2vB4xlI/rOUnG7cagmb7jYjrYNwnvt0Hwg5C+c9GPv8O48CIVU7P3dZDeezxslpOBVdB0Wxp8WdxH8IfqjJavQ4DRo78PIZy3CKsY3CDM5tAqD9Hn+kUoOzDlmVr663w9iiAUBCWLHs41S73n7JLqEq8sYuMTO5sqvHAaJ0GWCO8xE=
+  distributions: "compile_catalog sdist bdist_wheel"
+  on:
+    tags: true
+    python: "2.7"
