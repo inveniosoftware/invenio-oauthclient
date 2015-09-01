@@ -1,0 +1,55 @@
+# Translations template for invenio-oauthclient.
+# Copyright (C) 2015 CERN
+# This file is distributed under the same license as the invenio-oauthclient
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: invenio-oauthclient 0.1.1.dev20150804\n"
+"Report-Msgid-Bugs-To: info@invenio-software.org\n"
+"POT-Creation-Date: 2015-09-01 14:57+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+#: invenio_oauthclient/forms.py:37
+msgid "Email address"
+msgstr ""
+
+#: invenio_oauthclient/forms.py:38
+msgid "Required."
+msgstr ""
+
+#: invenio_oauthclient/forms.py:53
+#, python-format
+msgid ""
+"Email address %(addr)s already exists in the database. If this is your "
+"address, please sign-in and go to Profile > Linked Accounts to link your "
+"account."
+msgstr ""
+
+#: invenio_oauthclient/templates/oauthclient/signup_base.html:34
+msgid ""
+"Fill in your details to complete your registration. You only have to do "
+"this once."
+msgstr ""
+
+#: invenio_oauthclient/templates/oauthclient/signup_base.html:44
+msgid "Sign-up"
+msgstr ""
+
+#: invenio_oauthclient/views/settings.py:52
+#, python-format
+msgid "%(icon)s Linked accounts"
+msgstr ""
+
+#: invenio_oauthclient/views/settings.py:57
+msgid "Linked accounts"
+msgstr ""
+

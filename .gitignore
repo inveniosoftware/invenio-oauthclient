@@ -15,3 +15,6 @@ dist
 
 # doc
 docs/_build
+
+# ignore compiled translations
+*.mo
