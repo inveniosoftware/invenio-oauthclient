@@ -93,6 +93,8 @@ from flask_login import current_user
 
 import requests
 
+from sqlalchemy.exc import IntegrityError
+
 #: Tunable list of groups to be hidden.
 CFG_EXTERNAL_AUTH_HIDDEN_GROUPS = (
     'All Exchange People',
@@ -209,16 +211,68 @@ def account_setup(remote, token):
 
     response = remote.get(REMOTE_APP_RESOURCE_API_URL)
     user = token.remote_account.user
+    if not user:
+        raise Exception('`user` should not be None, something bad happened!')
 
     if response.status == requests.codes.ok:
         res = get_dict_from_response(response)
-        current_user.info['group'] = fetch_groups(res['Group'])
+
+        # update session object
+        groups_old = current_user.info['group']
+        groups_new = fetch_groups(res['Group'])
+        current_user.info['group'] = groups_new
         current_user.modified = True
         current_user.save()
 
-        if user and not any([user.family_name, user.given_names]):
+        # update DB object
+        modified = False
+
+        # try to add/remove groups
+        try:
+            from invenio_groups.models import Group
+
+            # create sets to cut from O(n^2) to O(n * log(n))
+            groups_old_set = set(groups_old)
+            groups_new_set = set(groups_new)
+
+            for groupname in groups_new_set - groups_old_set:
+                candidates = Group.query \
+                    .filter(Group.name == groupname) \
+                    .filter(Group.is_managed == True) \
+                    .all()
+                for candidate in candidates:
+                    try:
+                        candidate.add_member(user)
+                        db.session.add(candidate)
+                        modified = True
+                    except IntegrityError:
+                        # user is already member of this group
+                        # => we are fine
+                        pass
+            for groupname in groups_old_set - groups_new_set:
+                candidates = Group.query \
+                    .filter(Group.name == groupname) \
+                    .filter(Group.is_managed == True) \
+                    .all()
+                for candidate in candidates:
+                    try:
+                        candidate.remove_member(user)
+                        db.session.add(candidate)
+                        modified = True
+                    except IntegrityError:
+                        # user is not a member of this group
+                        # => we are fine
+                        pass
+        except ImportError:
+            # no invenio-groups installed
+            pass
+
+        # try to add firstname+lastname if not set
+        if not any([user.family_name, user.given_names]):
             user.family_name = res['Lastname'][0]
             user.given_names = res['Firstname'][0]
-
             db.session.add(user)
+            modified = True
+
+        if modified:
             current_user.reload()
