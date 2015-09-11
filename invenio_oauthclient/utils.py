@@ -23,7 +23,7 @@ from flask import current_app
 
 from flask_login import logout_user
 
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 from invenio.ext.login import UserInfo, authenticate
 from invenio.ext.sqlalchemy import db
 

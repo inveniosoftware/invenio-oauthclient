@@ -38,6 +38,7 @@ requirements = [
     'Flask>=0.10.1',
     'six>=1.7.2',
     'invenio-accounts>=0.1.0',
+    'invenio-base>=0.2.1',
     'Flask-OAuthlib>=0.6.0,<0.7',  # quick fix for issue invenio#2158
     # FIXME new oauthlib release after 0.7.2 has some compatible problems with
     # the used Flask-Oauthlib version.
@@ -57,6 +58,7 @@ test_requirements = [
 
 
 class PyTest(TestCommand):
+
     """PyTest Test."""
 
     user_options = [('pytest-args=', 'a', 'Arguments to pass to py.test')]

@@ -27,7 +27,7 @@ from flask import current_app, flash, redirect, render_template, \
     request, session, url_for
 from flask_login import current_user
 
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 
 import six
 

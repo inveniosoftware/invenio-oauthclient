@@ -26,7 +26,7 @@ from flask_login import user_logged_out
 from itsdangerous import BadData, TimedJSONWebSignatureSerializer
 from werkzeug.local import LocalProxy
 
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 from invenio.ext.sslify import ssl_required
 from invenio.utils.url import get_safe_redirect_target
 

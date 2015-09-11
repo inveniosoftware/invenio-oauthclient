@@ -33,7 +33,7 @@ class OAuth2ClientTestCase(InvenioTestCase):
         cfg['PACKAGES'] = [
             'invenio_oauthclient',
             'invenio_accounts',
-            'invenio.base',
+            'invenio_base',
         ]
         cfg['DEBUG'] = False
         return cfg

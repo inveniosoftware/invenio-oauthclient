@@ -21,7 +21,7 @@ from __future__ import absolute_import
 
 import time
 from flask import url_for, session
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 from invenio.ext.sqlalchemy import db
 from invenio.testsuite import make_test_suite, run_test_suite
 from itsdangerous import TimedJSONWebSignatureSerializer

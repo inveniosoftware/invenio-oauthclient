@@ -19,7 +19,7 @@
 
 """Forms for module."""
 
-from invenio.base.i18n import _
+from invenio_base.i18n import _
 from invenio_accounts.models import User
 from invenio_accounts.validators import validate_email
 from invenio.utils.forms import InvenioBaseForm
