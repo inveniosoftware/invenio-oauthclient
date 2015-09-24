@@ -44,6 +44,7 @@ requirements = [
     # the used Flask-Oauthlib version.
     'oauthlib==0.7.2',
     'invenio-upgrader>=0.1.0',
+    'invenio-utils>=0.1.1',
 ]
 
 test_requirements = [

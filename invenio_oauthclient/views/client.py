@@ -28,7 +28,7 @@ from werkzeug.local import LocalProxy
 
 from invenio_base.globals import cfg
 from invenio.ext.sslify import ssl_required
-from invenio.utils.url import get_safe_redirect_target
+from invenio_utils.url import get_safe_redirect_target
 
 from ..client import disconnect_handlers, handlers, oauth, signup_handlers
 from ..handlers import authorized_default_handler, disconnect_handler, \

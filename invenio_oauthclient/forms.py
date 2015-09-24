@@ -22,7 +22,7 @@
 from invenio_base.i18n import _
 from invenio_accounts.models import User
 from invenio_accounts.validators import validate_email
-from invenio.utils.forms import InvenioBaseForm
+from invenio_utils.forms import InvenioBaseForm
 
 from sqlalchemy.exc import SQLAlchemyError
 
