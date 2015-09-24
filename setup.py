@@ -35,16 +35,17 @@ history = open('CHANGES.rst').read()
 
 requirements = [
     'Babel>=1.3',
+    'Flask-OAuthlib>=0.6.0,<0.7',  # quick fix for issue invenio#2158
     'Flask>=0.10.1',
-    'six>=1.7.2',
     'invenio-accounts>=0.1.0',
     'invenio-base>=0.2.1',
-    'Flask-OAuthlib>=0.6.0,<0.7',  # quick fix for issue invenio#2158
+    'invenio-upgrader>=0.1.0',
+    'invenio-utils>=0.1.1',
+    'invenio-ext>=0.2.1',
     # FIXME new oauthlib release after 0.7.2 has some compatible problems with
     # the used Flask-Oauthlib version.
     'oauthlib==0.7.2',
-    'invenio-upgrader>=0.1.0',
-    'invenio-utils>=0.1.1',
+    'six>=1.7.2',
 ]
 
 test_requirements = [

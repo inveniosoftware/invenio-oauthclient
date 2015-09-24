@@ -27,7 +27,7 @@ from flask_email.backends import locmem
 
 import httpretty
 
-from invenio.ext.sqlalchemy import db
+from invenio_ext.sqlalchemy import db
 
 from invenio.testsuite import make_test_suite, run_test_suite
 

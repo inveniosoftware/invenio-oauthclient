@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import
 
-from invenio.ext.sqlalchemy import db
+from invenio_ext.sqlalchemy import db
 
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 

@@ -19,7 +19,7 @@
 
 import warnings
 from sqlalchemy import *
-from invenio.ext.sqlalchemy import db
+from invenio_ext.sqlalchemy import db
 from invenio_upgrader.api import op
 
 depends_on = []

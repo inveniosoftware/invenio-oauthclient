@@ -23,7 +23,7 @@ from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy_utils.types.encrypted import EncryptedType
 
 from invenio.config import SECRET_KEY as secret_key
-from invenio.ext.sqlalchemy import db
+from invenio_ext.sqlalchemy import db
 from invenio_accounts.models import User
 
 

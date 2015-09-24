@@ -205,7 +205,7 @@ def account_info(remote, resp):
 
 def account_setup(remote, token):
     """Perform additional setup after user have been logged in."""
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
 
     response = remote.get(REMOTE_APP_RESOURCE_API_URL)
     user = token.remote_account.user

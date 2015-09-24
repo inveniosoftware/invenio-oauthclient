@@ -29,7 +29,7 @@ from flask_breadcrumbs import register_breadcrumb
 from flask_menu import register_menu
 from invenio_base.i18n import _
 from invenio_base.globals import cfg
-from invenio.ext.sslify import ssl_required
+from invenio_ext.sslify import ssl_required
 
 from ..models import RemoteAccount
 from ..client import oauth

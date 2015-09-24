@@ -27,7 +27,7 @@ from itsdangerous import BadData, TimedJSONWebSignatureSerializer
 from werkzeug.local import LocalProxy
 
 from invenio_base.globals import cfg
-from invenio.ext.sslify import ssl_required
+from invenio_ext.sslify import ssl_required
 from invenio_utils.url import get_safe_redirect_target
 
 from ..client import disconnect_handlers, handlers, oauth, signup_handlers

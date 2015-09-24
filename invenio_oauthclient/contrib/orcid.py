@@ -80,7 +80,7 @@ import copy
 from flask import current_app, redirect, url_for
 from flask_login import current_user
 
-from invenio.ext.sqlalchemy.utils import session_manager
+from invenio_ext.sqlalchemy.utils import session_manager
 
 REMOTE_APP = dict(
     title='ORCID',
@@ -153,7 +153,7 @@ def disconnect_handler(remote, *args, **kwargs):
 def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
     from invenio_oauthclient.utils import oauth_link_external_id
-    from invenio.ext.sqlalchemy import db
+    from invenio_ext.sqlalchemy import db
 
     # Retrieve ORCID from response.
     orcid = resp.get("orcid")
