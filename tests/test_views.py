@@ -314,7 +314,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
             url_for("oauthclient.disconnect", remote_app='invalid')
         ))
 
-    @patch('invenio.ext.session.interface.SessionInterface.save_session')
+    @patch('invenio_ext.session.interface.SessionInterface.save_session')
     @patch('invenio_oauthclient.views.client.session')
     def test_token_getter_setter(self, session, save_session):
         from invenio_oauthclient.models import RemoteToken
@@ -390,7 +390,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 t = RemoteToken.get(1, "fullid")
                 assert t is None
 
-    @patch('invenio.ext.session.interface.SessionInterface.save_session')
+    @patch('invenio_ext.session.interface.SessionInterface.save_session')
     @patch('invenio_oauthclient.views.client.session')
     def test_rejected(self, session, save_session):
         from invenio_oauthclient.client import oauth
