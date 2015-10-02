@@ -19,8 +19,10 @@
 
 from __future__ import absolute_import
 
-from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
+from invenio_testing import InvenioTestCase
+
 from mock import MagicMock, Mock, patch
+
 from sqlalchemy.exc import SQLAlchemyError
 
 
@@ -44,9 +46,3 @@ class FormTestCase(InvenioTestCase):
         self.assertFalse(
             EmailSignUpForm(email='bad@invenio-software.org').validate()
         )
-
-
-TEST_SUITE = make_test_suite(FormTestCase)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)

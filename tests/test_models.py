@@ -21,10 +21,11 @@ from __future__ import absolute_import
 
 from invenio_ext.sqlalchemy import db
 
-from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
+from invenio_testing import InvenioTestCase
 
 
 class BaseTestCase(InvenioTestCase):
+
     def setUp(self):
         from invenio_oauthclient.models import RemoteAccount, RemoteToken
         RemoteToken.query.delete()
@@ -42,6 +43,7 @@ class BaseTestCase(InvenioTestCase):
 
 
 class RemoteAccountTestCase(BaseTestCase):
+
     def test_get_create(self):
         from invenio_oauthclient.models import RemoteAccount
 
@@ -57,6 +59,7 @@ class RemoteAccountTestCase(BaseTestCase):
 
 
 class RemoteTokenTestCase(BaseTestCase):
+
     def setUp(self):
         super(RemoteTokenTestCase, self).setUp()
         from invenio_accounts.models import User
@@ -119,10 +122,3 @@ class RemoteTokenTestCase(BaseTestCase):
             t3.remote_account.user_id
         assert RemoteToken.get(self.u3, "dev").remote_account.user_id == \
             t4.remote_account.user_id
-
-
-TEST_SUITE = make_test_suite(RemoteAccountTestCase, RemoteTokenTestCase)
-
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)

@@ -20,13 +20,19 @@
 from __future__ import absolute_import
 
 import time
-from flask import url_for, session
+
+from flask import session, url_for
+
 from invenio_base.globals import cfg
+
 from invenio_ext.sqlalchemy import db
-from invenio.testsuite import make_test_suite, run_test_suite
+
 from itsdangerous import TimedJSONWebSignatureSerializer
+
 from mock import MagicMock, patch
+
 from six.moves.urllib_parse import parse_qs, urlparse
+
 from .helpers import OAuth2ClientTestCase
 
 
@@ -249,7 +255,6 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 )
             )
 
-
     @patch('invenio_oauthclient.views.client.session')
     def test_state_token(self, session):
         from invenio_oauthclient.views.client import serializer
@@ -447,9 +452,3 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
         assert url_for('oauthclient.login', remote_app='full') in res.data
         assert url_for('oauthclient.login', remote_app='test_invalid') in \
             res.data
-
-
-TEST_SUITE = make_test_suite(RemoteAccountTestCase)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)

@@ -29,8 +29,6 @@ import httpretty
 
 from invenio_ext.sqlalchemy import db
 
-from invenio.testsuite import make_test_suite, run_test_suite
-
 from invenio_oauthclient.contrib.orcid import REMOTE_APP, account_info
 
 from mock import MagicMock
@@ -293,8 +291,3 @@ class OrcidTestCase(OAuth2ClientTestCase):
             method='orcid', id_user=u.id,
             id=self.example_data['orcid']
         ).count()
-
-TEST_SUITE = make_test_suite(OrcidTestCase)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)

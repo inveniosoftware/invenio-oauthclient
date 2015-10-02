@@ -52,6 +52,7 @@ test_requirements = [
     'coverage>=4.0.0',
     'flask-testing>=0.4.1',
     'httpretty>=0.8.10',
+    'invenio-testing>=0.1.1',
     'pytest>=2.8.0',
     'pytest-cov>=2.1.0',
     'pytest-pep8>=1.0.6',
