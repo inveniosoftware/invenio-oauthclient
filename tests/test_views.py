@@ -157,7 +157,8 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
             )
             self.assertEqual(url, state['next'])
 
-    def test_login(self):
+    @patch('webassets.ext.jinja2.AssetsExtension._render_assets')
+    def test_login(self, _render_assets):
         # Test redirect
         resp = self.client.get(
             url_for("oauthclient.login", remote_app='test', next='/')
@@ -307,7 +308,8 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 )
                 self.assert403(resp)
 
-    def test_no_remote_app(self):
+    @patch('webassets.ext.jinja2.AssetsExtension._render_assets')
+    def test_no_remote_app(self, _render_assets):
         self.assert404(self.client.get(
             url_for("oauthclient.authorized", remote_app='invalid')
         ))
@@ -438,7 +440,8 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 ))
                 assert res.status_code == 302
 
-    def test_settings_view(self):
+    @patch('webassets.ext.jinja2.AssetsExtension._render_assets')
+    def test_settings_view(self, _render_assets):
         # Create a remove account (linked account)
         from invenio_oauthclient.models import RemoteAccount
         RemoteAccount.create(1, 'testid', None)
