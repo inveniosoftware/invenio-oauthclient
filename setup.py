@@ -36,6 +36,7 @@ history = open('CHANGES.rst').read()
 requirements = [
     'Babel>=1.3',
     'Flask-Breadcrumbs>=0.2',
+    'Flask-Menu>=0.2',
     'Flask-OAuthlib>=0.6.0,<0.7',  # quick fix for issue invenio#2158
     'Flask>=0.10.1',
     'invenio-accounts>=0.1.0',
