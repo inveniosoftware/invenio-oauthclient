@@ -51,6 +51,7 @@ requirements = [
     'six>=1.7.2',
     'SQLAlchemy>=1.0',
     'SQLAlchemy-Utils[encrypted]>=0.30.1',
+    'WTForms>=2.0.1',
 ]
 
 test_requirements = [
