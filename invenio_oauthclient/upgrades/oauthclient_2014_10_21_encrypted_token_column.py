@@ -17,11 +17,12 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.legacy.dbquery import run_sql
+
+from invenio_ext.sqlalchemy import db
 
 from invenio_upgrader.api import op
 
-from ..models import secret_key
+from ..models import RemoteToken, secret_key
 
 depends_on = [u'oauthclient_2014_08_25_extra_data_nullable']
 
@@ -35,19 +36,23 @@ def do_upgrade():
     from sqlalchemy_utils.types.encrypted import AesEngine
     engine = AesEngine()
     engine._update_key(secret_key())
-    for row in run_sql(
-            "SELECT id_remote_account, token_type, access_token "
-            "FROM remoteTOKEN"):
-        run_sql(
-            "UPDATE remoteTOKEN SET access_token=%s "
-            "WHERE id_remote_account=%s AND "
-            "token_type=%s", (engine.encrypt(row[2]), row[0], row[1]))
+    with db.session.begin_nested():
+        for row in db.session.execute(
+                "SELECT id_remote_account, token_type, access_token "
+                "FROM remoteTOKEN"):
+            db.session.execute(
+                "UPDATE remoteTOKEN SET access_token=:token "
+                "WHERE id_remote_account=:account AND "
+                "token_type=:type", {
+                    'token': engine.encrypt(row[2]),
+                    'account': row[0],
+                    'type': row[1],
+                })
+    db.session.commit()
 
 
 def estimate():
     """Estimate running time of upgrade in seconds (optional)."""
     if op.has_table('remoteTOKEN'):
-        return run_sql(
-            "SELECT COUNT(*) AS ids FROM remoteTOKEN"
-        )[0][0]
+        return RemoteToken.query.count()
     return 1
