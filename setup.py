@@ -63,6 +63,7 @@ test_requirements = [
     'pytest>=2.8.0',
     'pytest-cov>=2.1.0',
     'pytest-pep8>=1.0.6',
+    'simplejson>=3.7',
     'unittest2>=1.1.0',
 ]
 
