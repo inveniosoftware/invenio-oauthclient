@@ -21,6 +21,7 @@ from invenio.legacy.dbquery import run_sql
 
 from invenio_upgrader.api import op
 
+from ..models import secret_key
 
 depends_on = [u'oauthclient_2014_08_25_extra_data_nullable']
 
@@ -31,10 +32,9 @@ def info():
 
 def do_upgrade():
     """Implement your upgrades here."""
-    from invenio_base.globals import cfg
     from sqlalchemy_utils.types.encrypted import AesEngine
     engine = AesEngine()
-    engine._update_key(cfg['SECRET_KEY'])
+    engine._update_key(secret_key())
     for row in run_sql(
             "SELECT id_remote_account, token_type, access_token "
             "FROM remoteTOKEN"):

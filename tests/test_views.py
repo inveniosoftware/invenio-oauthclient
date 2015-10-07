@@ -23,7 +23,7 @@ import time
 
 from flask import session, url_for
 
-from invenio_base.globals import cfg
+from invenio_base.wrappers import lazy_import
 
 from invenio_ext.sqlalchemy import db
 
@@ -34,6 +34,8 @@ from mock import MagicMock, patch
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from .helpers import OAuth2ClientTestCase
+
+secret_key = lazy_import('invenio_oauthclient.models.secret_key')
 
 
 class RemoteAccountTestCase(OAuth2ClientTestCase):
@@ -279,7 +281,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
             self.assert200(resp)
 
             outdated_serializer = TimedJSONWebSignatureSerializer(
-                cfg['SECRET_KEY'],
+                secret_key(),
                 expires_in=0,
             )
 

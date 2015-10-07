@@ -19,15 +19,21 @@
 
 """Models for storing access tokens and links between users and remote apps."""
 
-from invenio_accounts.models import User
-
-from invenio_base.globals import cfg
+from flask import current_app
 
 from invenio_ext.sqlalchemy import db
+
+from invenio_accounts.models import User
+
 
 from sqlalchemy.ext.mutable import MutableDict
 
 from sqlalchemy_utils.types.encrypted import EncryptedType
+
+
+def secret_key():
+    """Return secret key."""
+    return current_app.config['SECRET_KEY'].encode('utf-8')
 
 
 class TextEncryptedType(EncryptedType):
@@ -141,7 +147,7 @@ class RemoteToken(db.Model):
     """Type of token."""
 
     access_token = db.Column(TextEncryptedType(type_in=db.Text,
-                                               key=cfg['SECRET_KEY']),
+                                               key=secret_key),
                              nullable=False)
     """Access token to remote application."""
 
