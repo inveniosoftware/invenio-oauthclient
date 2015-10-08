@@ -20,14 +20,22 @@
 from __future__ import absolute_import
 
 import time
-from flask import url_for, session
-from invenio_base.globals import cfg
+
+from flask import session, url_for
+
+from invenio_base.wrappers import lazy_import
+
 from invenio_ext.sqlalchemy import db
-from invenio.testsuite import make_test_suite, run_test_suite
+
 from itsdangerous import TimedJSONWebSignatureSerializer
+
 from mock import MagicMock, patch
+
 from six.moves.urllib_parse import parse_qs, urlparse
+
 from .helpers import OAuth2ClientTestCase
+
+secret_key = lazy_import('invenio_oauthclient.models.secret_key')
 
 
 class RemoteAccountTestCase(OAuth2ClientTestCase):
@@ -149,7 +157,8 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
             )
             self.assertEqual(url, state['next'])
 
-    def test_login(self):
+    @patch('webassets.ext.jinja2.AssetsExtension._render_assets')
+    def test_login(self, _render_assets):
         # Test redirect
         resp = self.client.get(
             url_for("oauthclient.login", remote_app='test', next='/')
@@ -249,7 +258,6 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 )
             )
 
-
     @patch('invenio_oauthclient.views.client.session')
     def test_state_token(self, session):
         from invenio_oauthclient.views.client import serializer
@@ -274,7 +282,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
             self.assert200(resp)
 
             outdated_serializer = TimedJSONWebSignatureSerializer(
-                cfg['SECRET_KEY'],
+                secret_key(),
                 expires_in=0,
             )
 
@@ -300,7 +308,8 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 )
                 self.assert403(resp)
 
-    def test_no_remote_app(self):
+    @patch('webassets.ext.jinja2.AssetsExtension._render_assets')
+    def test_no_remote_app(self, _render_assets):
         self.assert404(self.client.get(
             url_for("oauthclient.authorized", remote_app='invalid')
         ))
@@ -309,7 +318,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
             url_for("oauthclient.disconnect", remote_app='invalid')
         ))
 
-    @patch('invenio.ext.session.interface.SessionInterface.save_session')
+    @patch('invenio_ext.session.interface.SessionInterface.save_session')
     @patch('invenio_oauthclient.views.client.session')
     def test_token_getter_setter(self, session, save_session):
         from invenio_oauthclient.models import RemoteToken
@@ -385,7 +394,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 t = RemoteToken.get(1, "fullid")
                 assert t is None
 
-    @patch('invenio.ext.session.interface.SessionInterface.save_session')
+    @patch('invenio_ext.session.interface.SessionInterface.save_session')
     @patch('invenio_oauthclient.views.client.session')
     def test_rejected(self, session, save_session):
         from invenio_oauthclient.client import oauth
@@ -431,7 +440,8 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 ))
                 assert res.status_code == 302
 
-    def test_settings_view(self):
+    @patch('webassets.ext.jinja2.AssetsExtension._render_assets')
+    def test_settings_view(self, _render_assets):
         # Create a remove account (linked account)
         from invenio_oauthclient.models import RemoteAccount
         RemoteAccount.create(1, 'testid', None)
@@ -447,9 +457,3 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
         assert url_for('oauthclient.login', remote_app='full') in res.data
         assert url_for('oauthclient.login', remote_app='test_invalid') in \
             res.data
-
-
-TEST_SUITE = make_test_suite(RemoteAccountTestCase)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)

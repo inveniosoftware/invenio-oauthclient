@@ -29,11 +29,9 @@ import httpretty
 
 from invenio_ext.sqlalchemy import db
 
-from invenio.testsuite import make_test_suite, run_test_suite
-
 from invenio_oauthclient.contrib.orcid import REMOTE_APP, account_info
 
-from mock import MagicMock
+from mock import MagicMock, patch
 
 from six.moves.urllib_parse import parse_qs, urlparse
 
@@ -154,7 +152,8 @@ class OrcidTestCase(OAuth2ClientTestCase):
         assert params['client_id']
         assert params['state']
 
-    def test_authorized_signup(self):
+    @patch('webassets.ext.jinja2.AssetsExtension._render_assets')
+    def test_authorized_signup(self, _render_assets):
         """Test authorized callback with sign-up."""
         from invenio_accounts.models import UserEXT, User
 
@@ -237,7 +236,8 @@ class OrcidTestCase(OAuth2ClientTestCase):
             # Check message flash
             self.assertEqual(session['_flashes'][0][0], 'info')
 
-    def test_authorized_already_authenticated(self):
+    @patch('webassets.ext.jinja2.AssetsExtension._render_assets')
+    def test_authorized_already_authenticated(self, _render_assets):
         """Test authorized callback with sign-up."""
         from invenio_accounts.models import UserEXT, User
         from .fixture import orcid_bio
@@ -293,8 +293,3 @@ class OrcidTestCase(OAuth2ClientTestCase):
             method='orcid', id_user=u.id,
             id=self.example_data['orcid']
         ).count()
-
-TEST_SUITE = make_test_suite(OrcidTestCase)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)

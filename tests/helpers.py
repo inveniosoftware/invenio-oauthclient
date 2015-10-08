@@ -19,8 +19,9 @@
 
 from __future__ import absolute_import
 
+from invenio_testing import InvenioTestCase
+
 from mock import MagicMock
-from invenio.testsuite import InvenioTestCase
 
 
 class OAuth2ClientTestCase(InvenioTestCase):

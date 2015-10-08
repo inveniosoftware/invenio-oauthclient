@@ -34,7 +34,6 @@ services:
 language: python
 
 cache:
-  - apt
   - pip
 
 env:
@@ -47,21 +46,23 @@ python:
 
 before_install:
   - "travis_retry pip install --upgrade pip"
-  - "travis_retry pip install yajl mock twine wheel"
+  - "travis_retry pip install check-manifest yajl mock twine wheel coveralls"
   - "python requirements.py --extras=$REXTRAS --level=min > .travis-lowest-requirements.txt"
   - "python requirements.py --extras=$REXTRAS --level=pypi > .travis-release-requirements.txt"
   - "python requirements.py --extras=$REXTRAS --level=dev > .travis-devel-requirements.txt"
 
 install:
-  - "travis_retry pip install -e git+https://github.com/inveniosoftware/invenio.git#egg=Invenio"
   - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external"
   - "travis_retry pip install -e .[$REXTRAS]"
+  - "mkdir -p ${VIRTUAL_ENV}/var/invenio.base-instance/"
+  - "cp .travis.invenio.cfg ${VIRTUAL_ENV}/var/invenio.base-instance/invenio.cfg"
 
 before_script:
-  - "inveniomanage database init --yes-i-know || echo ':('"
-  - "inveniomanage database create --quiet || echo ':('"
+  - "inveniomanage database init --yes-i-know"
+  - "inveniomanage database create --quiet"
 
 script:
+  - "check-manifest --ignore .travis-\\*-requirements.txt"
   - "sphinx-build -qnN docs docs/_build/html"
   - "python setup.py test"
 

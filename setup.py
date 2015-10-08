@@ -35,10 +35,13 @@ history = open('CHANGES.rst').read()
 
 requirements = [
     'Babel>=1.3',
+    'Flask-Breadcrumbs>=0.2',
+    'Flask-Menu>=0.2',
+    'Flask-Login>=0.2.7',
     'Flask-OAuthlib>=0.6.0,<0.7',  # quick fix for issue invenio#2158
     'Flask>=0.10.1',
     'invenio-accounts>=0.1.0',
-    'invenio-base>=0.2.1',
+    'invenio-base>=0.3.0',
     'invenio-upgrader>=0.1.0',
     'invenio-utils>=0.1.1',
     'invenio-ext>=0.2.1',
@@ -46,15 +49,21 @@ requirements = [
     # the used Flask-Oauthlib version.
     'oauthlib==0.7.2',
     'six>=1.7.2',
+    'SQLAlchemy>=1.0',
+    'SQLAlchemy-Utils[encrypted]>=0.30.1',
+    'WTForms>=2.0.1',
 ]
 
 test_requirements = [
-    'coverage>=3.7.1',
+    'coverage>=4.0.0',
     'flask-testing>=0.4.1',
     'httpretty>=0.8.10',
-    'pytest>=2.7.0',
-    'pytest-cov>=1.8.0',
+    'mock>=1.3.0',
+    'invenio-testing>=0.1.1',
+    'pytest>=2.8.0',
+    'pytest-cov>=2.1.0',
     'pytest-pep8>=1.0.6',
+    'simplejson>=3.7',
     'unittest2>=1.1.0',
 ]
 
@@ -87,9 +96,6 @@ class PyTest(TestCommand):
         """Run tests."""
         # import here, cause outside the eggs aren't loaded
         import pytest
-        import _pytest.config
-        pm = _pytest.config.get_plugin_manager()
-        pm.consider_setuptools_entrypoints()
         errno = pytest.main(self.pytest_args)
         sys.exit(errno)
 

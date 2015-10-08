@@ -20,6 +20,7 @@
 """Registries of handlers for oauthclient."""
 
 from flask_oauthlib.client import OAuth
+
 from flask_registry import DictRegistry, RegistryProxy
 
 oauth = OAuth()
