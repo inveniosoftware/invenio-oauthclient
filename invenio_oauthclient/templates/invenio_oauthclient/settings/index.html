@@ -1,3 +1,4 @@
+
 {#
 # This file is part of Invenio.
 # Copyright (C) 2014, 2015 CERN.
@@ -17,16 +18,11 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{%- import "accounts/settings/helpers.html" as helpers with context %}
-{%- from "_formhelpers.html" import render_field with context %}
-{%- extends "accounts/settings/index.html" %}
+{%- extends config.OAUTHCLIENT_SETTINGS_TEMPLATE %}
 
-{% block settings_body %}
-{{helpers.panel_start(
-    'Linked accounts',
-    with_body=False,
-    icon="fa fa-link fa-fw"
-)}}
+{% from "invenio_oauthclient/_macros.html" import render_field, form_errors %}
+
+{% block settings_form %}
 <div class="panel-body">
     {% block oauth_body_text %}
     <p>Tired of entering password for {{config.CFG_SITE_NAME}} every time you sign in? Setup single sign-on with one or more of the services below:</p>
@@ -38,9 +34,9 @@
     {% block oauth_controls scoped %}
     <div class="pull-right">
         {%- if s.account -%}
-        <a href="{{url_for('oauthclient.disconnect', remote_app=s.appid)}}" class="btn btn-default btn-xs"><i class="fa fa-times-circle"></i> Disconnect</a>
+        <a href="{{url_for('invenio_oauthclient.disconnect', remote_app=s.appid)}}" class="btn btn-default btn-xs"><i class="fa fa-times-circle"></i> Disconnect</a>
         {%- else -%}
-        <a href="{{url_for('oauthclient.login', remote_app=s.appid)}}" class="btn btn-default btn-xs"><i class="fa fa-link"></i> Connect</a>
+        <a href="{{url_for('invenio_oauthclient.login', remote_app=s.appid)}}" class="btn btn-default btn-xs"><i class="fa fa-link"></i> Connect</a>
         {%- endif -%}
     </div>
     {% endblock oauth_controls %}
@@ -48,5 +44,4 @@
     </li>
     {%- endfor %}
 </ul>
-{{helpers.panel_end(with_body=False)}}
 {% endblock %}

@@ -17,15 +17,14 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Module level errors. """
+"""Module level errors."""
 
 
 class OAuthError(Exception):
-
     """Base class for OAuth exceptions."""
 
     def __init__(self, message, remote):
-        """ Initialize exception.
+        """Initialize exception.
 
         :param message: Error message.
         :param message: Remote application.
@@ -35,11 +34,10 @@ class OAuthError(Exception):
 
 
 class OAuthResponseError(OAuthError):
-
     """Define response exception during OAuth process."""
 
     def __init__(self, message, remote, response):
-        """ Initialize exception.
+        """Initialize exception.
 
         :param message: Error message.
         :param remote: Remote application.
@@ -50,12 +48,10 @@ class OAuthResponseError(OAuthError):
 
 
 class OAuthRejectedRequestError(OAuthResponseError):
-
     """Define exception of rejected response during OAuth process."""
 
 
 class OAuthClientError(OAuthResponseError):
-
     """Define OAuth client exception.
 
     Client errors happens when the client (i.e. Invenio) creates an invalid
@@ -63,7 +59,7 @@ class OAuthClientError(OAuthResponseError):
     """
 
     def __init__(self, message, remote, response):
-        """ Initialize exception.
+        """Initialize exception.
 
         :param message: Error message.
         :param remote: Remote application.

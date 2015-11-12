@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2014, 2015 CERN.
+    Copyright (C) 2015 CERN.
 
     Invenio is free software; you can redistribute it
     and/or modify it under the terms of the GNU General Public License as
@@ -21,63 +21,54 @@
     waive the privileges and immunities granted to it by virtue of its status
     as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-.. _module_oauthclient:
 
-Invenio-OAuthClient
-====================
+API
+===
 
-Contents
-========
+Handlers
+--------
 
-.. toctree::
-   :maxdepth: 2
+.. automodule:: invenio_oauthclient.handlers
+   :members:
 
-.. _module_oauthclient_conf:
+Models
+------
 
-.. include:: ../README.rst
+.. automodule:: invenio_oauthclient.models
+   :members:
 
-User's Guide
-============
+Views
+-----
 
-This part of the documentation will show you how to get started in using
-Invenio-OAuthClient.
+.. automodule:: invenio_oauthclient.views
+   :members:
 
-.. toctree::
-  :maxdepth: 2
+Client
+~~~~~~
 
-  installation
-  howtouse
-  contributing
+.. automodule:: invenio_oauthclient.views.client
+   :members:
 
-API Reference
-=============
+Settings
+~~~~~~~~
 
-If you are looking for information on a specific function, class or method,
-this part of the documentation is for you.
+.. automodule:: invenio_oauthclient.views.settings
+   :members:
 
-.. toctree::
-  :maxdepth: 2
+Forms
+-----
 
-  contrib
-  api
+.. automodule:: invenio_oauthclient.forms
+   :members:
 
-Additional Notes
-================
+Utils
+-----
 
-Notes on how to contribute, legal information and changes are here for the
-interested.
+.. automodule:: invenio_oauthclient.utils
+   :members:
 
-.. toctree::
-   :maxdepth: 1
+Errors
+------
 
-   contributing
-   changes
-   license
-   authors
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. automodule:: invenio_oauthclient.errors
+   :members:

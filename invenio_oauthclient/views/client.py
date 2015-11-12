@@ -22,21 +22,20 @@
 from __future__ import absolute_import
 
 from flask import Blueprint, abort, current_app, request, session, url_for
+
 from flask_login import user_logged_out
+
 from itsdangerous import BadData, TimedJSONWebSignatureSerializer
+
 from werkzeug.local import LocalProxy
 
-from invenio_base.globals import cfg
-from invenio_ext.sslify import ssl_required
-from invenio_utils.url import get_safe_redirect_target
-
-from ..client import disconnect_handlers, handlers, oauth, signup_handlers
 from ..handlers import authorized_default_handler, disconnect_handler, \
-    make_handler, make_token_getter, oauth_logout_handler, set_session_next_url
-
+    make_handler, make_token_getter, oauth_logout_handler, \
+    set_session_next_url, disconnect_handlers, signup_handlers, handlers
+from ..utils import get_safe_redirect_target
 
 blueprint = Blueprint(
-    'oauthclient',
+    'invenio_oauthclient',
     __name__,
     url_prefix="/oauth",
     static_folder="../static",
@@ -46,10 +45,32 @@ blueprint = Blueprint(
 
 serializer = LocalProxy(
     lambda: TimedJSONWebSignatureSerializer(
-        cfg['SECRET_KEY'],
-        expires_in=cfg['OAUTHCLIENT_STATE_EXPIRES'],
+        current_app.config['SECRET_KEY'],
+        expires_in=current_app.config['OAUTHCLIENT_STATE_EXPIRES'],
     )
 )
+
+
+@blueprint.record_once
+def post_ext_init(state):
+    """Setup blueprint."""
+    app = state.app
+
+    app.config.setdefault(
+        "OAUTHCLIENT_SITENAME",
+        app.config.get("THEME_SITENAME", "Invenio"))
+    app.config.setdefault(
+        "OAUTHCLIENT_BASE_TEMPLATE",
+        app.config.get("BASE_TEMPLATE",
+                       "invenio_oauthclient/base.html"))
+    app.config.setdefault(
+        "OAUTHCLIENT_COVER_TEMPLATE",
+        app.config.get("COVER_TEMPLATE",
+                       "invenio_oauthclient/base_cover.html"))
+    app.config.setdefault(
+        "OAUTHCLIENT_SETTINGS_TEMPLATE",
+        app.config.get("SETTINGS_TEMPLATE",
+                       "invenio_oauthclient/settings/base.html"))
 
 
 @blueprint.before_app_first_request
@@ -58,10 +79,13 @@ def setup_app():
     # Connect signal to remove access tokens on logout
     user_logged_out.connect(oauth_logout_handler)
 
+    oauth = current_app.extensions['oauthlib.client']
+
     # Add remote applications
     oauth.init_app(current_app)
 
-    for remote_app, conf in cfg['OAUTHCLIENT_REMOTE_APPS'].items():
+    for remote_app, conf in current_app.config[
+            'OAUTHCLIENT_REMOTE_APPS'].items():
         # Prevent double creation problems
         if remote_app not in oauth.remote_apps:
             remote = oauth.remote_app(
@@ -75,21 +99,16 @@ def setup_app():
         remote.tokengetter(make_token_getter(remote))
 
         # Register authorized handler
-        handlers.register(
-            remote_app,
-            remote.authorized_handler(make_handler(
-                conf.get('authorized_handler', authorized_default_handler),
-                remote,
-            ))
-        )
+        handlers[remote_app] = remote.authorized_handler(make_handler(
+            conf.get('authorized_handler', authorized_default_handler),
+            remote,
+        ))
 
         # Register disconnect handler
-        disconnect_handlers.register(
-            remote_app, make_handler(
-                conf.get('disconnect_handler', disconnect_handler),
-                remote,
-                with_response=False,
-            )
+        disconnect_handlers[remote_app] = make_handler(
+            conf.get('disconnect_handler', disconnect_handler),
+            remote,
+            with_response=False,
         )
 
         # Register sign-up handlers
@@ -113,20 +132,18 @@ def setup_app():
             with_response=False
         )
 
-        signup_handlers.register(
-            remote_app,
-            dict(
-                info=account_info_handler,
-                setup=account_setup_handler,
-                view=account_view_handler,
-            )
+        signup_handlers[remote_app] = dict(
+            info=account_info_handler,
+            setup=account_setup_handler,
+            view=account_view_handler,
         )
 
 
 @blueprint.route('/login/<remote_app>/')
-@ssl_required
 def login(remote_app):
     """Send user to remote application for authentication."""
+    oauth = current_app.extensions['oauthlib.client']
+
     if remote_app not in oauth.remote_apps:
         return abort(404)
 
@@ -145,7 +162,7 @@ def login(remote_app):
     state_token = serializer.dumps({
         'app': remote_app,
         'next': next_param,
-        'sid': session.sid,
+        'sid': session['_id']
     })
 
     return oauth.remote_apps[remote_app].authorize(
@@ -155,7 +172,6 @@ def login(remote_app):
 
 
 @blueprint.route('/authorized/<remote_app>/')
-@ssl_required
 def authorized(remote_app=None):
     """Authorized handler callback."""
     if remote_app not in handlers:
@@ -170,7 +186,7 @@ def authorized(remote_app=None):
         state = serializer.loads(state_token)
         # Verify that state is for this session, app and that next parameter
         # have not been modified.
-        assert state['sid'] == session.sid
+        assert state['sid'] == session['_id']
         assert state['app'] == remote_app
         # Store next URL
         set_session_next_url(remote_app, state['next'])
@@ -183,7 +199,6 @@ def authorized(remote_app=None):
 
 
 @blueprint.route('/signup/<remote_app>/', methods=['GET', 'POST'])
-@ssl_required
 def signup(remote_app):
     """Extra signup step."""
     if remote_app not in signup_handlers:
@@ -193,7 +208,6 @@ def signup(remote_app):
 
 
 @blueprint.route('/disconnect/<remote_app>/')
-@ssl_required
 def disconnect(remote_app):
     """Disconnect user from remote application.
 

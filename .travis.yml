@@ -38,32 +38,29 @@ cache:
   - pip
 
 env:
-  - REQUIREMENTS=lowest REXTRAS=docs,tests
-  - REQUIREMENTS=release REXTRAS=docs,tests
-  - REQUIREMENTS=devel REXTRAS=docs,tests
+  - REQUIREMENTS=lowest
+  - REQUIREMENTS=release
+  - REQUIREMENTS=devel
 
 python:
   - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
 
 before_install:
-  - "travis_retry pip install --upgrade pip"
-  - "travis_retry pip install yajl mock twine wheel"
-  - "python requirements.py --extras=$REXTRAS --level=min > .travis-lowest-requirements.txt"
-  - "python requirements.py --extras=$REXTRAS --level=pypi > .travis-release-requirements.txt"
-  - "python requirements.py --extras=$REXTRAS --level=dev > .travis-devel-requirements.txt"
+  - "travis_retry pip install --upgrade pip setuptools py"
+  - "travis_retry pip install twine wheel coveralls requirements-builder"
+  - "requirements-builder --level=min setup.py > .travis-lowest-requirements.txt"
+  - "requirements-builder --level=pypi setup.py > .travis-release-requirements.txt"
+  - "requirements-builder --level=dev --req requirements-devel.txt setup.py > .travis-devel-requirements.txt"
 
 install:
-  - "travis_retry pip install -e git+https://github.com/inveniosoftware/invenio.git#egg=Invenio"
-  - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external"
-  - "travis_retry pip install -e .[$REXTRAS]"
-
-before_script:
-  - "inveniomanage database init --yes-i-know || echo ':('"
-  - "inveniomanage database create --quiet || echo ':('"
+  - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
+  - "travis_retry pip install -e .[all]"
 
 script:
-  - "sphinx-build -qnN docs docs/_build/html"
-  - "python setup.py test"
+  - "./run-tests.sh"
 
 after_success:
   - coveralls

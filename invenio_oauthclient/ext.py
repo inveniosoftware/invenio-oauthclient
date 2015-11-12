@@ -21,10 +21,29 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-#
-# !WARNING! !WARNING! !WARNING! !WARNING! !WARNING! !WARNING! !WARNING!
-#      Do NOT delete this file, even when it seems to be useless!
-#      It used by read Read the Docs to build our documentation!
-# !WARNING! !WARNING! !WARNING! !WARNING! !WARNING! !WARNING! !WARNING!
 
--e .[docs]
+"""Invenio-Oauthclient provides OAuth web authorization support."""
+
+from __future__ import absolute_import, print_function, unicode_literals
+
+from . import config
+
+
+class InvenioOAuthClient(object):
+    """Invenio Oauthclient extension."""
+
+    def __init__(self, app=None):
+        """Extension initialization."""
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app):
+        """Flask application initialization."""
+        self.init_config(app)
+        app.extensions['invenio-oauthclient'] = self
+
+    def init_config(self, app):
+        """Initialize configuration."""
+        for k in dir(config):
+            if k.startswith('OAUTHCLIENT_'):
+                app.config.setdefault(k, getattr(config, k))

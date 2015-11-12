@@ -17,7 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Pre-configured remote application for enabling sign in/up with GitHub.
+"""Pre-configured remote application for enabling sign in/up with GitHub.
 
 **Usage:**
 
@@ -25,7 +25,7 @@
 
    .. code-block:: console
 
-      cdvirtualenv src/invenio
+      cdvirtualenv src/invenio-oauthclient
       pip install -e .[github]
 
 2. Edit your configuration and add:
@@ -33,6 +33,7 @@
    .. code-block:: python
 
         from invenio_oauthclient.contrib import github
+
         OAUTHCLIENT_REMOTE_APPS = dict(
             github=github.REMOTE_APP,
         )
@@ -74,7 +75,7 @@ In templates you can add a sign in/up link:
 
 .. code-block:: jinja
 
-    <a href="{{url_for('oauthclient.login', remote_app='github')}}">
+    <a href="{{url_for('invenio_oauthclient.login', remote_app='github')}}">
       Sign in with GitHub
     </a>
 """
@@ -95,7 +96,7 @@ REMOTE_APP = dict(
         view="invenio_oauthclient.handlers:signup_handler",
     ),
     params=dict(
-        request_token_params={'scope': 'user:email'},
+        request_token_params={'scope': 'user,user:email'},
         base_url='https://api.github.com/',
         request_token_url=None,
         access_token_url="https://github.com/login/oauth/access_token",
@@ -107,12 +108,18 @@ REMOTE_APP = dict(
 
 
 def account_info(remote, resp):
-    """ Retrieve remote account information used to find local user. """
+    """Retrieve remote account information used to find local user."""
     gh = github3.login(token=resp['access_token'])
     ghuser = gh.user()
-    return dict(email=ghuser.email, nickname=ghuser.login)
+    email = ghuser.email
+    if not email:
+        record = next(gh.iter_emails(1))
+        email = record['email'] if 'email' in record else None
+    # FIXME get user informations accordly with invenio-userprofiles
+    return dict(email=email, external_id=ghuser.id,
+                external_method='github')
 
 
 def account_setup(remote, token):
-    """ Perform additional setup after user have been logged in. """
+    """Perform additional setup after user have been logged in."""
     pass

@@ -17,6 +17,8 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Encrypt access tokens in remoteTOKEN table."""
+
 from invenio.legacy.dbquery import run_sql
 from invenio_upgrader.api import op
 
@@ -25,6 +27,7 @@ depends_on = [u'oauthclient_2014_08_25_extra_data_nullable']
 
 
 def info():
+    """Info."""
     return "Encrypt access tokens in remoteTOKEN table."
 
 

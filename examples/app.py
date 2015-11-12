@@ -22,22 +22,49 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-include *.rst
-include *.sh
-include *.txt
-include LICENSE
-include babel.ini
-include pytest.ini
-include tox.ini
-include .dockerignore
-include .editorconfig
-include .tx/config
-recursive-include invenio_oauthclient *.po
-recursive-include invenio_oauthclient *.mo
-recursive-include docs *.bat
-recursive-include docs *.py
-recursive-include docs *.rst
-recursive-include docs Makefile
-recursive-include examples *.py
-recursive-include invenio_oauthclient *.html
-recursive-include invenio_oauthclient *.pot
+
+"""Minimal Flask application example for development.
+
+Run example development server:
+
+.. code-block:: console
+
+   $ cd examples
+   $ flask -a app.py shell
+
+Create the database tables inside a SQLite database:
+
+.. code-block:: console
+
+   >> from invenio_db import db
+   >> db.create_all()
+
+You can find the database in `examples/app.db`.
+"""
+
+from __future__ import absolute_import, print_function
+
+import os
+from invenio_accounts import InvenioAccounts
+from invenio_db import InvenioDB
+
+from flask import Flask
+from flask_babelex import Babel
+from flask_cli import FlaskCLI
+from flask_oauthlib.client import OAuth as FlaskOAuth
+
+from invenio_oauthclient import InvenioOAuthClient
+
+# Create Flask application
+app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'SQLALCHEMY_DATABASE_URI', 'sqlite:///app.db'
+)
+
+FlaskCLI(app)
+Babel(app)
+InvenioDB(app)
+InvenioAccounts(app)
+FlaskOAuth(app)
+InvenioOAuthClient(app)

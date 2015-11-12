@@ -19,43 +19,10 @@
 
 """Forms for module."""
 
-from invenio_base.i18n import _
-from invenio_accounts.models import User
-from invenio_accounts.validators import validate_email
-from invenio_utils.forms import InvenioBaseForm
-
-from sqlalchemy.exc import SQLAlchemyError
-
-from wtforms import StringField, validators
+from flask_security.forms import Form, UniqueEmailFormMixin
 
 
-class EmailSignUpForm(InvenioBaseForm):
-
+class EmailSignUpForm(Form, UniqueEmailFormMixin):
     """Form for requesting email address during sign up process."""
 
-    email = StringField(
-        label=_("Email address"),
-        description=_("Required."),
-        validators=[validators.DataRequired()]
-    )
-
-    def validate_email(self, field):
-        """Validate email address.
-
-        Ensures that the email address is not already registered.
-        """
-        field.data = field.data.lower()
-        validate_email(field.data.lower())
-
-        try:
-            User.query.filter(User.email == field.data).one()
-            raise validators.ValidationError(
-                _(
-                    "Email address %(addr)s already exists in the"
-                    " database. If this is your address, please sign-in and go"
-                    " to Profile > Linked Accounts to link your account.",
-                    addr=field.data
-                )
-            )
-        except SQLAlchemyError:
-            pass
+    pass

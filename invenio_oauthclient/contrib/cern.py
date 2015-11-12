@@ -78,7 +78,7 @@ In templates you can add a sign in/up link:
 
 .. code-block:: jinja
 
-    <a href="{{url_for("oauthclient.login", remote_app="cern")}}">
+    <a href="{{url_for("invenio_oauthclient.login", remote_app="cern")}}">
       Sign in with CERN
     </a>
 """
@@ -87,11 +87,11 @@ import copy
 
 import re
 
+import requests
+
 from flask import current_app
 
 from flask_login import current_user
-
-import requests
 
 #: Tunable list of groups to be hidden.
 CFG_EXTERNAL_AUTH_HIDDEN_GROUPS = (
@@ -200,12 +200,13 @@ def account_info(remote, resp):
     email = res['EmailAddress'][0]
     common_name = res['CommonName'][0]
 
+    # FIXME get user informations accordly with invenio-userprofiles
     return dict(email=email.lower(), nickname=common_name)
 
 
 def account_setup(remote, token):
     """Perform additional setup after user have been logged in."""
-    from invenio_ext.sqlalchemy import db
+    from invenio_db import db
 
     response = remote.get(REMOTE_APP_RESOURCE_API_URL)
     user = token.remote_account.user

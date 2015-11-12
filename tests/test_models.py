@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,112 +17,73 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Test case for models."""
+
 from __future__ import absolute_import
 
-from invenio_ext.sqlalchemy import db
+from invenio_db import db
 
-from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
-
-
-class BaseTestCase(InvenioTestCase):
-    def setUp(self):
-        from invenio_oauthclient.models import RemoteAccount, RemoteToken
-        RemoteToken.query.delete()
-        RemoteAccount.query.delete()
-        db.session.commit()
-        db.session.expunge_all()
-
-    def tearDown(self):
-        from invenio_oauthclient.models import RemoteAccount, RemoteToken
-        RemoteToken.query.delete()
-        RemoteAccount.query.delete()
-        db.session.commit()
-        db.session.expunge_all()
-        db.session.expunge_all()
+from invenio_oauthclient.models import RemoteAccount, RemoteToken
 
 
-class RemoteAccountTestCase(BaseTestCase):
-    def test_get_create(self):
-        from invenio_oauthclient.models import RemoteAccount
+def test_get_create_remote_account(app, example):
+    """Test create remote account."""
+    created_acc = RemoteAccount.create(1, "dev", dict(somekey="somevalue"))
+    assert created_acc
 
-        created_acc = RemoteAccount.create(1, "dev", dict(somekey="somevalue"))
-        assert created_acc
+    retrieved_acc = RemoteAccount.get(1, "dev")
+    assert created_acc.id == retrieved_acc.id
+    assert retrieved_acc.extra_data == dict(somekey="somevalue")
 
-        retrieved_acc = RemoteAccount.get(1, "dev")
-        assert created_acc.id == retrieved_acc.id
-        assert retrieved_acc.extra_data == dict(somekey="somevalue")
-
-        db.session.delete(retrieved_acc)
-        assert RemoteAccount.get(1, "dev") is None
+    db.session.delete(retrieved_acc)
+    assert RemoteAccount.get(1, "dev") is None
 
 
-class RemoteTokenTestCase(BaseTestCase):
-    def setUp(self):
-        super(RemoteTokenTestCase, self).setUp()
-        from invenio_accounts.models import User
-        u1 = User(nickname='RemoteTokenTestCaseUser1', password='')
-        u2 = User(nickname='RemoteTokenTestCaseUser2', password='')
-        u3 = User(nickname='RemoteTokenTestCaseUser3', password='')
-        db.session.add(u1)
-        db.session.add(u2)
-        db.session.add(u3)
-        db.session.commit()
+def test_get_create_remote_token(app, example):
+    """Test create remote token."""
+    existing_email = "existing@invenio-software.org"
+    datastore = app.extensions['invenio-accounts'].datastore
+    user = datastore.find_user(email=existing_email)
 
-        self.u1 = u1.id
-        self.u2 = u2.id
-        self.u3 = u3.id
-        db.session.expunge_all()
+    t = RemoteToken.create(user.id, "dev", "mytoken", "mysecret")
+    assert t
+    assert t.token() == ('mytoken', 'mysecret')
 
-    def tearDown(self):
-        super(RemoteTokenTestCase, self).tearDown()
-        from invenio_accounts.models import User
-        User.query.filter_by(id=self.u1).delete()
-        User.query.filter_by(id=self.u2).delete()
-        User.query.filter_by(id=self.u3).delete()
-        db.session.commit()
-        db.session.expunge_all()
+    acc = RemoteAccount.get(user.id, "dev")
+    assert acc
+    assert t.remote_account.id == acc.id
+    assert t.token_type == ''
 
-    def test_get_create(self):
-        from invenio_oauthclient.models import RemoteAccount, RemoteToken
+    t2 = RemoteToken.create(
+        user.id, "dev", "mytoken2", "mysecret2",
+        token_type='t2'
+    )
+    assert t2.remote_account.id == acc.id
+    assert t2.token_type == 't2'
 
-        t = RemoteToken.create(self.u1, "dev", "mytoken", "mysecret")
-        assert t
-        assert t.token() == ('mytoken', 'mysecret')
+    t3 = RemoteToken.get(user.id, "dev")
+    t4 = RemoteToken.get(user.id, "dev", token_type="t2")
+    assert t4.token() != t3.token()
 
-        acc = RemoteAccount.get(self.u1, "dev")
-        assert acc
-        assert t.remote_account.id == acc.id
-        assert t.token_type == ''
-
-        t2 = RemoteToken.create(
-            self.u1, "dev", "mytoken2", "mysecret2",
-            token_type='t2'
-        )
-        assert t2.remote_account.id == acc.id
-        assert t2.token_type == 't2'
-
-        t3 = RemoteToken.get(self.u1, "dev")
-        t4 = RemoteToken.get(self.u1, "dev", token_type="t2")
-        assert t4.token() != t3.token()
-
-        assert RemoteToken.query.count() == 2
-        acc.delete()
-        assert RemoteToken.query.count() == 0
-
-    def test_get_regression(self):
-        from invenio_oauthclient.models import RemoteToken
-
-        t3 = RemoteToken.create(self.u2, "dev", "mytoken", "mysecret")
-        t4 = RemoteToken.create(self.u3, "dev", "mytoken", "mysecret")
-
-        assert RemoteToken.get(self.u2, "dev").remote_account.user_id == \
-            t3.remote_account.user_id
-        assert RemoteToken.get(self.u3, "dev").remote_account.user_id == \
-            t4.remote_account.user_id
+    assert RemoteToken.query.count() == 2
+    acc.delete()
+    assert RemoteToken.query.count() == 0
 
 
-TEST_SUITE = make_test_suite(RemoteAccountTestCase, RemoteTokenTestCase)
+def test_get_regression(app, example):
+    """Test regression."""
+    datastore = app.extensions['invenio-accounts'].datastore
 
+    email2 = "test2@invenio-software.org"
+    email3 = "test3@invenio-software.org"
 
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)
+    user2 = datastore.find_user(email=email2)
+    user3 = datastore.find_user(email=email3)
+
+    t3 = RemoteToken.create(user2.id, "dev", "mytoken", "mysecret")
+    t4 = RemoteToken.create(user3.id, "dev", "mytoken", "mysecret")
+
+    assert RemoteToken.get(user2.id, "dev").remote_account.user_id == \
+        t3.remote_account.user_id
+    assert RemoteToken.get(user3.id, "dev").remote_account.user_id == \
+        t4.remote_account.user_id

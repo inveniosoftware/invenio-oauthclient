@@ -19,42 +19,45 @@
 
 """Models for storing access tokens and links between users and remote apps."""
 
-from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy_utils.types.encrypted import EncryptedType
-
-from invenio.config import SECRET_KEY as secret_key
-from invenio_ext.sqlalchemy import db
 from invenio_accounts.models import User
+
+from invenio_db import db
+
+from flask import current_app
+
+from sqlalchemy.ext.mutable import MutableDict
+
+from sqlalchemy_utils import JSONType
+from sqlalchemy_utils.types.encrypted import EncryptedType
 
 
 class TextEncryptedType(EncryptedType):
+    """Text encrypted type."""
 
     impl = db.Text
 
 
 class RemoteAccount(db.Model):
-
     """Storage for remote linked accounts."""
 
-    __tablename__ = 'remoteACCOUNT'
+    __tablename__ = 'oauthclient_remoteaccount'
 
     __table_args__ = (
         db.UniqueConstraint('user_id', 'client_id'),
-        db.Model.__table_args__
     )
 
     #
     # Fields
     #
     id = db.Column(
-        db.Integer(15, unsigned=True),
+        db.Integer,
         primary_key=True,
         autoincrement=True
     )
     """Primary key."""
 
     user_id = db.Column(
-        db.Integer(15, unsigned=True),
+        db.Integer,
         db.ForeignKey(User.id),
         nullable=False
     )
@@ -63,7 +66,7 @@ class RemoteAccount(db.Model):
     client_id = db.Column(db.String(255), nullable=False)
     """Client ID of remote application (defined in OAUTHCLIENT_REMOTE_APPS)."""
 
-    extra_data = db.Column(MutableDict.as_mutable(db.JSON), nullable=False)
+    extra_data = db.Column(MutableDict.as_mutable(JSONType), nullable=False)
     """Extra data associated with this linked account."""
 
     #
@@ -75,6 +78,7 @@ class RemoteAccount(db.Model):
     tokens = db.relationship(
         "RemoteToken",
         backref="remote_account",
+        cascade="all, delete-orphan"
     )
     """SQLAlchemy relationship to RemoteToken objects."""
 
@@ -99,33 +103,31 @@ class RemoteAccount(db.Model):
         :param extra_data: JSON-serializable dictionary of any extra data that
                            needs to be save together with this link.
         """
-        account = cls(
-            user_id=user_id,
-            client_id=client_id,
-            extra_data=extra_data or dict()
-        )
-        db.session.add(account)
-        db.session.commit()
+        with db.session.begin_nested():
+            account = cls(
+                user_id=user_id,
+                client_id=client_id,
+                extra_data=extra_data or dict()
+            )
+            db.session.add(account)
         return account
 
     def delete(self):
         """Delete remote account together with all stored tokens."""
-        RemoteToken.query.filter_by(id_remote_account=self.id).delete()
-        db.session.delete(self)
-        db.session.commit()
+        with db.session.begin_nested():
+            db.session.delete(self)
 
 
 class RemoteToken(db.Model):
-
     """Storage for the access tokens for linked accounts."""
 
-    __tablename__ = 'remoteTOKEN'
+    __tablename__ = 'oauthclient_remotetoken'
 
     #
     # Fields
     #
     id_remote_account = db.Column(
-        db.Integer(15, unsigned=True),
+        db.Integer,
         db.ForeignKey(RemoteAccount.id),
         nullable=False,
         primary_key=True
@@ -137,9 +139,11 @@ class RemoteToken(db.Model):
     )
     """Type of token."""
 
-    access_token = db.Column(TextEncryptedType(type_in=db.Text,
-                                               key=secret_key),
-                             nullable=False)
+    access_token = db.Column(
+        TextEncryptedType(type_in=db.Text,
+                          key=lambda: current_app.config.get('SECRET_KEY')),
+        nullable=False
+    )
     """Access token to remote application."""
 
     secret = db.Column(db.Text(), default='', nullable=False)
@@ -152,9 +156,10 @@ class RemoteToken(db.Model):
     def update_token(self, token, secret):
         """Update token with new values."""
         if self.access_token != token or self.secret != secret:
-            self.access_token = token
-            self.secret = secret
-            db.session.commit()
+            with db.session.begin_nested():
+                self.access_token = token
+                self.secret = secret
+                db.session.add(self)
 
     @classmethod
     def get(cls, user_id, client_id, token_type='', access_token=None):
@@ -192,20 +197,39 @@ class RemoteToken(db.Model):
         """
         account = RemoteAccount.get(user_id, client_id)
 
-        if account is None:
-            account = RemoteAccount(
-                user_id=user_id,
-                client_id=client_id,
-                extra_data=extra_data or dict(),
-            )
-            db.session.add(account)
+        with db.session.begin_nested():
+            if account is None:
+                account = RemoteAccount(
+                    user_id=user_id,
+                    client_id=client_id,
+                    extra_data=extra_data or dict(),
+                )
+                db.session.add(account)
 
-        token = cls(
-            token_type=token_type,
-            remote_account=account,
-            access_token=token,
-            secret=secret,
-        )
-        db.session.add(token)
-        db.session.commit()
+            token = cls(
+                token_type=token_type,
+                remote_account=account,
+                access_token=token,
+                secret=secret,
+            )
+            db.session.add(token)
         return token
+
+
+class UserIdentity(db.Model):
+    """Represent a UserIdentity record."""
+
+    __tablename__ = 'oauthclient_useridentity'
+
+    id = db.Column(db.String(), primary_key=True, nullable=False)
+    method = db.Column(db.String(), primary_key=True, nullable=False)
+    id_user = db.Column(db.Integer(),
+                        db.ForeignKey(User.id), nullable=False)
+
+    user = db.relationship(User, backref="external_identifiers")
+
+    __table_args__ = (
+        db.Index('useridentity_id_user_method', id_user, method, unique=True),
+    )
+
+__all__ = ('RemoteAccount', 'RemoteToken', 'UserIdentity')

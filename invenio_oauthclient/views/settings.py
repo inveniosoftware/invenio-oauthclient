@@ -17,26 +17,29 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Account settings blueprint for oauthclient. """
+"""Account settings blueprint for oauthclient."""
 
 from __future__ import absolute_import
 
 import six
-from operator import itemgetter
-from flask import Blueprint, render_template, request
-from flask_login import login_required, current_user
+
+from flask import Blueprint, render_template, request, current_app
+
+from flask_babelex import gettext as _
+
+from flask_security import login_required, current_user
+
 from flask_breadcrumbs import register_breadcrumb
+
 from flask_menu import register_menu
-from invenio_base.i18n import _
-from invenio_base.globals import cfg
-from invenio_ext.sslify import ssl_required
+
+from operator import itemgetter
 
 from ..models import RemoteAccount
-from ..client import oauth
 
 
 blueprint = Blueprint(
-    'oauthclient_settings',
+    'invenio_oauthclient_settings',
     __name__,
     url_prefix="/account/settings/linkedaccounts",
     static_folder="../static",
@@ -45,7 +48,6 @@ blueprint = Blueprint(
 
 
 @blueprint.route("/", methods=['GET', 'POST'])
-@ssl_required
 @login_required
 @register_menu(
     blueprint, 'settings.oauthclient',
@@ -57,12 +59,15 @@ blueprint = Blueprint(
     blueprint, 'breadcrumbs.settings.oauthclient', _('Linked accounts')
 )
 def index():
-    """ List linked accounts. """
+    """List linked accounts."""
+    oauth = current_app.extensions['oauthlib.client']
+
     services = []
     service_map = {}
     i = 0
 
-    for appid, conf in six.iteritems(cfg['OAUTHCLIENT_REMOTE_APPS']):
+    for appid, conf in six.iteritems(
+            current_app.config['OAUTHCLIENT_REMOTE_APPS']):
         if not conf.get('hide', False):
             services.append(dict(
                 appid=appid,
@@ -87,6 +92,6 @@ def index():
     services.sort(key=itemgetter('title'))
 
     return render_template(
-        "oauthclient/settings/index.html",
+        "invenio_oauthclient/settings/index.html",
         services=services
     )

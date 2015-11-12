@@ -19,26 +19,32 @@
 
 """Handlers for customizing oauthclient endpoints."""
 
+from __future__ import absolute_import
+
 import warnings
-
-from functools import partial, wraps
-
-from flask import current_app, flash, redirect, render_template, \
-    request, session, url_for
-from flask_login import current_user
-
-from invenio_base.globals import cfg
 
 import six
 
+from flask import current_app, flash, redirect, render_template, request, \
+    session, url_for
+
+from flask_login import current_user
+
+from functools import partial, wraps
+
+from invenio_db import db
+
 from werkzeug.utils import import_string
 
-from .client import oauth, signup_handlers
-from .errors import OAuthClientError, OAuthError, \
-    OAuthRejectedRequestError, OAuthResponseError
+from .errors import OAuthClientError, OAuthError, OAuthRejectedRequestError, \
+    OAuthResponseError
 from .forms import EmailSignUpForm
 from .models import RemoteAccount, RemoteToken
 from .utils import oauth_authenticate, oauth_get_user, oauth_register
+
+handlers = {}
+disconnect_handlers = {}
+signup_handlers = {}
 
 
 #
@@ -59,7 +65,8 @@ def set_session_next_url(remote_app, url):
 
 def token_session_key(remote_app):
     """Generate a session key used to store the token for a remote app."""
-    return '%s_%s' % (cfg['OAUTHCLIENT_SESSION_KEY_PREFIX'], remote_app)
+    return '%s_%s' % (current_app.config['OAUTHCLIENT_SESSION_KEY_PREFIX'],
+                      remote_app)
 
 
 def response_token_setter(remote, resp):
@@ -243,7 +250,8 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
         # Authenticate user
         if not oauth_authenticate(remote.consumer_key, user,
                                   require_existing_link=False,
-                                  remember=cfg['OAUTHCLIENT_REMOTE_APPS']
+                                  remember=current_app.config[
+                                      'OAUTHCLIENT_REMOTE_APPS']
                                   [remote.name].get('remember', False)):
             return current_app.login_manager.unauthorized()
 
@@ -283,14 +291,15 @@ def disconnect_handler(remote, *args, **kwargs):
     if not current_user.is_authenticated():
         return current_app.login_manager.unauthorized()
 
-    account = RemoteAccount.get(
-        user_id=current_user.get_id(),
-        client_id=remote.consumer_key
-    )
-    if account:
-        account.delete()
+    with db.session.begin_nested():
+        account = RemoteAccount.get(
+            user_id=current_user.get_id(),
+            client_id=remote.consumer_key
+        )
+        if account:
+            account.delete()
 
-    return redirect(url_for('oauthclient_settings.index'))
+    return redirect(url_for('invenio_oauthclient_settings.index'))
 
 
 def signup_handler(remote, *args, **kwargs):
@@ -329,7 +338,8 @@ def signup_handler(remote, *args, **kwargs):
         # Authenticate the user
         if not oauth_authenticate(remote.consumer_key, user,
                                   require_existing_link=False,
-                                  remember=cfg['OAUTHCLIENT_REMOTE_APPS']
+                                  remember=current_app.config[
+                                      'OAUTHCLIENT_REMOTE_APPS']
                                   [remote.name].get('remember', False)):
             return current_app.login_manager.unauthorized()
 
@@ -362,19 +372,21 @@ def signup_handler(remote, *args, **kwargs):
             return redirect('/')
 
     return render_template(
-        "oauthclient/signup.html",
+        "invenio_oauthclient/signup.html",
         form=form,
         remote=remote,
-        app_title=cfg['OAUTHCLIENT_REMOTE_APPS'][remote.name].get('title', ''),
-        app_description=cfg['OAUTHCLIENT_REMOTE_APPS'][remote.name].get(
-            'description', ''
-        ),
-        app_icon=cfg['OAUTHCLIENT_REMOTE_APPS'][remote.name].get('icon', None),
+        app_title=current_app.config['OAUTHCLIENT_REMOTE_APPS'][
+            remote.name].get('title', ''),
+        app_description=current_app.config['OAUTHCLIENT_REMOTE_APPS'][
+            remote.name].get('description', ''),
+        app_icon=current_app.config['OAUTHCLIENT_REMOTE_APPS'][
+            remote.name].get('icon', None),
     )
 
 
 def oauth_logout_handler(sender_app, user=None):
     """Remove all access tokens from session on logout."""
+    oauth = current_app.extensions['oauthlib.client']
     for remote in oauth.remote_apps.values():
         token_delete(remote)
 

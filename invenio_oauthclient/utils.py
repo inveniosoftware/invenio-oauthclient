@@ -19,17 +19,17 @@
 
 """Utility methods to help find, authenticate or register a remote user."""
 
-from flask import current_app
+from invenio_accounts.models import User
 
-from flask_login import logout_user
+from invenio_db import db
 
-from invenio_base.globals import cfg
-from invenio_ext.login import UserInfo, authenticate
-from invenio_ext.sqlalchemy import db
+from flask import current_app, request
 
-from invenio_accounts.models import User, UserEXT
+from flask_security import login_user, logout_user
 
-from .models import RemoteAccount, RemoteToken
+from uritools import urisplit
+
+from .models import RemoteAccount, RemoteToken, UserIdentity
 
 
 def _get_external_id(account_info):
@@ -49,30 +49,27 @@ def oauth_get_user(client_id, account_info=None, access_token=None):
     if access_token:
         token = RemoteToken.get_by_token(client_id, access_token)
         if token:
-            return UserInfo(token.remote_account.user_id)
+            return token.remote_account.user
 
     if account_info:
         external_id = _get_external_id(account_info)
         if external_id:
-            u = UserEXT.query.filter_by(id=external_id['id'],
-                                        method=external_id['method']
-                                        ).first()
-            if u:
-                return UserInfo(u.id_user)
+            user_identity = UserIdentity.query.filter_by(
+                id=external_id['id'], method=external_id['method']).first()
+            if user_identity:
+                return user_identity.user
         if account_info.get('email'):
-            u = User.query.filter_by(email=account_info['email']).first()
-            if u:
-                return UserInfo(u.id)
+            return User.query.filter_by(email=account_info['email']).first()
     return None
 
 
-def oauth_authenticate(client_id, userinfo, require_existing_link=False,
+def oauth_authenticate(client_id, user, require_existing_link=False,
                        remember=False):
     """Authenticate an oauth authorized callback."""
     # Authenticate via the access token (access token used to get user_id)
-    if userinfo and authenticate(userinfo['email'], remember=remember):
+    if login_user(user):
         if require_existing_link:
-            account = RemoteAccount.get(userinfo.get_id(), client_id)
+            account = RemoteAccount.get(user.id, client_id)
             if account is None:
                 logout_user()
                 return False
@@ -82,39 +79,23 @@ def oauth_authenticate(client_id, userinfo, require_existing_link=False,
 
 def oauth_register(account_info, form_data=None):
     """Register user if possible."""
-    from invenio_accounts.models import User
-
     email = account_info.get("email")
     if form_data and form_data.get("email"):
         email = form_data.get("email")
 
+    datastore = current_app.extensions['invenio-accounts'].datastore
+
     if email:
-        note = '1'
-        if cfg['CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT']:
-            note = '2'
+        with db.session.begin_nested():
+            if not datastore.find_user(email=email):
+                kwargs = dict(email=email, password=None, active=True)
+                try:
+                    user = datastore.create_user(**kwargs)
+                except Exception:
+                    current_app.logger.exception("Cannot create user")
+                    raise
 
-        if not User.query.filter_by(email=email).first():
-            # Email does not already exists. so we can proceed to register
-            # user.
-            u = User(
-                nickname=account_info.get('nickname', ''),
-                email=email,
-                password=None,
-                note=note
-            )
-
-            try:
-                db.session.add(u)
-                db.session.commit()
-            except Exception:
-                current_app.logger.exception("Cannot create user")
-                return None
-
-            # verify the email
-            if note == '2':
-                u.verify_email()
-
-            return UserInfo(u.id)
+        return user
 
     return None
 
@@ -122,13 +103,30 @@ def oauth_register(account_info, form_data=None):
 def oauth_link_external_id(user, external_id=None):
     """Link a user to an external id."""
     oauth_unlink_external_id(external_id)
-    db.session.add(UserEXT(
-        id=external_id['id'], method=external_id['method'], id_user=user.id
-    ))
+    with db.session.begin_nested():
+        db.session.add(UserIdentity(
+            id=external_id['id'], method=external_id['method'], id_user=user.id
+        ))
 
 
 def oauth_unlink_external_id(external_id):
     """Unlink a user from an external id."""
-    UserEXT.query.filter_by(id=external_id['id'],
-                            method=external_id['method']).delete()
-    db.session.commit()
+    with db.session.begin_nested():
+        UserIdentity.query.filter_by(id=external_id['id'],
+                                     method=external_id['method']).delete()
+
+
+def is_local_url(target):
+    """Determine if URL is a local."""
+    server_name = current_app.config['SERVER_NAME']
+    test_url = urisplit(target)
+    return not test_url.host or test_url.scheme in ('http', 'https') and \
+        server_name == test_url.host
+
+
+def get_safe_redirect_target(arg='next'):
+    """Get URL to redirect to and ensure that it is local."""
+    for target in request.args.get(arg), request.referrer:
+        if target and is_local_url(target):
+            return target
+    return None

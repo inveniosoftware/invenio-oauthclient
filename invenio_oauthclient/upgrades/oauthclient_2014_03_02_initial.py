@@ -17,20 +17,23 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Initial creation of tables."""
+
 import warnings
 from sqlalchemy import *
-from invenio_ext.sqlalchemy import db
+from invenio_db import db
 from invenio_upgrader.api import op
 
 depends_on = []
 
 
 def info():
+    """Info."""
     return "Initial creation of tables"
 
 
 def do_upgrade():
-    """ Implement your upgrades here  """
+    """Implement your upgrades here."""
     if not op.has_table('remoteACCOUNT'):
         op.create_table(
             'remoteACCOUNT',
@@ -66,4 +69,5 @@ def do_upgrade():
 
 
 def estimate():
+    """Estimate."""
     return 1

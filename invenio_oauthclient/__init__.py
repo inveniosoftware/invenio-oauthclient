@@ -17,7 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
+r"""
 The oauthclient module provides OAuth web authorization support in Invenio.
 
 OAuth client support is typically used to allow features such as social login
@@ -172,12 +172,11 @@ Usage
         # ...
     )
 
-See :ref:`module_oauthclient_conf` for how to define remote applications in
-``OAUTHCLIENT_REMOTE_APPS``.
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+from .ext import InvenioOAuthClient
 from .version import __version__
 
-__all__ = ('__version__', )
+__all__ = ('__version__', 'InvenioOAuthClient')

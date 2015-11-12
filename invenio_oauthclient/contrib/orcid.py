@@ -26,6 +26,7 @@
    .. code-block:: python
 
        from invenio_oauthclient.contrib import orcid
+
        OAUTHCLIENT_REMOTE_APPS = dict(
            orcid=orcid.REMOTE_APP,
        )
@@ -69,7 +70,7 @@ In templates you can add a sign in/up link:
 
 .. code-block:: jinja
 
-    <a href="{{url_for('oauthclient.login', remote_app='orcid')}}">
+    <a href="{{url_for('invenio_oauthclient.login', remote_app='orcid')}}">
       Sign in with ORCID
     </a>
 
@@ -78,9 +79,11 @@ In templates you can add a sign in/up link:
 import copy
 
 from flask import current_app, redirect, url_for
+
 from flask_login import current_user
 
-from invenio_ext.sqlalchemy.utils import session_manager
+from invenio_db import db
+
 
 REMOTE_APP = dict(
     title='ORCID',
@@ -144,47 +147,50 @@ def disconnect_handler(remote, *args, **kwargs):
     if orcid:
         oauth_unlink_external_id(dict(id=orcid, method='orcid'))
     if account:
-        account.delete()
+        with db.session.begin_nested():
+            account.delete()
 
-    return redirect(url_for('oauthclient_settings.index'))
+    return redirect(url_for('invenio_oauthclient_settings.index'))
 
 
-@session_manager
 def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
     from invenio_oauthclient.utils import oauth_link_external_id
-    from invenio_ext.sqlalchemy import db
+    from invenio_db import db
 
-    # Retrieve ORCID from response.
-    orcid = resp.get("orcid")
+    with db.session.begin_nested():
+        # Retrieve ORCID from response.
+        orcid = resp.get("orcid")
 
-    # Set ORCID in extra_data.
-    token.remote_account.extra_data = {"orcid": orcid}
-    user = token.remote_account.user
+        # Set ORCID in extra_data.
+        token.remote_account.extra_data = {"orcid": orcid}
+        user = token.remote_account.user
 
-    # Create user <-> external id link.
-    oauth_link_external_id(user, dict(id=orcid, method="orcid"))
+        # Create user <-> external id link.
+        oauth_link_external_id(user, dict(id=orcid, method="orcid"))
 
-    # Fill user full name if not already set
-    if user and not any([user.given_names, user.family_name]):
-        # Query ORCID to get the real name
-        response = remote.get("{0}/orcid-bio".format(orcid),
-                              headers={'Accept': 'application/orcid+json'},
-                              content_type="application/json")
-
-        if response.status == 200:
-            try:
-                name = response.data["orcid-profile"]["orcid-bio"][
-                    "personal-details"]
-                user.given_names = name["given-names"]["value"]
-                user.family_name = name["family-name"]["value"]
-            except KeyError:
-                current_app.logger.exception(
-                    "Unexpected return format from ORCID: {0}".format(
-                        repr(response.data)))
-                return
-
-            db.session.add(user)
-
-            # Refresh user cache
-            current_user.reload()
+        # FIXME put these data in user profile!
+        # Fill user full name if not already set
+        # if user and not any([user.given_names, user.family_name]):
+        #     # Query ORCID to get the real name
+        #     response = remote.get("{0}/orcid-bio".format(orcid),
+        #                           headers={'Accept':
+        #                                    'application/orcid+json'},
+        #                           content_type="application/json")
+        #
+        #     if response.status == 200:
+        #         try:
+        #             name = response.data["orcid-profile"]["orcid-bio"][
+        #                 "personal-details"]
+        #             user.given_names = name["given-names"]["value"]
+        #             user.family_name = name["family-name"]["value"]
+        #         except KeyError:
+        #             current_app.logger.exception(
+        #                 "Unexpected return format from ORCID: {0}".format(
+        #                     repr(response.data)))
+        #             return
+        #
+        #         db.session.add(user)
+        #
+        #         # Refresh user cache
+        #         current_user.reload()

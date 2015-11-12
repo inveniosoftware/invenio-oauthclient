@@ -17,6 +17,8 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Change JSON data type from TEXT to LONGTEXT."""
+
 from invenio_upgrader.api import op
 from sqlalchemy.dialects import mysql
 
@@ -24,10 +26,12 @@ depends_on = [u'oauthclient_2014_03_02_initial']
 
 
 def info():
+    """Info."""
     return "Change JSON data type from TEXT to LONGTEXT"
 
 
 def do_upgrade():
+    """Do upgrade."""
     op.alter_column(
         u'remoteACCOUNT', 'extra_data',
         existing_type=mysql.TEXT(),
@@ -37,5 +41,5 @@ def do_upgrade():
 
 
 def estimate():
-    """  Estimate running time of upgrade in seconds (optional). """
+    """Estimate running time of upgrade in seconds (optional)."""
     return 1
