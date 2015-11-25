@@ -174,9 +174,14 @@ Usage
 
 """
 
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, print_function
 
 from .ext import InvenioOAuthClient
+from .proxies import current_oauthclient
 from .version import __version__
 
-__all__ = ('__version__', 'InvenioOAuthClient')
+__all__ = (
+    '__version__',
+    'current_oauthclient',
+    'InvenioOAuthClient',
+)

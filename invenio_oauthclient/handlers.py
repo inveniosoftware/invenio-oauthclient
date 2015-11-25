@@ -22,29 +22,21 @@
 from __future__ import absolute_import
 
 import warnings
-
-import six
-
-from flask import current_app, flash, redirect, render_template, request, \
-    session, url_for
-
-from flask_login import current_user
-
 from functools import partial, wraps
 
+import six
+from flask import current_app, flash, redirect, render_template, request, \
+    session, url_for
+from flask_login import current_user
 from invenio_db import db
-
 from werkzeug.utils import import_string
 
 from .errors import OAuthClientError, OAuthError, OAuthRejectedRequestError, \
     OAuthResponseError
 from .forms import EmailSignUpForm
 from .models import RemoteAccount, RemoteToken
+from .proxies import current_oauthclient
 from .utils import oauth_authenticate, oauth_get_user, oauth_register
-
-handlers = {}
-disconnect_handlers = {}
-signup_handlers = {}
 
 
 #
@@ -218,7 +210,7 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
     # Set token in session - token object only returned if
     # current_user.is_autenticated().
     token = response_token_setter(remote, resp)
-    handlers = signup_handlers[remote.name]
+    handlers = current_oauthclient.signup_handlers[remote.name]
 
     # Sign-in/up user
     # ---------------
@@ -345,7 +337,7 @@ def signup_handler(remote, *args, **kwargs):
 
         # Link account and set session data
         token = token_setter(remote, oauth_token[0], secret=oauth_token[1])
-        handlers = signup_handlers[remote.name]
+        handlers = current_oauthclient.signup_handlers[remote.name]
 
         if token is None:
             raise OAuthError("Could not create token for user.", remote)

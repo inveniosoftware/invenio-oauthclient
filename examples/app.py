@@ -45,14 +45,14 @@ You can find the database in `examples/app.db`.
 from __future__ import absolute_import, print_function
 
 import os
-from invenio_accounts import InvenioAccounts
-from invenio_db import InvenioDB
 
 from flask import Flask
 from flask_babelex import Babel
 from flask_cli import FlaskCLI
 from flask_oauthlib.client import OAuth as FlaskOAuth
+from invenio_db import InvenioDB
 
+from invenio_accounts import InvenioAccounts
 from invenio_oauthclient import InvenioOAuthClient
 
 # Create Flask application

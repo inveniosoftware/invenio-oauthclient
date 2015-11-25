@@ -22,26 +22,19 @@
 from __future__ import absolute_import
 
 import os
-
 import time
 
 import pytest
-
 from flask import session, url_for
-
 from flask_login import login_user
+from itsdangerous import TimedJSONWebSignatureSerializer
+from mock import MagicMock, patch
+from simplejson import JSONDecodeError
+from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.handlers import token_getter
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
 from invenio_oauthclient.views.client import serializer
-
-from itsdangerous import TimedJSONWebSignatureSerializer
-
-from mock import MagicMock, patch
-
-from simplejson import JSONDecodeError
-
-from six.moves.urllib_parse import parse_qs, urlparse
 
 from .conftest import gen_app
 

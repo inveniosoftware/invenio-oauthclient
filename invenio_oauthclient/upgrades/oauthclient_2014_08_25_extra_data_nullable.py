@@ -19,9 +19,8 @@
 
 """Update remoteACCOUNT.extra_data to be nullable."""
 
-from sqlalchemy.dialects import mysql
 from invenio_upgrader.api import op
-
+from sqlalchemy.dialects import mysql
 
 depends_on = ['oauthclient_2014_04_14_json_type_fix']
 

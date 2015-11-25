@@ -29,27 +29,19 @@ from __future__ import absolute_import, print_function
 import os
 
 import pytest
+from flask import Flask
+from flask_babelex import Babel
+from flask_cli import FlaskCLI
+from flask_mail import Mail
+from flask_menu import Menu as FlaskMenu
+from flask_oauthlib.client import OAuth as FlaskOAuth
+from invenio_db import InvenioDB, db
 
 from invenio_accounts import InvenioAccounts
-
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib.orcid import REMOTE_APP
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
-
-from invenio_db import InvenioDB, db
-
-from flask import Flask
-
-from flask_babelex import Babel
-
-from flask_cli import FlaskCLI
-
-from flask_mail import Mail
-
-from flask_menu import Menu as FlaskMenu
-
-from flask_oauthlib.client import OAuth as FlaskOAuth
 
 
 @pytest.fixture()

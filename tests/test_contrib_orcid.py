@@ -21,21 +21,16 @@
 
 from __future__ import absolute_import
 
-from invenio_accounts.models import User
-
 import httpretty
-
 from flask import session, url_for
-
 from flask_security.utils import login_user
+from mock import MagicMock
+from six.moves.urllib_parse import parse_qs, urlparse
 
+from invenio_accounts.models import User
 from invenio_oauthclient.contrib.orcid import account_info
 from invenio_oauthclient.models import UserIdentity
 from invenio_oauthclient.views.client import serializer
-
-from mock import MagicMock
-
-from six.moves.urllib_parse import parse_qs, urlparse
 
 
 def mock_response(oauth, remote_app='test', data=None):

@@ -84,13 +84,10 @@ In templates you can add a sign in/up link:
 """
 
 import copy
-
 import re
 
 import requests
-
 from flask import current_app
-
 from flask_login import current_user
 
 #: Tunable list of groups to be hidden.

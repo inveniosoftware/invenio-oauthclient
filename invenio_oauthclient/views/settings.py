@@ -21,22 +21,16 @@
 
 from __future__ import absolute_import
 
-import six
-
-from flask import Blueprint, render_template, request, current_app
-
-from flask_babelex import gettext as _
-
-from flask_security import login_required, current_user
-
-from flask_breadcrumbs import register_breadcrumb
-
-from flask_menu import register_menu
-
 from operator import itemgetter
 
-from ..models import RemoteAccount
+import six
+from flask import Blueprint, current_app, render_template, request
+from flask_babelex import gettext as _
+from flask_breadcrumbs import register_breadcrumb
+from flask_menu import register_menu
+from flask_security import current_user, login_required
 
+from ..models import RemoteAccount
 
 blueprint = Blueprint(
     'invenio_oauthclient_settings',

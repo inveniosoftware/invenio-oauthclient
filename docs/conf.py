@@ -24,7 +24,7 @@
 
 """Configure sphinx."""
 
-from __future__ import print_function, unicode_literals
+from __future__ import print_function
 
 import os
 

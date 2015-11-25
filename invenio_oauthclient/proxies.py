@@ -22,10 +22,11 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Version information for Invenio-OAuthClient.
+"""Helper proxy to the state object."""
 
-This file is imported by ``invenio_oauthclient.__init__``,
-and parsed by ``setup.py``.
-"""
+from flask import current_app
+from werkzeug.local import LocalProxy
 
-__version__ = "1.0.0.dev20151125"
+current_oauthclient = LocalProxy(
+    lambda: current_app.extensions['invenio-oauthclient']
+)

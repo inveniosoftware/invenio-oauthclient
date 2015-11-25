@@ -19,9 +19,9 @@
 
 """Encrypt access tokens in remoteTOKEN table."""
 
-from invenio.legacy.dbquery import run_sql
 from invenio_upgrader.api import op
 
+from invenio.legacy.dbquery import run_sql
 
 depends_on = [u'oauthclient_2014_08_25_extra_data_nullable']
 

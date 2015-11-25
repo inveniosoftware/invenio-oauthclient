@@ -79,11 +79,8 @@ In templates you can add a sign in/up link:
 import copy
 
 from flask import current_app, redirect, url_for
-
 from flask_login import current_user
-
 from invenio_db import db
-
 
 REMOTE_APP = dict(
     title='ORCID',

@@ -22,16 +22,11 @@
 from __future__ import absolute_import
 
 from flask import Blueprint, abort, current_app, request, session, url_for
-
-from flask_login import user_logged_out
-
 from itsdangerous import BadData, TimedJSONWebSignatureSerializer
-
 from werkzeug.local import LocalProxy
 
-from ..handlers import authorized_default_handler, disconnect_handler, \
-    make_handler, make_token_getter, oauth_logout_handler, \
-    set_session_next_url, disconnect_handlers, signup_handlers, handlers
+from ..handlers import set_session_next_url
+from ..proxies import current_oauthclient
 from ..utils import get_safe_redirect_target
 
 blueprint = Blueprint(
@@ -73,72 +68,6 @@ def post_ext_init(state):
                        "invenio_oauthclient/settings/base.html"))
 
 
-@blueprint.before_app_first_request
-def setup_app():
-    """Setup OAuth clients."""
-    # Connect signal to remove access tokens on logout
-    user_logged_out.connect(oauth_logout_handler)
-
-    oauth = current_app.extensions['oauthlib.client']
-
-    # Add remote applications
-    oauth.init_app(current_app)
-
-    for remote_app, conf in current_app.config[
-            'OAUTHCLIENT_REMOTE_APPS'].items():
-        # Prevent double creation problems
-        if remote_app not in oauth.remote_apps:
-            remote = oauth.remote_app(
-                remote_app,
-                **conf['params']
-            )
-
-        remote = oauth.remote_apps[remote_app]
-
-        # Set token getter for remote
-        remote.tokengetter(make_token_getter(remote))
-
-        # Register authorized handler
-        handlers[remote_app] = remote.authorized_handler(make_handler(
-            conf.get('authorized_handler', authorized_default_handler),
-            remote,
-        ))
-
-        # Register disconnect handler
-        disconnect_handlers[remote_app] = make_handler(
-            conf.get('disconnect_handler', disconnect_handler),
-            remote,
-            with_response=False,
-        )
-
-        # Register sign-up handlers
-        def dummy_handler(remote, *args, **kargs):
-            pass
-
-        signup_handler = conf.get('signup_handler', dict())
-        account_info_handler = make_handler(
-            signup_handler.get('info', dummy_handler),
-            remote,
-            with_response=False
-        )
-        account_setup_handler = make_handler(
-            signup_handler.get('setup', dummy_handler),
-            remote,
-            with_response=False
-        )
-        account_view_handler = make_handler(
-            signup_handler.get('view', dummy_handler),
-            remote,
-            with_response=False
-        )
-
-        signup_handlers[remote_app] = dict(
-            info=account_info_handler,
-            setup=account_setup_handler,
-            view=account_view_handler,
-        )
-
-
 @blueprint.route('/login/<remote_app>/')
 def login(remote_app):
     """Send user to remote application for authentication."""
@@ -174,7 +103,7 @@ def login(remote_app):
 @blueprint.route('/authorized/<remote_app>/')
 def authorized(remote_app=None):
     """Authorized handler callback."""
-    if remote_app not in handlers:
+    if remote_app not in current_oauthclient.handlers:
         return abort(404)
 
     state_token = request.args.get('state')
@@ -195,15 +124,15 @@ def authorized(remote_app=None):
            not(current_app.debug or current_app.testing)):
             abort(403)
 
-    return handlers[remote_app]()
+    return current_oauthclient.handlers[remote_app]()
 
 
 @blueprint.route('/signup/<remote_app>/', methods=['GET', 'POST'])
 def signup(remote_app):
     """Extra signup step."""
-    if remote_app not in signup_handlers:
+    if remote_app not in current_oauthclient.signup_handlers:
         return abort(404)
-    res = signup_handlers[remote_app]['view']()
+    res = current_oauthclient.signup_handlers[remote_app]['view']()
     return abort(404) if res is None else res
 
 
@@ -213,7 +142,7 @@ def disconnect(remote_app):
 
     Removes application as well as associated information.
     """
-    if remote_app not in disconnect_handlers:
+    if remote_app not in current_oauthclient.disconnect_handlers:
         return abort(404)
 
-    return disconnect_handlers[remote_app]()
+    return current_oauthclient.disconnect_handlers[remote_app]()

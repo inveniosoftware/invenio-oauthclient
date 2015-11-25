@@ -20,9 +20,10 @@
 """Initial creation of tables."""
 
 import warnings
-from sqlalchemy import *
+
 from invenio_db import db
 from invenio_upgrader.api import op
+from sqlalchemy import *
 
 depends_on = []
 

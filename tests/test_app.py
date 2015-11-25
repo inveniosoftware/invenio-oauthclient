@@ -23,13 +23,12 @@ from __future__ import absolute_import
 
 import os
 
+from flask import Flask
+from flask_cli import FlaskCLI
+from flask_oauthlib.client import OAuth as FlaskOAuth
 from invenio_db import InvenioDB, db
 
 from invenio_oauthclient import InvenioOAuthClient
-
-from flask import Flask
-
-from flask_cli import FlaskCLI
 
 
 def test_version():
@@ -42,11 +41,13 @@ def test_init():
     """Test extension initialization."""
     app = Flask('testapp')
     FlaskCLI(app)
+    FlaskOAuth(app)
     ext = InvenioOAuthClient(app)
     assert 'invenio-oauthclient' in app.extensions
 
     app = Flask('testapp')
     FlaskCLI(app)
+    FlaskOAuth(app)
     ext = InvenioOAuthClient()
     assert 'invenio-oauthclient' not in app.extensions
     ext.init_app(app)
@@ -61,6 +62,7 @@ def test_db(request):
     )
     FlaskCLI(app)
     InvenioDB(app)
+    FlaskOAuth(app)
     InvenioOAuthClient(app)
 
     def teardown():
