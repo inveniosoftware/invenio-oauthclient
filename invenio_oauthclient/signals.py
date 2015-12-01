@@ -38,10 +38,27 @@ Example subscriber:
     from invenio_oauthclient.signals import account_info_received
 
     # During overlay initialization.
-    @account_info_received.connect_via(
-        sender=app.extensions['invenio-oauthclient'].handlers['orcid']
-    )
-    def load_extra_information(remote, response=None, account_info=None):
+    @account_info_received.connect
+    def load_extra_information(remote, token=None, response=None,
+                               account_info=None):
+        response = remote.get('https://example.org/api/resource')
+        # process response
+
+"""
+
+account_setup_received = _signals.signal('oauthclient-account-setup-received')
+"""Signal is sent after account info handler response.
+
+Example subscriber:
+
+.. code-block:: python
+
+    from invenio_oauthclient.signals import account_setup_received
+
+    # During overlay initialization.
+    @account_setup_received.connect
+    def load_extra_information(remote, token=None, response=None,
+                               account_setup=None):
         response = remote.get('https://example.org/api/resource')
         # process response
 

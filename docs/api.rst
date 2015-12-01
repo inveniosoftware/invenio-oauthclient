@@ -61,6 +61,12 @@ Forms
 .. automodule:: invenio_oauthclient.forms
    :members:
 
+Signals
+-------
+
+.. automodule:: invenio_oauthclient.signals
+   :members:
+
 Utils
 -----
 

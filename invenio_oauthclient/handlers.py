@@ -36,7 +36,7 @@ from .errors import OAuthClientError, OAuthError, OAuthRejectedRequestError, \
 from .forms import EmailSignUpForm
 from .models import RemoteAccount, RemoteToken
 from .proxies import current_oauthclient
-from .signals import account_info_received, account_set
+from .signals import account_info_received, account_setup_received
 from .utils import oauth_authenticate, oauth_get_user, oauth_register
 
 
@@ -219,7 +219,7 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
     if not current_user.is_authenticated:
         account_info = handlers['info'](resp)
         account_info_received.send(
-            remote, response=resp, account_info=account_info
+            remote, token=token, response=resp, account_info=account_info
         )
 
         user = oauth_get_user(
@@ -261,7 +261,10 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
     # Setup account
     # -------------
     if not token.remote_account.extra_data:
-        handlers['setup'](token, resp)
+        account_setup = handlers['setup'](token, resp)
+        account_setup_received.send(
+            remote, token=token, response=resp, account_setup=account_setup
+        )
 
     # Redirect to next
     next_url = get_session_next_url(remote.name)
@@ -341,8 +344,11 @@ def signup_handler(remote, *args, **kwargs):
             raise OAuthError("Could not create token for user.", remote)
 
         if not token.remote_account.extra_data:
-            handlers['setup'](token, response)
-            # TODO add signal for account setup
+            account_setup = handlers['setup'](token, response)
+            account_setup_received.send(
+                remote, token=token, response=response,
+                account_setup=account_setup
+            )
 
         # Remove account info from session
         session.pop(session_prefix + '_account_info', None)

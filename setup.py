@@ -67,6 +67,7 @@ setup_requires = [
 ]
 
 install_requires = [
+    'blinker>=1.4',
     'cryptography>=0.6',  # sqlalchemy-utils dependency
     'Flask>=0.10.1',
     'Flask-BabelEx>=0.9.2',

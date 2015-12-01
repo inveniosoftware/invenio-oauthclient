@@ -86,9 +86,7 @@ In templates you can add a sign in/up link:
 import copy
 import re
 
-import requests
 from flask import current_app
-from flask_login import current_user
 
 #: Tunable list of groups to be hidden.
 CFG_EXTERNAL_AUTH_HIDDEN_GROUPS = (
@@ -201,22 +199,6 @@ def account_info(remote, resp):
     return dict(email=email.lower(), nickname=common_name)
 
 
-def account_setup(remote, token):
+def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
-    from invenio_db import db
-
-    response = remote.get(REMOTE_APP_RESOURCE_API_URL)
-    user = token.remote_account.user
-
-    if response.status == requests.codes.ok:
-        res = get_dict_from_response(response)
-        current_user.info['group'] = fetch_groups(res['Group'])
-        current_user.modified = True
-        current_user.save()
-
-        if user and not any([user.family_name, user.given_names]):
-            user.family_name = res['Lastname'][0]
-            user.given_names = res['Firstname'][0]
-
-            db.session.add(user)
-            current_user.reload()
+    pass

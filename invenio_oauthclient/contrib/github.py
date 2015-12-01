@@ -120,6 +120,6 @@ def account_info(remote, resp):
                 external_method='github')
 
 
-def account_setup(remote, token):
+def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
     pass
