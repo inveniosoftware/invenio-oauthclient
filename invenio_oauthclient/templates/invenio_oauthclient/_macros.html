@@ -37,12 +37,14 @@
 {% macro form_errors(form) %}
   {%- if form.errors %}
   <div class="alert alert-danger alert-dismissible text-left" role="alert">
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  {%- for field, errors in form.errors.items() %}
-    {%- for error in errors %}
-      <p>{{error}}</p>
+    <button type="button" class="close" data-dismiss="alert" aria-label="{{ _('Close') }}">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    {%- for field, errors in form.errors.items() %}
+      {%- for error in errors %}
+        <p>{{error}}</p>
+      {%- endfor %}
     {%- endfor %}
-  {%- endfor %}
   </div>
   {%- endif %}
 {% endmacro %}

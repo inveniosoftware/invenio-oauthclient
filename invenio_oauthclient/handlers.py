@@ -26,6 +26,7 @@ from functools import partial, wraps
 import six
 from flask import current_app, flash, redirect, render_template, request, \
     session, url_for
+from flask_babelex import gettext as _
 from flask_login import current_user
 from invenio_db import db
 from werkzeug.utils import import_string
@@ -180,7 +181,8 @@ def oauth_error_handler(f):
                 e.remote, e.response, e.code, e.uri, e.description
             )
         except OAuthRejectedRequestError:
-            flash("You rejected the authentication request.", category='info')
+            flash(_("You rejected the authentication request."),
+                  category='info')
             return redirect('/')
     return inner
 
@@ -396,5 +398,5 @@ def make_token_getter(remote):
 def oauth2_handle_error(remote, resp, error_code, error_uri,
                         error_description):
     """Handle errors during exchange of one-time code for an access tokens."""
-    flash("Authorization with remote service failed.")
+    flash(_("Authorization with remote service failed."))
     return redirect('/')
