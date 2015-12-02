@@ -21,7 +21,6 @@
 
 from __future__ import absolute_import
 
-import warnings
 from functools import partial, wraps
 
 import six
@@ -256,14 +255,7 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
     # Setup account
     # -------------
     if not token.remote_account.extra_data:
-        try:
-            handlers['setup'](token, resp)
-        except TypeError:
-            warnings.warn('Method signature of setup signup handler is '
-                          'deprecated. It must take three arguments (remote,'
-                          ' token, response).',
-                          DeprecationWarning)
-            handlers['setup'](token)
+        handlers['setup'](token, resp)
 
     # Redirect to next
     next_url = get_session_next_url(remote.name)
@@ -343,14 +335,7 @@ def signup_handler(remote, *args, **kwargs):
             raise OAuthError("Could not create token for user.", remote)
 
         if not token.remote_account.extra_data:
-            try:
-                handlers['setup'](token, response)
-            except TypeError:
-                warnings.warn('Method signature of setup signup handler is '
-                              'deprecated. It must take three arguments'
-                              ' (remote, token, response).',
-                              DeprecationWarning)
-                handlers['setup'](token)
+            handlers['setup'](token, response)
 
         # Remove account info from session
         session.pop(session_prefix + '_account_info', None)
