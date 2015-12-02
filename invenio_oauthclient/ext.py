@@ -26,7 +26,6 @@
 
 from __future__ import absolute_import, print_function
 
-import pkg_resources
 from flask_login import user_logged_out
 
 from . import config
@@ -37,7 +36,7 @@ from .handlers import authorized_default_handler, disconnect_handler, \
 class _OAuthClientState(object):
     """OAuth client state storing registered actions."""
 
-    def __init__(self, app, entry_point_group=None):
+    def __init__(self, app):
         """Initialize state."""
         self.app = app
         self.handlers = {}
@@ -105,16 +104,6 @@ class _OAuthClientState(object):
                 setup=account_setup_handler,
                 view=account_view_handler,
             )
-
-    def register_action(self, action):
-        """Register an action to be showed in the actions list."""
-        assert action.value not in self.actions
-        self.actions[action.value] = action
-
-    def load_entry_point_group(self, entry_point_group):
-        """Load actions from an entry point group."""
-        for ep in pkg_resources.iter_entry_points(group=entry_point_group):
-            self.register_action(ep.load())
 
 
 class InvenioOAuthClient(object):
