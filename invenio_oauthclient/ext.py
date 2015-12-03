@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from flask_login import user_logged_out
+from flask_oauthlib.client import OAuth as FlaskOAuth
 
 from . import config
 from .handlers import authorized_default_handler, disconnect_handler, \
@@ -46,21 +47,21 @@ class _OAuthClientState(object):
         # Connect signal to remove access tokens on logout
         user_logged_out.connect(oauth_logout_handler)
 
-        oauth = app.extensions['oauthlib.client']
+        self.oauth = app.extensions.get('oauthlib.client') or FlaskOAuth()
 
         # Add remote applications
-        oauth.init_app(app)
+        self.oauth.init_app(app)
 
         for remote_app, conf in app.config[
                 'OAUTHCLIENT_REMOTE_APPS'].items():
             # Prevent double creation problems
-            if remote_app not in oauth.remote_apps:
-                remote = oauth.remote_app(
+            if remote_app not in self.oauth.remote_apps:
+                remote = self.oauth.remote_app(
                     remote_app,
                     **conf['params']
                 )
 
-            remote = oauth.remote_apps[remote_app]
+            remote = self.oauth.remote_apps[remote_app]
 
             # Set token getter for remote
             remote.tokengetter(make_token_getter(remote))

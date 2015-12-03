@@ -47,6 +47,11 @@ def test_init():
 
     app = Flask('testapp')
     FlaskCLI(app)
+    ext = InvenioOAuthClient(app)
+    assert 'invenio-oauthclient' in app.extensions
+
+    app = Flask('testapp')
+    FlaskCLI(app)
     FlaskOAuth(app)
     ext = InvenioOAuthClient()
     assert 'invenio-oauthclient' not in app.extensions
