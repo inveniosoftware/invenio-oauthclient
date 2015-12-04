@@ -23,6 +23,7 @@ from __future__ import absolute_import
 
 import httpretty
 from flask import session, url_for
+from flask_login import _create_identifier
 from flask_security.utils import login_user
 from mock import MagicMock
 from six.moves.urllib_parse import parse_qs, urlparse
@@ -41,7 +42,7 @@ def mock_response(oauth, remote_app='test', data=None):
 
 
 def _get_state():
-    return serializer.dumps({'app': 'orcid', 'sid': session['_id'],
+    return serializer.dumps({'app': 'orcid', 'sid': _create_identifier(),
                              'next': None, })
 
 

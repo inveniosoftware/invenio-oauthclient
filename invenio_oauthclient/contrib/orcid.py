@@ -134,7 +134,7 @@ def disconnect_handler(remote, *args, **kwargs):
     from invenio_oauthclient.utils import oauth_unlink_external_id
     from invenio_oauthclient.models import RemoteAccount
 
-    if not current_user.is_authenticated():
+    if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
 
     account = RemoteAccount.get(user_id=current_user.get_id(),

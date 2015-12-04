@@ -22,6 +22,7 @@
 from __future__ import absolute_import
 
 from flask import Blueprint, abort, current_app, request, session, url_for
+from flask_login import _create_identifier
 from itsdangerous import BadData, TimedJSONWebSignatureSerializer
 from werkzeug.local import LocalProxy
 
@@ -91,7 +92,7 @@ def login(remote_app):
     state_token = serializer.dumps({
         'app': remote_app,
         'next': next_param,
-        'sid': session['_id']
+        'sid': _create_identifier(),
     })
 
     return oauth.remote_apps[remote_app].authorize(
@@ -115,7 +116,7 @@ def authorized(remote_app=None):
         state = serializer.loads(state_token)
         # Verify that state is for this session, app and that next parameter
         # have not been modified.
-        assert state['sid'] == session['_id']
+        assert state['sid'] == _create_identifier()
         assert state['app'] == remote_app
         # Store next URL
         set_session_next_url(remote_app, state['next'])

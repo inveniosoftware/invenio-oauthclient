@@ -25,8 +25,8 @@ import os
 import time
 
 import pytest
-from flask import session, url_for
-from flask_login import login_user
+from flask import url_for
+from flask_login import _create_identifier, login_user
 from itsdangerous import TimedJSONWebSignatureSerializer
 from mock import MagicMock, patch
 from simplejson import JSONDecodeError
@@ -207,7 +207,7 @@ def test_authorized():
 
         state = serializer.dumps({
             'app': 'test',
-            'sid': session['_id'],
+            'sid': _create_identifier(),
             'next': None,
         })
 
@@ -227,7 +227,7 @@ def test_authorized():
 
         state = serializer.dumps({
             'app': 'test_invalid',
-            'sid': session['_id'],
+            'sid': _create_identifier(),
             'next': None,
         })
 
@@ -257,7 +257,7 @@ def test_invalid_authorized_response():
 
         state = serializer.dumps({
             'app': 'test',
-            'sid': session['_id'],
+            'sid': _create_identifier(),
             'next': None,
         })
 
@@ -273,8 +273,9 @@ def test_invalid_authorized_response():
 def test_state_token(monkeypatch):
     """Test state token."""
     # Mock session id
-    monkeypatch.setattr('invenio_oauthclient.views.client.session',
-                        {'_id': '1234'})
+    monkeypatch.setattr('flask_login._create_identifier', lambda: '1234')
+    monkeypatch.setattr(
+        'invenio_oauthclient.views.client._create_identifier', lambda: '1234')
     app = setup_app()
     with app.test_client() as client:
         # Ensure remote apps have been loaded (due to before first
@@ -335,13 +336,12 @@ def test_no_remote_app():
         assert resp.status_code == 404
 
 
-#  @patch('invenio.ext.session.interface.SessionInterface.save_session')
-#  @patch('invenio_oauthclient.views.client.session')
 def test_token_getter_setter(monkeypatch):
     """Test token getter setter."""
     # Mock session id
-    monkeypatch.setattr('invenio_oauthclient.views.client.session',
-                        {'_id': '1234'})
+    monkeypatch.setattr('flask_login._create_identifier', lambda: '1234')
+    monkeypatch.setattr(
+        'invenio_oauthclient.views.client._create_identifier', lambda: '1234')
 
     app = setup_app()
     oauth = app.extensions['oauthlib.client']
@@ -418,8 +418,9 @@ def test_token_getter_setter(monkeypatch):
 def test_rejected(monkeypatch):
     """Test rejected."""
     # Mock session id
-    monkeypatch.setattr('invenio_oauthclient.views.client.session',
-                        {'_id': '1234'})
+    monkeypatch.setattr('flask_login._create_identifier', lambda: '1234')
+    monkeypatch.setattr(
+        'invenio_oauthclient.views.client._create_identifier', lambda: '1234')
 
     app = setup_app()
     oauth = app.extensions['oauthlib.client']

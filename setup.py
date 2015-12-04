@@ -72,7 +72,8 @@ install_requires = [
     'Flask-BabelEx>=0.9.2',
     'Flask-Breadcrumbs>=0.3.0',
     'Flask-OAuthlib>=0.6.0,<0.7',  # quick fix for issue invenio#2158
-    'invenio-accounts>=1.0.0a5',
+    'Flask-Security>=1.7.5',
+    'invenio-accounts>=1.0.0a6',
     'invenio-db>=1.0.0a4',
     # FIXME
     #  'invenio-upgrader>=0.1.0',
