@@ -46,7 +46,7 @@
 
 2. Register a new application with ORCID. When registering the
    application ensure that the *Redirect URI* points to:
-   ``CFG_SITE_SECURE_URL/oauth/authorized/orcid/`` (note, ORCID does not
+   ``CFG_SITE_URL/oauth/authorized/orcid/`` (note, ORCID does not
    allow localhost to be used, thus testing on development machines is
    somewhat complicated by this).
 
@@ -61,7 +61,7 @@
            consumer_secret="<CLIENT SECRET>",
        )
 
-4. Now go to ``CFG_SITE_SECURE_URL/oauth/login/orcid/`` (e.g.
+4. Now go to ``CFG_SITE_URL/oauth/login/orcid/`` (e.g.
    http://localhost:4000/oauth/login/orcid/)
 
 5. Also, you should see ORCID listed under Linked accounts:
