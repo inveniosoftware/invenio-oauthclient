@@ -36,8 +36,13 @@
            consumer_secret="changeme",
        )
 
-  Note, if you want to use the ORCID sandbox, use ``orcid.REMOTE_SANDBOX_APP``
+  Note, if you want to use the ORCID Member API, use
+  ``orcid.REMOTE_MEMBER_APP`` instead of ``orcid.REMOTE_APP``.
+
+  In case you want use sandbox:
+  To use the ORCID Public API sandbox, use ``orcid.REMOTE_SANDBOX_APP``
   instead of ``orcid.REMOTE_APP``.
+  To use the ORCID Member API sandbox, use ``orcid.REMOTE_SANDBOX_MEMBER_APP``.
 
 2. Register a new application with ORCID. When registering the
    application ensure that the *Redirect URI* points to:
@@ -60,7 +65,7 @@
    http://localhost:4000/oauth/login/orcid/)
 
 5. Also, you should see ORCID listed under Linked accounts:
-   http://localhost:4000//account/settings/linkedaccounts/
+   http://localhost:4000/account/settings/linkedaccounts/
 
 By default the ORCID module will try first look if a link already exists
 between a ORCID account and a user. If no link is found, the user is asked
@@ -109,14 +114,34 @@ REMOTE_APP = dict(
 )
 """ ORCID Remote Application. """
 
-REMOTE_SANDBOX_APP = copy.deepcopy(REMOTE_APP)
-"""ORCID Sandbox Remote Application."""
+REMOTE_MEMBER_APP = copy.deepcopy(REMOTE_APP)
+"""ORCID Remote Application with member API."""
 
-REMOTE_SANDBOX_APP['params'].update(dict(
+REMOTE_MEMBER_APP['params'].update(dict(
+    base_url="https://api.orcid.org/",
+    access_token_url="https://api.orcid.org/oauth/token",
+))
+"""ORCID sandbox member API."""
+
+REMOTE_SANDBOX_MEMBER_APP = copy.deepcopy(REMOTE_APP)
+"""ORCID Sandbox Remote Application with member API."""
+
+REMOTE_SANDBOX_MEMBER_APP['params'].update(dict(
     base_url="https://api.sandbox.orcid.org/",
     access_token_url="https://api.sandbox.orcid.org/oauth/token",
     authorize_url="https://sandbox.orcid.org/oauth/authorize#show_login",
 ))
+"""ORCID sandbox member API."""
+
+REMOTE_SANDBOX_APP = copy.deepcopy(REMOTE_APP)
+"""ORCID Sandbox Remote Application with public API."""
+
+REMOTE_SANDBOX_APP['params'].update(dict(
+    base_url="https://pub.sandbox.orcid.org/",
+    access_token_url="https://pub.sandbox.orcid.org/oauth/token",
+    authorize_url="https://sandbox.orcid.org/oauth/authorize#show_login",
+))
+"""ORCID sandbox public API."""
 
 
 def account_info(remote, resp):
