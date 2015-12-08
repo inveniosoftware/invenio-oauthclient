@@ -36,6 +36,7 @@ from .errors import OAuthClientError, OAuthError, OAuthRejectedRequestError, \
 from .forms import EmailSignUpForm
 from .models import RemoteAccount, RemoteToken
 from .proxies import current_oauthclient
+from .signals import account_info_received
 from .utils import oauth_authenticate, oauth_get_user, oauth_register
 
 
@@ -217,6 +218,9 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
     # ---------------
     if not current_user.is_authenticated:
         account_info = handlers['info'](resp)
+        account_info_received.send(
+            remote, response=resp, account_info=account_info
+        )
 
         user = oauth_get_user(
             remote.consumer_key,
@@ -258,6 +262,7 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
     # -------------
     if not token.remote_account.extra_data:
         handlers['setup'](token, resp)
+        # TODO add signal for account setup
 
     # Redirect to next
     next_url = get_session_next_url(remote.name)
@@ -338,6 +343,7 @@ def signup_handler(remote, *args, **kwargs):
 
         if not token.remote_account.extra_data:
             handlers['setup'](token, response)
+            # TODO add signal for account setup
 
         # Remove account info from session
         session.pop(session_prefix + '_account_info', None)
