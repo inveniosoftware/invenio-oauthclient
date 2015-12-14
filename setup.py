@@ -37,7 +37,7 @@ tests_require = [
     'Flask-CLI>=0.2.1',
     'check-manifest>=0.25',
     'coverage>=4.0',
-    'httpretty>=0.8.10',
+    'httpretty==0.8.10',  # see gabrielfalcao/HTTPretty#269
     'isort>=4.2.2',
     'mock>=1.3.0',
     'pep257>=0.7.0',
