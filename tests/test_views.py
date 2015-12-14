@@ -348,8 +348,9 @@ def test_token_getter_setter(monkeypatch):
 
     # Mock user
     user = MagicMock()
+    user.id = 1
     user.get_id = MagicMock(return_value=1)
-    user.is_authenticated = MagicMock(return_value=True)
+    user.is_anonymous = False
 
     with patch('flask_login._get_user', return_value=user):
         with app.test_client() as c:

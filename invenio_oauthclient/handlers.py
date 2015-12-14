@@ -27,7 +27,7 @@ import six
 from flask import current_app, flash, redirect, render_template, request, \
     session, url_for
 from flask_babelex import gettext as _
-from flask_login import current_user
+from flask_security import current_user
 from invenio_db import db
 from werkzeug.utils import import_string
 
@@ -107,13 +107,16 @@ def oauth2_token_setter(remote, resp, token_type='', extra_data=None):
     )
 
 
-def token_setter(remote, token, secret='', token_type='', extra_data=None):
+def token_setter(remote, token, secret='', token_type='', extra_data=None,
+                 user=None):
     """Set token for user."""
     session[token_session_key(remote.name)] = (token, secret)
+    user = user or current_user
 
-    # Save token if used is authenticated
-    if current_user.is_authenticated:
-        uid = current_user.get_id()
+    # Save token if user is not anonymous (user exists but can be not active at
+    # this moment)
+    if not user.is_anonymous:
+        uid = user.id
         cid = remote.consumer_key
 
         # Check for already existing token
@@ -328,16 +331,9 @@ def signup_handler(remote, *args, **kwargs):
         # Remove session key
         session.pop(session_prefix + '_autoregister', None)
 
-        # Authenticate the user
-        if not oauth_authenticate(remote.consumer_key, user,
-                                  require_existing_link=False,
-                                  remember=current_app.config[
-                                      'OAUTHCLIENT_REMOTE_APPS']
-                                  [remote.name].get('remember', False)):
-            return current_app.login_manager.unauthorized()
-
         # Link account and set session data
-        token = token_setter(remote, oauth_token[0], secret=oauth_token[1])
+        token = token_setter(remote, oauth_token[0], secret=oauth_token[1],
+                             user=user)
         handlers = current_oauthclient.signup_handlers[remote.name]
 
         if token is None:
@@ -349,6 +345,16 @@ def signup_handler(remote, *args, **kwargs):
                 remote, token=token, response=response,
                 account_setup=account_setup
             )
+
+        # Authenticate the user
+        if not oauth_authenticate(remote.consumer_key, user,
+                                  require_existing_link=False,
+                                  remember=current_app.config[
+                                      'OAUTHCLIENT_REMOTE_APPS']
+                                  [remote.name].get('remember', False)):
+            # Redirect the user after registration (which doesn't include the
+            # activation), waiting for user to confirm his email.
+            return redirect(url_for("security.login"))
 
         # Remove account info from session
         session.pop(session_prefix + '_account_info', None)

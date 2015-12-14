@@ -56,6 +56,9 @@ extras_require = {
     'github': [
         'github3.py>=0.9',
     ],
+    'orcid': [
+        'invenio-mail>=1.0.0a2',
+    ]
 }
 
 extras_require['all'] = []

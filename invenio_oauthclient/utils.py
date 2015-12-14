@@ -19,14 +19,27 @@
 
 """Utility methods to help find, authenticate or register a remote user."""
 
-from flask import current_app, request
+from flask import current_app, request, after_this_request
 from flask_security import login_user, logout_user
+from flask_security.registerable import register_user
+from flask_security.confirmable import requires_confirmation
 from invenio_db import db
 from uritools import urisplit
+from werkzeug.local import LocalProxy
 
 from invenio_accounts.models import User
 
 from .models import RemoteAccount, RemoteToken, UserIdentity
+
+
+_security = LocalProxy(lambda: current_app.extensions['security'])
+
+_datastore = LocalProxy(lambda: _security.datastore)
+
+
+def _commit(response=None):
+    _datastore.commit()
+    return response
 
 
 def _get_external_id(account_info):
@@ -64,13 +77,15 @@ def oauth_authenticate(client_id, user, require_existing_link=False,
                        remember=False):
     """Authenticate an oauth authorized callback."""
     # Authenticate via the access token (access token used to get user_id)
-    if login_user(user):
-        if require_existing_link:
-            account = RemoteAccount.get(user.id, client_id)
-            if account is None:
-                logout_user()
-                return False
-        return True
+    if not requires_confirmation(user):
+        after_this_request(_commit)
+        if login_user(user):
+            if require_existing_link:
+                account = RemoteAccount.get(user.id, client_id)
+                if account is None:
+                    logout_user()
+                    return False
+            return True
     return False
 
 
@@ -80,18 +95,9 @@ def oauth_register(account_info, form_data=None):
     if form_data and form_data.get("email"):
         email = form_data.get("email")
 
-    datastore = current_app.extensions['invenio-accounts'].datastore
-
     if email:
-        with db.session.begin_nested():
-            if not datastore.find_user(email=email):
-                kwargs = dict(email=email, password=None, active=True)
-                try:
-                    user = datastore.create_user(**kwargs)
-                except Exception:
-                    current_app.logger.exception("Cannot create user")
-                    raise
-
+        form_data['password'] = None
+        user = register_user(**form_data)
         return user
 
     return None

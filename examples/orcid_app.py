@@ -34,7 +34,7 @@ Usage:
    .. code-block:: console
 
       cdvirtualenv src/invenio-oauthclient
-      pip install -e .
+      pip install -e .[orcid]
 
 3. Grab the *Client ID* and *Client Secret* after registering the application
    and add them to your instance configuration as `consumer_key` and
@@ -83,7 +83,7 @@ import os
 from flask import Flask, redirect, url_for
 from flask_babelex import Babel
 from flask_cli import FlaskCLI
-from flask_login import current_user
+from flask_security import current_user
 from flask_menu import Menu as FlaskMenu
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from invenio_accounts import InvenioAccounts
@@ -94,6 +94,7 @@ from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib import orcid
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
+from invenio_mail import InvenioMail as Mail
 
 # [ Configure application credentials ]
 ORCID_APP_CREDENTIALS = dict(
@@ -105,6 +106,7 @@ ORCID_APP_CREDENTIALS = dict(
 app = Flask(__name__)
 
 app.config.update(
+    SQLALCHEMY_ECHO=False,
     SQLALCHEMY_DATABASE_URI=os.environ.get(
         'SQLALCHEMY_DATABASE_URI', 'sqlite:///orcid_app.db'
     ),
@@ -115,11 +117,13 @@ app.config.update(
     DEBUG=True,
     SECRET_KEY='TEST',
     SECURITY_PASSWORD_SALT='security-password-salt',
+    SECURITY_LOGIN_WITHOUT_CONFIRMATION=False,
 )
 
 FlaskCLI(app)
 Babel(app)
 FlaskMenu(app)
+Mail(app)
 InvenioDB(app)
 InvenioAccounts(app)
 FlaskOAuth(app)
