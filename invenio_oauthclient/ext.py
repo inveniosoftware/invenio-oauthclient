@@ -127,3 +127,7 @@ class InvenioOAuthClient(object):
         for k in dir(config):
             if k.startswith('OAUTHCLIENT_'):
                 app.config.setdefault(k, getattr(config, k))
+
+        app.config.update(
+            SECURITY_LOGIN_USER_TEMPLATE="invenio_oauthclient/login_user.html"
+        )
