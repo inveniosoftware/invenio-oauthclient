@@ -127,3 +127,18 @@ class InvenioOAuthClient(object):
         for k in dir(config):
             if k.startswith('OAUTHCLIENT_'):
                 app.config.setdefault(k, getattr(config, k))
+
+        @app.before_first_request
+        def override_template_configuration():
+            """Override template configuration."""
+            template_key = app.config.get(
+                'OAUTHCLIENT_TEMPLATE_KEY',
+                'SECURITY_LOGIN_USER_TEMPLATE'  # default template key
+            )
+            if template_key is not None:
+                template = app.config[template_key]  # keep the old value
+                app.config['OAUTHCLIENT_LOGIN_USER_TEMPLATE_PARENT'] = template
+                app.config[template_key] = app.config.get(
+                    'OAUTHCLIENT_LOGIN_USER_TEMPLATE',
+                    'invenio_oauthclient/login_user.html'
+                )
