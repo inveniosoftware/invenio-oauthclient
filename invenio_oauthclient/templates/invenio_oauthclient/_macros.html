@@ -48,3 +48,13 @@
   </div>
   {%- endif %}
 {% endmacro %}
+
+
+{% macro oauth_button(name) %}
+  {# TODO add next argument except when security.login or logout #}
+  <a class="btn btn-default btn-lg btn-block"
+     href="{{url_for('invenio_oauthclient.login', remote_app=name)}}">
+    <i class="fa fa-{{ name|lower() }}"></i> {{ _('Sign in with %(title)s',
+                                                   title=config.OAUTHCLIENT_REMOTE_APPS[name]['title']) }}
+  </a>
+{% endmacro %}
