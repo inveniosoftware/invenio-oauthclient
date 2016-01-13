@@ -49,6 +49,9 @@ tests_require = [
 ]
 
 extras_require = {
+    'admin': [
+        'invenio-admin>=1.0.0a2',
+    ],
     'docs': [
         "Sphinx>=1.3",
     ],
@@ -137,6 +140,12 @@ setup(
         'invenio_i18n.translations': [
             'invenio_oauthclient = invenio_oauthclient',
         ],
+        'invenio_admin.views': [
+            'invenio_oauth_remote_account = '
+            'invenio_oauthclient.admin:remote_account_adminview',
+            'invenio_oauth_remote_token = '
+            'invenio_oauthclient.admin:remote_token_adminview',
+        ]
     },
     extras_require=extras_require,
     install_requires=install_requires,

@@ -194,7 +194,7 @@ def account_setup(remote, token, resp):
         # FIXME put these data in user profile!
         # Fill user full name if not already set
         # if user and not any([user.given_names, user.family_name]):
-        #     # Query ORCID to get the real name
+        # Query ORCID to get the real name
         #     response = remote.get("{0}/orcid-bio".format(orcid),
         #                           headers={'Accept':
         #                                    'application/orcid+json'},
@@ -214,5 +214,5 @@ def account_setup(remote, token, resp):
         #
         #         db.session.add(user)
         #
-        #         # Refresh user cache
+        # Refresh user cache
         #         current_user.reload()

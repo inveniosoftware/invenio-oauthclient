@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -83,9 +83,9 @@ import os
 from flask import Flask, redirect, url_for
 from flask_babelex import Babel
 from flask_cli import FlaskCLI
-from flask_security import current_user
 from flask_menu import Menu as FlaskMenu
 from flask_oauthlib.client import OAuth as FlaskOAuth
+from flask_security import current_user
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_user
 from invenio_db import InvenioDB

@@ -20,12 +20,11 @@
 """Models for storing access tokens and links between users and remote apps."""
 
 from flask import current_app
+from invenio_accounts.models import User
 from invenio_db import db
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy_utils import JSONType
 from sqlalchemy_utils.types.encrypted import EncryptedType
-
-from invenio_accounts.models import User
 
 
 def _secret_key():
@@ -72,9 +71,9 @@ class RemoteAccount(db.Model):
     """SQLAlchemy relationship to user."""
 
     tokens = db.relationship(
-        "RemoteToken",
-        backref="remote_account",
-        cascade="all, delete-orphan"
+        'RemoteToken',
+        backref='remote_account',
+        cascade='all, delete-orphan'
     )
     """SQLAlchemy relationship to RemoteToken objects."""
 
@@ -113,6 +112,10 @@ class RemoteAccount(db.Model):
         with db.session.begin_nested():
             db.session.delete(self)
 
+    def __repr__(self):
+        """String representation for model."""
+        return 'Remote Account <id={0.id}, user_id={0.user.id}>'.format(self)
+
 
 class RemoteToken(db.Model):
     """Storage for the access tokens for linked accounts."""
@@ -142,6 +145,11 @@ class RemoteToken(db.Model):
 
     secret = db.Column(db.Text(), default='', nullable=False)
     """Used only by OAuth 1."""
+
+    def __repr__(self):
+        """String representation for model."""
+        return ('Remote Token <token_type={0.token_type} '
+                'access_token={0.access_token}'.format(self))
 
     def token(self):
         """Get token as expected by Flask-OAuthlib."""
@@ -220,7 +228,7 @@ class UserIdentity(db.Model):
     id_user = db.Column(db.Integer(),
                         db.ForeignKey(User.id), nullable=False)
 
-    user = db.relationship(User, backref="external_identifiers")
+    user = db.relationship(User, backref='external_identifiers')
 
     __table_args__ = (
         db.Index('useridentity_id_user_method', id_user, method, unique=True),

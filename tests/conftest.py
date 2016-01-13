@@ -38,11 +38,11 @@ from flask_cli import FlaskCLI
 from flask_mail import Mail
 from flask_menu import Menu as FlaskMenu
 from flask_oauthlib.client import OAuth as FlaskOAuth
+from invenio_accounts import InvenioAccounts
 from invenio_db import InvenioDB, db
 from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
 
-from invenio_accounts import InvenioAccounts
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib.orcid import REMOTE_APP
 from invenio_oauthclient.views.client import blueprint as blueprint_client
