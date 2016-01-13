@@ -50,9 +50,10 @@ from flask import Flask
 from flask_babelex import Babel
 from flask_cli import FlaskCLI
 from flask_oauthlib.client import OAuth as FlaskOAuth
+from invenio_accounts import InvenioAccounts
+from invenio_admin import InvenioAdmin
 from invenio_db import InvenioDB
 
-from invenio_accounts import InvenioAccounts
 from invenio_oauthclient import InvenioOAuthClient
 
 # Create Flask application
@@ -62,9 +63,23 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'SQLALCHEMY_DATABASE_URI', 'sqlite:///app.db'
 )
 
+app.config.update(
+    ACCOUNTS_USE_CELERY=False,
+    CELERY_ALWAYS_EAGER=True,
+    CELERY_CACHE_BACKEND="memory",
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+    CELERY_RESULT_BACKEND="cache",
+    MAIL_SUPPRESS_SEND=True,
+    SECRET_KEY="CHANGE_ME",
+    SECURITY_PASSWORD_SALT="CHANGE_ME_ALSO",
+)
+
 FlaskCLI(app)
 Babel(app)
 InvenioDB(app)
 InvenioAccounts(app)
 FlaskOAuth(app)
 InvenioOAuthClient(app)
+
+InvenioAdmin(app, permission_factory=lambda x: x,
+             view_class_factory=lambda x: x)
