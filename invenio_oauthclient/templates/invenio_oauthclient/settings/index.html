@@ -22,11 +22,11 @@
 
 {% from "invenio_oauthclient/_macros.html" import render_field, form_errors %}
 
-{% block settings_form %}
+{% block settings_body %}
 <div class="panel-body">
     {% block oauth_body_text %}
     <p>{{ _('Tired of entering password for %(sitename)s every time you sign in? Setup single sign-on with one or more of the services below:',
-            sitename=config.CFG_SITE_NAME) }}</p>
+            sitename=config.THEME_SITENAME) }}</p>
     {% endblock oauth_body_text %}
 </div>
 <ul class="list-group">
