@@ -19,18 +19,16 @@
 
 """Utility methods to help find, authenticate or register a remote user."""
 
-from flask import current_app, request, after_this_request
+from flask import after_this_request, current_app, request
 from flask_security import login_user, logout_user
-from flask_security.registerable import register_user
 from flask_security.confirmable import requires_confirmation
+from flask_security.registerable import register_user
+from invenio_accounts.models import User
 from invenio_db import db
 from uritools import urisplit
 from werkzeug.local import LocalProxy
 
-from invenio_accounts.models import User
-
 from .models import RemoteAccount, RemoteToken, UserIdentity
-
 
 _security = LocalProxy(lambda: current_app.extensions['security'])
 

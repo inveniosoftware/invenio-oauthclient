@@ -103,6 +103,7 @@ from flask_oauthlib.client import OAuth as FlaskOAuth
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_user
 from invenio_db import InvenioDB
+
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib import cern
 from invenio_oauthclient.views.client import blueprint as blueprint_client

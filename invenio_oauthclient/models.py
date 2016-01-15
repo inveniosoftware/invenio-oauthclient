@@ -20,12 +20,11 @@
 """Models for storing access tokens and links between users and remote apps."""
 
 from flask import current_app
+from invenio_accounts.models import User
 from invenio_db import db
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy_utils import JSONType
 from sqlalchemy_utils.types.encrypted import EncryptedType
-
-from invenio_accounts.models import User
 
 
 def _secret_key():
@@ -119,9 +118,17 @@ class RemoteAccount(db.Model):
         with db.session.begin_nested():
             db.session.delete(self)
 
+    def __repr__(self):
+        """String representation for model."""
+        return str(self.id)
+
 
 class RemoteToken(db.Model):
     """Storage for the access tokens for linked accounts."""
+
+    def __repr__(self):
+        """String representation for model."""
+        return "{0.token_type} {0.access_token}".format(self)
 
     __tablename__ = 'oauthclient_remotetoken'
 
@@ -231,5 +238,6 @@ class UserIdentity(db.Model):
     __table_args__ = (
         db.Index('useridentity_id_user_method', id_user, method, unique=True),
     )
+
 
 __all__ = ('RemoteAccount', 'RemoteToken', 'UserIdentity')

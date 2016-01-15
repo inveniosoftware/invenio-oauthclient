@@ -78,7 +78,7 @@ install_requires = [
     'Flask-OAuthlib>=0.6.0,<0.7',  # quick fix for issue invenio#2158
     'Flask-Security>=1.7.5',
     'invenio-accounts>=1.0.0a6',
-    'invenio-db>=1.0.0a4',
+    'invenio-db>=1.0.0a9',
     # FIXME
     #  'invenio-upgrader>=0.1.0',
     # FIXME new oauthlib release after 0.7.2 has some compatible problems with
@@ -87,6 +87,7 @@ install_requires = [
     'six>=1.7.2',
     'sqlalchemy-utils>=0.31',
     'uritools>=1.0.1',
+    'invenio-admin>=1.0.0a2'
 ]
 
 packages = find_packages()
@@ -160,6 +161,12 @@ setup(
         'invenio_i18n.translations': [
             'invenio_oauthclient = invenio_oauthclient',
         ],
+        'invenio_admin.views': [
+          'invenio_oauth_remote_account = '
+          'invenio_oauthclient.admin:remote_account_adminview',
+          'invenio_oauth_remote_token = '
+          'invenio_oauthclient.admin:remote_token_adminview',
+        ]
     },
     extras_require=extras_require,
     install_requires=install_requires,
