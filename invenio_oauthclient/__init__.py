@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-r"""
+"""
 The oauthclient module provides OAuth web authorization support in Invenio.
 
 OAuth client support is typically used to allow features such as social login
@@ -70,9 +70,11 @@ flow with ORCID:
    .. code-block:: http
 
       HTTP/1.1 302 FOUND
-      Location: https://orcid.org/oauth/authorize?response_type=code&\
-      client_id=<CLIENT KEY>&redirect_uri=https://localhost/oauth/\
-      authorized/orcid/&scope=/authenticate&state=...
+      Location: https://orcid.org/oauth/authorize?response_type=code&
+        client_id=<CLIENT KEY>&
+        redirect_uri=https://localhost/oauth/authorized/orcid/&
+        scope=/authenticate&
+        state=...
 
   Note, following query parameters in the authorize URL:
 
@@ -100,9 +102,9 @@ flow with ORCID:
 
    .. code-block:: http
 
-       HTTP/1.1 302 FOUND
-       Location: https://localhost/oauth/authorized/orcid/?code=<CODE>&\
-       state=...
+      HTTP/1.1 302 FOUND
+      Location: https://localhost/oauth/authorized/orcid/?code=<CODE>&
+        state=...
 
    Included in the redirect is a one-time *auth code* which is typically only
    valid for short time (seconds), as well as the ``state`` token initially
@@ -127,7 +129,7 @@ flow with ORCID:
 
    .. code-block:: json
 
-      {"access_token": "<ACCESS TOKEN>}
+      {"access_token": "<ACCESS TOKEN>"}
 
    The client stores the access token, and can use it to make authenticated
    requests to the *resource server*:

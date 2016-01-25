@@ -41,3 +41,4 @@ recursive-include docs Makefile
 recursive-include examples *.py
 recursive-include invenio_oauthclient *.html
 recursive-include invenio_oauthclient *.pot
+recursive-include tests *.json

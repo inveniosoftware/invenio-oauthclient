@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -37,7 +37,7 @@ tests_require = [
     'Flask-CLI>=0.2.1',
     'check-manifest>=0.25',
     'coverage>=4.0',
-    'httpretty==0.8.10',  # see gabrielfalcao/HTTPretty#269
+    'httpretty>=0.8.14',
     'isort>=4.2.2',
     'mock>=1.3.0',
     'pep257>=0.7.0',
@@ -52,17 +52,28 @@ extras_require = {
     'docs': [
         "Sphinx>=1.3",
     ],
-    'tests': tests_require,
     'github': [
         'github3.py>=0.9',
     ],
     'orcid': [
         'invenio-mail>=1.0.0a2',
-    ]
+    ],
+    'mysql': [
+        'invenio-db[mysql]>=1.0.0a9',
+    ],
+    'postgresql': [
+        'invenio-db[postgresql]>=1.0.0a9',
+    ],
+    'sqlite': [
+        'invenio-db>=1.0.0a9',
+    ],
+    'tests': tests_require,
 }
 
 extras_require['all'] = []
-for reqs in extras_require.values():
+for name, reqs in extras_require.items():
+    if name in ('mysql', 'postgresql', 'sqlite'):
+        continue
     extras_require['all'].extend(reqs)
 
 setup_requires = [
@@ -78,7 +89,6 @@ install_requires = [
     'Flask-OAuthlib>=0.6.0,<0.7',  # quick fix for issue invenio#2158
     'Flask-Security>=1.7.5',
     'invenio-accounts>=1.0.0a6',
-    'invenio-db>=1.0.0a4',
     # FIXME
     #  'invenio-upgrader>=0.1.0',
     # FIXME new oauthlib release after 0.7.2 has some compatible problems with

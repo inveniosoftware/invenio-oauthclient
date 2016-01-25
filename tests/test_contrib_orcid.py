@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,6 +29,8 @@ from mock import MagicMock
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_accounts.models import User
+from invenio_db import db
+
 from invenio_oauthclient.contrib.orcid import account_info
 from invenio_oauthclient.models import UserIdentity
 from invenio_oauthclient.views.client import serializer
@@ -84,14 +86,12 @@ def test_login(app, example):
     assert params['state']
 
 
-def test_authorized_signup(app, example):
+def test_authorized_signup(app, example, orcid_bio):
     """Test authorized callback with sign-up."""
     example_data, example_account_info = example
     example_email = "orcidtest@invenio-software.org"
 
     with app.test_client() as c:
-        from .fixture import orcid_bio
-
         # Ensure remote apps have been loaded (due to before first
         # request)
         c.get(url_for("invenio_oauthclient.login", remote_app='orcid'))
@@ -174,11 +174,12 @@ def test_authorized_reject(app, example):
         assert session['_flashes'][0][0] == 'info'
 
 
-def test_authorized_already_authenticated(app, example):
+def test_authorized_already_authenticated(models_fixture, example, orcid_bio):
     """Test authorized callback with sign-up."""
     from invenio_oauthclient.models import UserIdentity
     from invenio_accounts.models import User
-    from .fixture import orcid_bio
+
+    app = models_fixture
 
     datastore = app.extensions['invenio-accounts'].datastore
     login_manager = app.login_manager

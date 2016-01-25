@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,75 +27,19 @@ import time
 import pytest
 from flask import url_for
 from flask_login import _create_identifier, login_user
+from flask_oauthlib.client import OAuth as FlaskOAuth
+from invenio_db import db
 from itsdangerous import TimedJSONWebSignatureSerializer
 from mock import MagicMock, patch
 from simplejson import JSONDecodeError
 from six.moves.urllib_parse import parse_qs, urlparse
 
+from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.handlers import token_getter
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
 from invenio_oauthclient.views.client import serializer
-
-from .conftest import gen_app
-
-
-def setup_app(test_ah=None, test_invalid_ah=None):
-    """Setup tests."""
-    test_ah = test_ah or \
-        (lambda *args, **kwargs: "TEST")
-    test_invalid_ah = test_invalid_ah or \
-        (lambda *args, **kwargs: "TEST")
-
-    def params(x):
-        return dict(
-            request_token_params={'scope': ''},
-            base_url='https://foo.bar/',
-            request_token_url=None,
-            access_token_url="https://foo.bar/oauth/access_token",
-            authorize_url="https://foo.bar/oauth/authorize",
-            consumer_key=x,
-            consumer_secret='testsecret',
-        )
-
-    remote_apps = dict(
-        test=dict(
-            authorized_handler=test_ah,
-            params=params('testid'),
-            title='MyLinkedTestAccount',
-        ),
-        test_invalid=dict(
-            authorized_handler=test_invalid_ah,
-            params=params('test_invalidid'),
-            title='Test Invalid',
-        ),
-        full=dict(
-            params=params("fullid"),
-            title='Full',
-        ),
-    )
-
-    config = dict(
-        TESTING=True,
-        LOGIN_DISABLED=False,
-        WTF_CSRF_ENABLED=False,
-        #  OAUTHCLIENT_STATE_ENABLED=True,
-        CACHE_TYPE='simple',
-        OAUTHCLIENT_REMOTE_APPS=remote_apps,
-        ORCID_APP_CREDENTIALS=dict(
-            consumer_key='changeme',
-            consumer_secret='changeme',
-        ),
-        # use local memory mailbox
-        EMAIL_BACKEND='flask_email.backends.locmem.Mail',
-        SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI',
-                                          'sqlite://'),
-        SERVER_NAME='localhost',
-        DEBUG=False,
-        SECRET_KEY='TEST',
-    )
-
-    return gen_app(config)
-
+from invenio_oauthclient.views.client import blueprint as blueprint_client
+from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 
 def mock_response(oauth, remote_app='test', data=None):
     """Mock the oauth response to use the remote."""
@@ -109,9 +53,9 @@ def mock_response(oauth, remote_app='test', data=None):
     )
 
 
-def test_redirect_uri():
+def test_redirect_uri(views_fixture):
     """Test redirect uri."""
-    app = setup_app()
+    app = views_fixture
     with app.test_client() as client:
         # Test redirect
         resp = client.get(
@@ -153,9 +97,9 @@ def test_redirect_uri():
             assert url == state['next']
 
 
-def test_login():
+def test_login(views_fixture):
     """Test login."""
-    app = setup_app()
+    app = views_fixture
     with app.test_client() as client:
         # Test redirect
         resp = client.get(
@@ -176,8 +120,10 @@ def test_login():
         assert resp.status_code == 404
 
 
-def test_authorized():
+def test_authorized(base_app, params):
     """Test login."""
+    app = base_app
+
     handled = {}
 
     def test_authorized_handler(resp, remote, *args, **kwargs):
@@ -195,7 +141,30 @@ def test_authorized():
         handled['args'] = 1
         handled['kwargs'] = 1
 
-    app = setup_app(test_authorized_handler, test_invalid_authorized_handler)
+    base_app.config['OAUTHCLIENT_REMOTE_APPS'].update(
+        dict(
+            test=dict(
+                authorized_handler=test_authorized_handler,
+                params=params('testid'),
+                title='MyLinkedTestAccount',
+            ),
+            test_invalid=dict(
+                authorized_handler=test_invalid_authorized_handler,
+                params=params('test_invalidid'),
+                title='Test Invalid',
+            ),
+            full=dict(
+                params=params("fullid"),
+                title='Full',
+            ),
+        )
+    )
+
+    FlaskOAuth(app)
+    InvenioOAuthClient(app)
+    base_app.register_blueprint(blueprint_client)
+    base_app.register_blueprint(blueprint_settings)
+
     with app.test_client() as client:
         # Ensure remote apps have been loaded (due to before first
         # request)
@@ -241,9 +210,9 @@ def test_authorized():
             ))
 
 
-def test_invalid_authorized_response():
+def test_invalid_authorized_response(views_fixture):
     """Test login."""
-    app = setup_app()
+    app = views_fixture
     oauth = app.extensions['oauthlib.client']
     with app.test_client() as client:
         # Fake an authorized request
@@ -270,13 +239,14 @@ def test_invalid_authorized_response():
             ))
 
 
-def test_state_token(monkeypatch):
+def test_state_token(views_fixture, monkeypatch):
     """Test state token."""
     # Mock session id
     monkeypatch.setattr('flask_login._create_identifier', lambda: '1234')
     monkeypatch.setattr(
         'invenio_oauthclient.views.client._create_identifier', lambda: '1234')
-    app = setup_app()
+    app = views_fixture
+
     with app.test_client() as client:
         # Ensure remote apps have been loaded (due to before first
         # request)
@@ -321,9 +291,9 @@ def test_state_token(monkeypatch):
             assert resp.status_code == 403
 
 
-def test_no_remote_app():
+def test_no_remote_app(views_fixture):
     """Test no remote app."""
-    app = setup_app()
+    app = views_fixture
     with app.test_client() as client:
         resp = client.get(
             url_for("invenio_oauthclient.authorized", remote_app='invalid')
@@ -336,14 +306,14 @@ def test_no_remote_app():
         assert resp.status_code == 404
 
 
-def test_token_getter_setter(monkeypatch):
+def test_token_getter_setter(views_fixture, monkeypatch):
     """Test token getter setter."""
     # Mock session id
     monkeypatch.setattr('flask_login._create_identifier', lambda: '1234')
     monkeypatch.setattr(
         'invenio_oauthclient.views.client._create_identifier', lambda: '1234')
 
-    app = setup_app()
+    app = views_fixture
     oauth = app.extensions['oauthlib.client']
 
     # Mock user
@@ -414,16 +384,18 @@ def test_token_getter_setter(monkeypatch):
             # Assert that remote account have been removed.
             t = RemoteToken.get(1, "fullid")
             assert t is None
+            # TODO: Figure out what is leaving session open & blocked
+            db.session.close()
 
 
-def test_rejected(monkeypatch):
+def test_rejected(views_fixture, monkeypatch):
     """Test rejected."""
     # Mock session id
     monkeypatch.setattr('flask_login._create_identifier', lambda: '1234')
     monkeypatch.setattr(
         'invenio_oauthclient.views.client._create_identifier', lambda: '1234')
 
-    app = setup_app()
+    app = views_fixture
     oauth = app.extensions['oauthlib.client']
 
     # Mock user id
@@ -465,14 +437,12 @@ def test_rejected(monkeypatch):
             assert res.status_code == 302
 
 
-def test_settings_view():
+def test_settings_view(views_fixture):
     """Test settings view."""
-    app = setup_app()
+    app = views_fixture
     app.login_manager.login_view = None
     login_manager = app.login_manager
     datastore = app.extensions['invenio-accounts'].datastore
-    datastore.create_user(email="pippo@test.it", password="pippo")
-    user = datastore.find_user(email="pippo@test.it")
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -480,27 +450,29 @@ def test_settings_view():
 
     @app.route('/foo_login')
     def login():
+        user = datastore.find_user(email="existing@invenio-software.org")
         login_user(user)
         return "Logged In"
 
-    with app.test_client() as client:
-        # Create a remove account (linked account)
-        RemoteAccount.create(user.id, 'testid', None)
+    with app.app_context():
+        with app.test_client() as client:
+            user = datastore.find_user(email="existing@invenio-software.org")
+            RemoteAccount.create(user.get_id(), 'testid', None)
 
-        resp = client.get(url_for('invenio_oauthclient_settings.index'),
-                          follow_redirects=False)
-        assert resp.status_code == 401
+            resp = client.get(url_for('invenio_oauthclient_settings.index'),
+                              follow_redirects=False)
+            assert resp.status_code == 401
 
-        # make a fake login (using my login function)
-        client.get('/foo_login', follow_redirects=True)
+            # make a fake login (using my login function)
+            client.get('/foo_login', follow_redirects=True)
 
-        resp = client.get(url_for('invenio_oauthclient_settings.index'),
-                          follow_redirects=True)
-        assert resp.status_code == 200
-        assert b'MyLinkedTestAccount' in resp.data
-        assert url_for('invenio_oauthclient.disconnect',
-                       remote_app='test') in resp.data.decode("utf-8")
-        assert url_for('invenio_oauthclient.login',
-                       remote_app='full') in resp.data.decode("utf-8")
-        assert url_for('invenio_oauthclient.login',
-                       remote_app='test_invalid') in resp.data.decode("utf-8")
+            resp = client.get(url_for('invenio_oauthclient_settings.index'),
+                              follow_redirects=True)
+            assert resp.status_code == 200
+            assert b'MyLinkedTestAccount' in resp.data
+            assert url_for('invenio_oauthclient.disconnect',
+                           remote_app='test') in resp.data.decode("utf-8")
+            assert url_for('invenio_oauthclient.login',
+                           remote_app='full') in resp.data.decode("utf-8")
+            assert url_for('invenio_oauthclient.login',
+                           remote_app='test_invalid') in resp.data.decode("utf-8")

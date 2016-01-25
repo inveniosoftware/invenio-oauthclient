@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -26,8 +26,9 @@ from invenio_db import db
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
 
 
-def test_get_create_remote_account(app, example):
+def test_get_create_remote_account(models_fixture, example):
     """Test create remote account."""
+    app = models_fixture
     created_acc = RemoteAccount.create(1, "dev", dict(somekey="somevalue"))
     assert created_acc
 
@@ -39,8 +40,9 @@ def test_get_create_remote_account(app, example):
     assert RemoteAccount.get(1, "dev") is None
 
 
-def test_get_create_remote_token(app, example):
+def test_get_create_remote_token(models_fixture, example):
     """Test create remote token."""
+    app = models_fixture
     existing_email = "existing@invenio-software.org"
     datastore = app.extensions['invenio-accounts'].datastore
     user = datastore.find_user(email=existing_email)
@@ -70,8 +72,9 @@ def test_get_create_remote_token(app, example):
     assert RemoteToken.query.count() == 0
 
 
-def test_get_regression(app, example):
+def test_get_regression(models_fixture, example):
     """Test regression."""
+    app = models_fixture
     datastore = app.extensions['invenio-accounts'].datastore
 
     email2 = "test2@invenio-software.org"

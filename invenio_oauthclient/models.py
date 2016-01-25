@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -31,12 +31,6 @@ from invenio_accounts.models import User
 def _secret_key():
     """Return secret key from current application."""
     return current_app.config.get('SECRET_KEY')
-
-
-class TextEncryptedType(EncryptedType):
-    """Text encrypted type."""
-
-    impl = db.Text
 
 
 class RemoteAccount(db.Model):
@@ -142,7 +136,7 @@ class RemoteToken(db.Model):
     """Type of token."""
 
     access_token = db.Column(
-        TextEncryptedType(type_in=db.Text, key=_secret_key), nullable=False
+        EncryptedType(type_in=db.Text, key=_secret_key), nullable=False
     )
     """Access token to remote application."""
 
@@ -221,8 +215,8 @@ class UserIdentity(db.Model):
 
     __tablename__ = 'oauthclient_useridentity'
 
-    id = db.Column(db.String(), primary_key=True, nullable=False)
-    method = db.Column(db.String(), primary_key=True, nullable=False)
+    id = db.Column(db.String(255), primary_key=True, nullable=False)
+    method = db.Column(db.String(255), primary_key=True, nullable=False)
     id_user = db.Column(db.Integer(),
                         db.ForeignKey(User.id), nullable=False)
 
