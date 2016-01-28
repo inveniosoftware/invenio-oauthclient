@@ -26,7 +26,7 @@ from invenio_db import db
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
 
 
-def test_get_create_remote_account(app, example):
+def test_get_create_remote_account(app):
     """Test create remote account."""
     created_acc = RemoteAccount.create(1, "dev", dict(somekey="somevalue"))
     assert created_acc
@@ -39,7 +39,7 @@ def test_get_create_remote_account(app, example):
     assert RemoteAccount.get(1, "dev") is None
 
 
-def test_get_create_remote_token(app, example):
+def test_get_create_remote_token(app):
     """Test create remote token."""
     existing_email = "existing@invenio-software.org"
     datastore = app.extensions['invenio-accounts'].datastore
@@ -70,7 +70,7 @@ def test_get_create_remote_token(app, example):
     assert RemoteToken.query.count() == 0
 
 
-def test_get_regression(app, example):
+def test_get_regression(app):
     """Test regression."""
     datastore = app.extensions['invenio-accounts'].datastore
 

@@ -143,6 +143,8 @@ REMOTE_APP = dict(
         authorize_url="https://oauth.web.cern.ch/OAuth/Authorize",
         app_key="CERN_APP_CREDENTIALS",
         content_type="application/json",
+        request_token_params={'scope': 'Name Email Bio Groups',
+                              'show_login': 'true'}
     )
 )
 """CERN Remote Application."""
@@ -194,7 +196,6 @@ def account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
     # Query CERN Resources to get user info and groups
     response = remote.get(REMOTE_APP_RESOURCE_API_URL)
-    current_app.logger.error(response.data)
     res = get_dict_from_response(response)
 
     email = res['EmailAddress'][0]
@@ -206,7 +207,7 @@ def account_info(remote, resp):
     return dict(email=email.lower(),
                 profile=dict(nickname=nice, full_name=name),
                 external_id=external_id, external_method='cern',
-                active=True, confirmed_at=datetime.utcnow())
+                active=True)
 
 
 def account_setup(remote, token, resp):
@@ -224,7 +225,7 @@ def account_setup(remote, token, resp):
         # Create user <-> external id link.
         oauth_link_external_id(user, dict(id=external_id, method="cern"))
 
-    groups = res['Group']
+    groups = fetch_groups(res['Group'])
     for group in groups:
         g.identity.provides.add(RoleNeed(group))
 

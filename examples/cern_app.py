@@ -124,17 +124,12 @@ CERN_APP_CREDENTIALS = dict(
 # Create Flask application
 app = Flask(__name__)
 
-CERN_REMOTE_APP = copy.deepcopy(cern.REMOTE_APP)
-CERN_REMOTE_APP["params"].update(dict(request_token_params={
-    "scope": "Name Email Bio Groups",
-}))
-
 app.config.update(
     SQLALCHEMY_DATABASE_URI=os.environ.get(
         'SQLALCHEMY_DATABASE_URI', 'sqlite:///cern_app.db'
     ),
     OAUTHCLIENT_REMOTE_APPS=dict(
-        cern=CERN_REMOTE_APP
+        cern=cern.REMOTE_APP
     ),
     CERN_APP_CREDENTIALS=CERN_APP_CREDENTIALS,
     DEBUG=True,
@@ -158,6 +153,7 @@ app.register_blueprint(blueprint_user)
 app.register_blueprint(blueprint_client)
 app.register_blueprint(blueprint_settings)
 principal = app.extensions['security'].principal
+
 
 # FIXME: This should probably go into invenio-accounts
 @principal.identity_loader
