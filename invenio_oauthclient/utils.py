@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -96,6 +96,7 @@ def oauth_register(account_info, form_data=None):
         email = form_data.get("email")
 
     if email:
+        form_data = form_data or {'email': email}
         form_data['password'] = None
         user = register_user(**form_data)
         return user

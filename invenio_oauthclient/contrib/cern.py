@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -85,8 +85,11 @@ In templates you can add a sign in/up link:
 
 import copy
 import re
+from datetime import datetime
 
-from flask import current_app
+from flask import g, current_app, session
+from flask_principal import RoleNeed, identity_changed
+
 
 #: Tunable list of groups to be hidden.
 CFG_EXTERNAL_AUTH_HIDDEN_GROUPS = (
@@ -140,6 +143,8 @@ REMOTE_APP = dict(
         authorize_url="https://oauth.web.cern.ch/OAuth/Authorize",
         app_key="CERN_APP_CREDENTIALS",
         content_type="application/json",
+        request_token_params={'scope': 'Name Email Bio Groups',
+                              'show_login': 'true'}
     )
 )
 """CERN Remote Application."""
@@ -175,6 +180,7 @@ def fetch_groups(groups):
     return groups
 
 
+# TODO: Add cache for the dict
 def get_dict_from_response(response):
     """Prepare new mapping with 'Value's groupped by 'Type'."""
     result = {}
@@ -193,12 +199,35 @@ def account_info(remote, resp):
     res = get_dict_from_response(response)
 
     email = res['EmailAddress'][0]
-    common_name = res['CommonName'][0]
+    external_id = res['PersonID'][0]
+    nice = res['CommonName'][0]
+    name = res['DisplayName'][0]
 
     # FIXME get user informations accordly with invenio-userprofiles
-    return dict(email=email.lower(), nickname=common_name)
+    return dict(email=email.lower(),
+                profile=dict(nickname=nice, full_name=name),
+                external_id=external_id, external_method='cern',
+                active=True)
 
 
 def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
-    pass
+    from invenio_oauthclient.utils import oauth_link_external_id
+    from invenio_db import db
+
+    response = remote.get(REMOTE_APP_RESOURCE_API_URL)
+    res = get_dict_from_response(response)
+
+    with db.session.begin_nested():
+        user = token.remote_account.user
+        external_id = res['PersonID'][0]
+
+        # Create user <-> external id link.
+        oauth_link_external_id(user, dict(id=external_id, method="cern"))
+
+    groups = fetch_groups(res['Group'])
+    for group in groups:
+        g.identity.provides.add(RoleNeed(group))
+
+    principal = current_app.extensions['security'].principal
+    principal.set_identity(g.identity)

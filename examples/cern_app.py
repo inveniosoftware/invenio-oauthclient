@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -92,21 +92,28 @@ You can find the database in `examples/cern_app.db`.
 from __future__ import absolute_import, print_function
 
 import copy
+import redis
 import os
 
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, session
 from flask_babelex import Babel
 from flask_cli import FlaskCLI
+from flask_kvsession import KVSessionExtension
 from flask_login import current_user
 from flask_menu import Menu as FlaskMenu
 from flask_oauthlib.client import OAuth as FlaskOAuth
+from flask_principal import Identity, RoleNeed
+from simplekv.memory.redisstore import RedisStore
+
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_user
 from invenio_db import InvenioDB
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib import cern
+from invenio_oauthclient.signals import account_setup_received
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
+
 
 # [ Configure application credentials ]
 CERN_APP_CREDENTIALS = dict(
@@ -117,23 +124,21 @@ CERN_APP_CREDENTIALS = dict(
 # Create Flask application
 app = Flask(__name__)
 
-CERN_REMOTE_APP = copy.deepcopy(cern.REMOTE_APP)
-CERN_REMOTE_APP["params"].update(dict(request_token_params={
-    "scope": "Name Email Bio Groups",
-}))
-
 app.config.update(
     SQLALCHEMY_DATABASE_URI=os.environ.get(
         'SQLALCHEMY_DATABASE_URI', 'sqlite:///cern_app.db'
     ),
     OAUTHCLIENT_REMOTE_APPS=dict(
-        cern=CERN_REMOTE_APP
+        cern=cern.REMOTE_APP
     ),
     CERN_APP_CREDENTIALS=CERN_APP_CREDENTIALS,
     DEBUG=True,
     SECRET_KEY='TEST',
     SECURITY_PASSWORD_SALT='security-password-salt',
+    SECURITY_SEND_REGISTER_EMAIL=False,
 )
+
+store = RedisStore(redis.StrictRedis())
 
 FlaskCLI(app)
 Babel(app)
@@ -142,10 +147,33 @@ InvenioDB(app)
 InvenioAccounts(app)
 FlaskOAuth(app)
 InvenioOAuthClient(app)
+KVSessionExtension(store, app)
 
 app.register_blueprint(blueprint_user)
 app.register_blueprint(blueprint_client)
 app.register_blueprint(blueprint_settings)
+principal = app.extensions['security'].principal
+
+
+# FIXME: This should probably go into invenio-accounts
+@principal.identity_loader
+def identity_loader_session():
+    """Load the identity from the session."""
+    try:
+        identity = Identity(
+            session['identity.id'], session['identity.auth_type'])
+        identity.provides = session['identity.provides']
+        return identity
+    except KeyError:
+        return None
+
+
+@principal.identity_saver
+def identity_saver_session(identity):
+    """Save identity to the session."""
+    session['identity.id'] = identity.id
+    session['identity.auth_type'] = identity.auth_type
+    session['identity.provides'] = identity.provides
 
 
 @app.route('/')
