@@ -1,39 +1,30 @@
-============================
- Invenio-OAuthClient v0.1.1
-============================
+==============================
+ Invenio-OAuthClient v1.0.0a1
+==============================
 
-Invenio-OAuthClient v0.1.1 was released on August 25, 2015.
+Invenio-OAuthClient v1.0.0a1 was released on February 1, 2016.
 
 About
 -----
 
 Invenio module that provides OAuth web authorization support.
 
-*This is an experimental development preview release.*
+*This is an experimental developer preview release.*
 
-Improved features
------------------
+What's new
+----------
 
-- Improves the account setup for the CERN oauthclient.
-
-Bug fixes
----------
-
-- Adds missing `invenio_upgrader` dependency and amends past upgrade
-  recipes following its separation into standalone package.
-
-- Sends a validation email only if the option is enabled in the
-  config.  (#4)
+- Refactoring for Invenio 3.
 
 Installation
 ------------
 
-   $ pip install invenio-oauthclient==0.1.1
+   $ pip install invenio-oauthclient==1.0.0a1
 
 Documentation
 -------------
 
-   http://invenio-oauthclient.readthedocs.org/en/v0.1.1
+   http://pythonhosted.org/invenio-oauthclient/
 
 Happy hacking and thanks for flying Invenio-OAuthClient.
 
