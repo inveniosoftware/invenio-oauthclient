@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -47,7 +47,8 @@ blueprint = Blueprint(
     blueprint, 'settings.oauthclient',
     _('%(icon)s Linked accounts', icon='<i class="fa fa-link fa-fw"></i>'),
     order=3,
-    active_when=lambda: request.endpoint.startswith("oauthclient_settings.")
+    active_when=lambda: request.endpoint.startswith(
+        "invenio_oauthclient_settings.")
 )
 @register_breadcrumb(
     blueprint, 'breadcrumbs.settings.oauthclient', _('Linked accounts')
