@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -26,6 +26,7 @@
                                  an access token. **Default:** ``oauth_token``.
 `OAUTHCLIENT_STATE_EXPIRES`      Number of seconds after which the state token
                                  expires. Defaults to 300 seconds.
+`OAUTHCLIENT_REMOTE_APP`         Replaces the default remote application class.
 ================================ ==============================================
 
 Each remote application must be defined in the ``OAUTHCLIENT_REMOTE_APPS``
@@ -174,6 +175,39 @@ a given authorize request.
             # ...
         )
     )
+
+Custom remote application
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some OAuth services require a specific handling of OAuth requests. If the
+standard flask-oauthlib.client.OAuthRemoteApp does not support it, it is
+possible to replace the standard OAuthRemoteApp for all remote application
+by referring to the custom class with the configuration variable
+``OAUTHCLIENT_REMOTE_APP`` or for only one remote application by
+setting ``remote_app`` in your remote application configuration.
+
+.. code-block:: python
+
+    class CustomOAuthRemoteApp(OAuthRemoteApp):
+        pass
+
+    app.config.update(
+        OAUTHCLIENT_REMOTE_APP=
+            'myproject.mymodule:CustomOAuthRemoteApp'
+    )
+
+    # OR
+
+    app.config.update(
+        OAUTHCLIENT_REMOTE_APPS=dict(
+            custom_app=dict(
+                # ...
+                remote_app=
+                    'myproject.mymodule:CustomOAuthRemoteApp'
+            )
+        )
+    )
+
 """
 
 OAUTHCLIENT_REMOTE_APPS = {}

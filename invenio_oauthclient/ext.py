@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -27,11 +27,12 @@
 from __future__ import absolute_import, print_function
 
 from flask_login import user_logged_out
-from flask_oauthlib.client import OAuth as FlaskOAuth
+from flask_oauthlib.client import OAuth as FlaskOAuth, OAuthRemoteApp
 
 from . import config
 from .handlers import authorized_default_handler, disconnect_handler, \
     make_handler, make_token_getter, oauth_logout_handler
+from .utils import load_or_import_from_config, obj_or_import_string
 
 
 class _OAuthClientState(object):
@@ -52,11 +53,23 @@ class _OAuthClientState(object):
         # Add remote applications
         self.oauth.init_app(app)
 
+        remote_app_class = load_or_import_from_config(
+            'OAUTHCLIENT_REMOTE_APP', app, default=OAuthRemoteApp
+        )
+
         for remote_app, conf in app.config[
                 'OAUTHCLIENT_REMOTE_APPS'].items():
             # Prevent double creation problems
             if remote_app not in self.oauth.remote_apps:
-                remote = self.oauth.remote_app(
+                # use this app's specific remote app class if there is one.
+                current_remote_app_class = obj_or_import_string(
+                    conf.get('remote_app'), default=remote_app_class
+                )
+                # Register the remote app. We are doing this because the
+                # current version of OAuth.remote_app does not allow to specify
+                # the remote app class. Use it once it is fixed.
+                self.oauth.remote_apps[remote_app] = current_remote_app_class(
+                    self.oauth,
                     remote_app,
                     **conf['params']
                 )

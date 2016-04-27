@@ -19,6 +19,7 @@
 
 """Utility methods to help find, authenticate or register a remote user."""
 
+import six
 from flask import after_this_request, current_app, request
 from flask_security import login_user, logout_user
 from flask_security.confirmable import requires_confirmation
@@ -27,6 +28,7 @@ from invenio_accounts.models import User
 from invenio_db import db
 from uritools import urisplit
 from werkzeug.local import LocalProxy
+from werkzeug.utils import import_string
 
 from .models import RemoteAccount, RemoteToken, UserIdentity
 
@@ -131,3 +133,19 @@ def get_safe_redirect_target(arg='next'):
         if target and is_local_url(target):
             return target
     return None
+
+
+def obj_or_import_string(value, default=None):
+    """Import string or return object."""
+    if isinstance(value, six.string_types):
+        return import_string(value)
+    elif value:
+        return value
+    return default
+
+
+def load_or_import_from_config(key, app=None, default=None):
+    """Load or import value from config."""
+    app = app or current_app
+    imp = app.config.get(key)
+    return obj_or_import_string(imp, default=default)
