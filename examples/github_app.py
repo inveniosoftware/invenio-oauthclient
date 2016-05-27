@@ -26,7 +26,7 @@ r"""Minimal Flask application example for development with github handler.
 
 Usage:
 
-1. Register a gihub application with `Authorization callback URL` as
+1. Register a github application with `Authorization callback URL` as
    `http://localhost:5000/oauth/authorized/github/`
 
 2. Ensure you have ``github3.py`` package installed:

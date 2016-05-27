@@ -58,3 +58,5 @@ target/
 
 # example app
 examples/*.db
+examples/*.key
+examples/*.crt

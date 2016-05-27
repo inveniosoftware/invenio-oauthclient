@@ -26,7 +26,7 @@ r"""Minimal Flask application example for development with orcid handler.
 
 Usage:
 
-1. Register a gihub application with `Authorization callback URL` as
+1. Register an orcid application with `Authorization callback URL` as
    `http://localhost:5000/oauth/authorized/orcid/`
 
 2. Install oauthclient:

@@ -37,6 +37,7 @@ Invenio module that provides OAuth web authorization support.
 - Ludmila Marian <ludmila.marian@gmail.com>
 - Marco Neumann <marco@crepererum.net>
 - Nicolas Harraudeau <nicolas.harraudeau@cern.ch>
+- Orestis Melkonian <melkon.or@gmail.com>
 - Pamfilos Fokianos <pamfilos.fokianos@cern.ch>
 - Sami Hiltunen <sami.mikael.hiltunen@cern.ch>
 - Tibor Simko <tibor.simko@cern.ch>

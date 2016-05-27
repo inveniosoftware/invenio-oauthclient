@@ -98,6 +98,7 @@ def oauth_register(account_info, form_data=None):
     if email:
         data = dict(**form_data) if form_data else {}
         data['password'] = ''
+        data['email'] = email
         user = register_user(**data)
         user.password = None
         _datastore.commit()

@@ -23,30 +23,17 @@ from __future__ import absolute_import
 
 import httpretty
 from flask import session, url_for
-from flask_login import _create_identifier
 from flask_security.utils import login_user
 from invenio_accounts.models import User
-from mock import MagicMock
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.contrib.orcid import account_info
 from invenio_oauthclient.models import UserIdentity
-from invenio_oauthclient.views.client import serializer
+
+from .helpers import mock_response, get_state
 
 
-def mock_response(oauth, remote_app='test', data=None):
-    """Mock the oauth response to use the remote."""
-    oauth.remote_apps[remote_app].handle_oauth2_response = MagicMock(
-        return_value=data
-    )
-
-
-def _get_state():
-    return serializer.dumps({'app': 'orcid', 'sid': _create_identifier(),
-                             'next': None, })
-
-
-def test_account_info(app, example):
+def test_account_info(app, example_orcid):
     """Test account info extraction."""
     client = app.test_client()
     ioc = app.extensions['oauthlib.client']
@@ -54,7 +41,7 @@ def test_account_info(app, example):
     # request)
     client.get(url_for("invenio_oauthclient.login", remote_app='orcid'))
 
-    example_data, example_account_info = example
+    example_data, example_account_info = example_orcid
 
     assert account_info(
         ioc.remote_apps['orcid'], example_data) == example_account_info
@@ -65,7 +52,7 @@ def test_account_info(app, example):
              nickname=None)
 
 
-def test_login(app, example):
+def test_login(app, example_orcid):
     """Test ORCID login."""
     client = app.test_client()
 
@@ -84,9 +71,9 @@ def test_login(app, example):
     assert params['state']
 
 
-def test_authorized_signup(app, example, orcid_bio):
+def test_authorized_signup(app, example_orcid, orcid_bio):
     """Test authorized callback with sign-up."""
-    example_data, example_account_info = example
+    example_data, example_account_info = example_orcid
     example_email = "orcidtest@invenio-software.org"
 
     with app.test_client() as c:
@@ -100,7 +87,7 @@ def test_authorized_signup(app, example, orcid_bio):
         resp = c.get(
             url_for("invenio_oauthclient.authorized",
                     remote_app='orcid', code='test',
-                    state=_get_state()))
+                    state=get_state('orcid')))
         assert resp.status_code == 302
         assert resp.location == (
             "http://localhost" +
@@ -155,7 +142,7 @@ def test_authorized_signup(app, example, orcid_bio):
         ).count()
 
 
-def test_authorized_reject(app, example):
+def test_authorized_reject(app, example_orcid):
     """Test a rejected request."""
     with app.test_client() as c:
         c.get(url_for("invenio_oauthclient.login", remote_app='orcid'))
@@ -163,7 +150,7 @@ def test_authorized_reject(app, example):
             url_for("invenio_oauthclient.authorized",
                     remote_app='orcid', error='access_denied',
                     error_description='User denied access',
-                    state=_get_state()))
+                    state=get_state('orcid')))
         assert resp.status_code in (301, 302)
         assert resp.location == (
             "http://localhost/"
@@ -172,7 +159,8 @@ def test_authorized_reject(app, example):
         assert session['_flashes'][0][0] == 'info'
 
 
-def test_authorized_already_authenticated(models_fixture, example, orcid_bio):
+def test_authorized_already_authenticated(models_fixture, example_orcid,
+                                          orcid_bio):
     """Test authorized callback with sign-up."""
     from invenio_oauthclient.models import UserIdentity
     from invenio_accounts.models import User
@@ -182,7 +170,7 @@ def test_authorized_already_authenticated(models_fixture, example, orcid_bio):
     datastore = app.extensions['invenio-accounts'].datastore
     login_manager = app.login_manager
 
-    example_data, example_account_info = example
+    example_data, example_account_info = example_orcid
     existing_email = "existing@invenio-software.org"
     user = datastore.find_user(email=existing_email)
 
@@ -228,7 +216,7 @@ def test_authorized_already_authenticated(models_fixture, example, orcid_bio):
         resp = client.get(
             url_for("invenio_oauthclient.authorized",
                     remote_app='orcid', code='test',
-                    state=_get_state()))
+                    state=get_state('orcid')))
         httpretty.disable()
 
         # Assert database state (Sign-up complete)

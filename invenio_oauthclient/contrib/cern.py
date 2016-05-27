@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -86,7 +86,11 @@ In templates you can add a sign in/up link:
 import copy
 import re
 
-from flask import current_app
+from flask import current_app, session
+from flask_principal import RoleNeed, identity_loaded
+
+from invenio_oauthclient.utils import oauth_link_external_id
+from invenio_db import db
 
 #: Tunable list of groups to be hidden.
 CFG_EXTERNAL_AUTH_HIDDEN_GROUPS = (
@@ -140,6 +144,8 @@ REMOTE_APP = dict(
         authorize_url="https://oauth.web.cern.ch/OAuth/Authorize",
         app_key="CERN_APP_CREDENTIALS",
         content_type="application/json",
+        request_token_params={'scope': 'Name Email Bio Groups',
+                              'show_login': 'true'}
     )
 )
 """CERN Remote Application."""
@@ -186,19 +192,51 @@ def get_dict_from_response(response):
     return result
 
 
+def get_resource(remote):
+    """Query CERN Resources to get user info and groups."""
+    cached_resource = session.get('cern_resource')
+    if cached_resource:
+        return cached_resource
+
+    response = remote.get(REMOTE_APP_RESOURCE_API_URL)
+    dict_response = get_dict_from_response(response)
+    session['cern_resource'] = dict_response
+    return dict_response
+
+
 def account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
-    # Query CERN Resources to get user info and groups
-    response = remote.get(REMOTE_APP_RESOURCE_API_URL)
-    res = get_dict_from_response(response)
+    res = get_resource(remote)
 
     email = res['EmailAddress'][0]
-    common_name = res['CommonName'][0]
+    external_id = res['PersonID'][0]
+    nice = res['CommonName'][0]
+    name = res['DisplayName'][0]
 
     # FIXME get user informations accordly with invenio-userprofiles
-    return dict(email=email.lower(), nickname=common_name)
+    return dict(email=email.lower(),
+                profile=dict(nickname=nice, full_name=name),
+                external_id=external_id, external_method='cern',
+                active=True)
 
 
 def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
-    pass
+    res = get_resource(remote)
+    session.pop('cern_resource')
+
+    with db.session.begin_nested():
+        user = token.remote_account.user
+        external_id = res['PersonID'][0]
+
+        # Create user <-> external id link.
+        oauth_link_external_id(user, dict(id=external_id, method="cern"))
+
+    groups = fetch_groups(res['Group'])
+    session['identity.cern_provides'] = [RoleNeed(group) for group in groups]
+
+
+@identity_loaded.connect
+def on_identity_loaded(sender, identity):
+    """Store groups in session whenever identity changes."""
+    identity.provides.update(session.get('identity.cern_provides', []))

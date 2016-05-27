@@ -41,6 +41,7 @@ from invenio_oauthclient.views.client import serializer
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 
+
 def mock_response(oauth, remote_app='test', data=None):
     """Mock the oauth response to use the remote."""
     # Mock oauth remote application
