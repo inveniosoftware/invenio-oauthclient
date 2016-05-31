@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014, 2015, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -46,13 +46,13 @@ from .utils import oauth_authenticate, oauth_get_user, oauth_register
 def get_session_next_url(remote_app):
     """Return redirect url stored in session."""
     return session.get(
-        "%s_%s" % (token_session_key(remote_app), "next_url")
+        '%s_%s' % (token_session_key(remote_app), 'next_url')
     )
 
 
 def set_session_next_url(remote_app, url):
     """Store redirect url in session for security reasons."""
-    session["%s_%s" % (token_session_key(remote_app), "next_url")] = \
+    session['%s_%s' % (token_session_key(remote_app), 'next_url')] = \
         url
 
 
@@ -65,7 +65,7 @@ def token_session_key(remote_app):
 def response_token_setter(remote, resp):
     """Extract token from response and set it for the user."""
     if resp is None:
-        raise OAuthRejectedRequestError("User rejected request.", remote, resp)
+        raise OAuthRejectedRequestError('User rejected request.', remote, resp)
     else:
         if 'access_token' in resp:
             return oauth2_token_setter(remote, resp)
@@ -76,7 +76,7 @@ def response_token_setter(remote, resp):
             raise OAuthClientError(
                 'Authorization with remote service failed.', remote, resp,
             )
-    raise OAuthResponseError("Bad OAuth authorized request", remote, resp)
+    raise OAuthResponseError('Bad OAuth authorized request', remote, resp)
 
 
 def oauth1_token_setter(remote, resp, token_type='', extra_data=None):
@@ -185,7 +185,7 @@ def oauth_error_handler(f):
                 e.remote, e.response, e.code, e.uri, e.description
             )
         except OAuthRejectedRequestError:
-            flash(_("You rejected the authentication request."),
+            flash(_('You rejected the authentication request.'),
                   category='info')
             return redirect('/')
     return inner
@@ -201,7 +201,8 @@ def authorized_default_handler(resp, remote, *args, **kwargs):
     Default authorized handler.
     """
     response_token_setter(remote, resp)
-    return redirect('/')
+    db.session.commit()
+    return redirect(url_for('invenio_oauthclient_settings.index'))
 
 
 @oauth_error_handler
@@ -239,11 +240,12 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
                 session[
                     token_session_key(remote.name) + '_autoregister'] = True
                 session[token_session_key(remote.name) +
-                        "_account_info"] = account_info
+                        '_account_info'] = account_info
                 session[token_session_key(remote.name) +
-                        "_response"] = resp
+                        '_response'] = resp
+                db.session.commit()
                 return redirect(url_for(
-                    ".signup",
+                    '.signup',
                     remote_app=remote.name,
                 ))
 
@@ -271,10 +273,10 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
 
     # Redirect to next
     next_url = get_session_next_url(remote.name)
+    db.session.commit()
     if next_url:
         return redirect(next_url)
-    else:
-        return redirect('/')
+    return redirect(url_for('invenio_oauthclient_settings.index'))
 
 
 def disconnect_handler(remote, *args, **kwargs):
@@ -295,6 +297,7 @@ def disconnect_handler(remote, *args, **kwargs):
         if account:
             account.delete()
 
+    db.session.commit()
     return redirect(url_for('invenio_oauthclient_settings.index'))
 
 
@@ -302,31 +305,31 @@ def signup_handler(remote, *args, **kwargs):
     """Handle extra signup information."""
     # User already authenticated so move on
     if current_user.is_authenticated:
-        return redirect("/")
+        return redirect('/')
 
     # Retrieve token from session
     oauth_token = token_getter(remote)
     if not oauth_token:
-        return redirect("/")
+        return redirect('/')
 
     session_prefix = token_session_key(remote.name)
 
     # Test to see if this is coming from on authorized request
     if not session.get(session_prefix + '_autoregister',
                        False):
-        return redirect(url_for(".login", remote_app=remote.name))
+        return redirect(url_for('.login', remote_app=remote.name))
 
     form = EmailSignUpForm(request.form)
 
     if form.validate_on_submit():
-        account_info = session.get(session_prefix + "_account_info")
-        response = session.get(session_prefix + "_response")
+        account_info = session.get(session_prefix + '_account_info')
+        response = session.get(session_prefix + '_response')
 
         # Register user
         user = oauth_register(account_info, form.data)
 
         if user is None:
-            raise OAuthError("Could not create user.", remote)
+            raise OAuthError('Could not create user.', remote)
 
         # Remove session key
         session.pop(session_prefix + '_autoregister', None)
@@ -337,7 +340,7 @@ def signup_handler(remote, *args, **kwargs):
         handlers = current_oauthclient.signup_handlers[remote.name]
 
         if token is None:
-            raise OAuthError("Could not create token for user.", remote)
+            raise OAuthError('Could not create token for user.', remote)
 
         if not token.remote_account.extra_data:
             account_setup = handlers['setup'](token, response)
@@ -345,6 +348,9 @@ def signup_handler(remote, *args, **kwargs):
                 remote, token=token, response=response,
                 account_setup=account_setup
             )
+
+        # Registration has been finished
+        db.session.commit()
 
         # Authenticate the user
         if not oauth_authenticate(remote.consumer_key, user,
@@ -354,7 +360,7 @@ def signup_handler(remote, *args, **kwargs):
                                   [remote.name].get('remember', False)):
             # Redirect the user after registration (which doesn't include the
             # activation), waiting for user to confirm his email.
-            return redirect(url_for("security.login"))
+            return redirect(url_for('security.login'))
 
         # Remove account info from session
         session.pop(session_prefix + '_account_info', None)
@@ -368,7 +374,7 @@ def signup_handler(remote, *args, **kwargs):
             return redirect('/')
 
     return render_template(
-        "invenio_oauthclient/signup.html",
+        'invenio_oauthclient/signup.html',
         form=form,
         remote=remote,
         app_title=current_app.config['OAUTHCLIENT_REMOTE_APPS'][
@@ -385,6 +391,7 @@ def oauth_logout_handler(sender_app, user=None):
     oauth = current_app.extensions['oauthlib.client']
     for remote in oauth.remote_apps.values():
         token_delete(remote)
+    db.session.commit()
 
 
 #
@@ -415,5 +422,5 @@ def make_token_getter(remote):
 def oauth2_handle_error(remote, resp, error_code, error_uri,
                         error_description):
     """Handle errors during exchange of one-time code for an access tokens."""
-    flash(_("Authorization with remote service failed."))
+    flash(_('Authorization with remote service failed.'))
     return redirect('/')

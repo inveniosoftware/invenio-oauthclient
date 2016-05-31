@@ -73,6 +73,7 @@ def base_app(request):
         SERVER_NAME='localhost',
         DEBUG=False,
         SECRET_KEY='TEST',
+        SECURITY_DEPRECATED_PASSWORD_SCHEMES=[],
         SECURITY_PASSWORD_HASH='plaintext',
         SECURITY_PASSWORD_SCHEMES=['plaintext'],
     )
@@ -199,7 +200,7 @@ def views_fixture(base_app, params):
     InvenioOAuthClient(base_app)
     base_app.register_blueprint(blueprint_client)
     base_app.register_blueprint(blueprint_settings)
-    
+
     return base_app
 
 
@@ -223,6 +224,6 @@ def example(request):
 def orcid_bio():
     """ORCID response fixture."""
     file_path = os.path.join(os.path.dirname(__file__), 'data/orcid_bio.json')
-    with open(file_path) as response_file:    
+    with open(file_path) as response_file:
         data = json.load(response_file)
     return data
