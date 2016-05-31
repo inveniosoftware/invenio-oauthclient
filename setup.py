@@ -55,7 +55,7 @@ extras_require = {
         'Sphinx>=1.4',
     ],
     'github': [
-        'github3.py>=0.9',
+        'github3.py>=1.0.0a4',
     ],
     'orcid': [
         'invenio-mail>=1.0.0a2',

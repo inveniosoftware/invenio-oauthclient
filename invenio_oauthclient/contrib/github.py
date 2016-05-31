@@ -39,8 +39,8 @@
         )
 
         GITHUB_APP_CREDENTIALS = dict(
-            consumer_key="changeme",
-            consumer_secret="changeme",
+            consumer_key='changeme',
+            consumer_secret='changeme',
         )
 
 3. Go to GitHub and register a new application:
@@ -56,8 +56,8 @@
    .. code-block:: python
 
         GITHUB_APP_CREDENTIALS = dict(
-            consumer_key="<CLIENT ID>",
-            consumer_secret="<CLIENT SECRET>",
+            consumer_key='<CLIENT ID>',
+            consumer_secret='<CLIENT SECRET>',
         )
 
 5. Now go to ``CFG_SITE_SECURE_URL/oauth/login/github/`` (e.g.
@@ -75,7 +75,7 @@ In templates you can add a sign in/up link:
 
 .. code-block:: jinja
 
-    <a href="{{url_for('invenio_oauthclient.login', remote_app='github')}}">
+    <a href='{{url_for('invenio_oauthclient.login', remote_app='github')}}'>
       Sign in with GitHub
     </a>
 """
@@ -91,23 +91,23 @@ REMOTE_APP = dict(
     title='GitHub',
     description='Software collaboration platform.',
     icon='fa fa-github',
-    authorized_handler="invenio_oauthclient.handlers"
-                       ":authorized_signup_handler",
-    disconnect_handler="invenio_oauthclient.handlers"
-                       ":disconnect_handler",
+    authorized_handler='invenio_oauthclient.handlers'
+                       ':authorized_signup_handler',
+    disconnect_handler='invenio_oauthclient.handlers'
+                       ':disconnect_handler',
     signup_handler=dict(
-        info="invenio_oauthclient.contrib.github:account_info",
-        setup="invenio_oauthclient.contrib.github:account_setup",
-        view="invenio_oauthclient.handlers:signup_handler",
+        info='invenio_oauthclient.contrib.github:account_info',
+        setup='invenio_oauthclient.contrib.github:account_setup',
+        view='invenio_oauthclient.handlers:signup_handler',
     ),
     params=dict(
         request_token_params={'scope': 'user,user:email'},
         base_url='https://api.github.com/',
         request_token_url=None,
-        access_token_url="https://github.com/login/oauth/access_token",
+        access_token_url='https://github.com/login/oauth/access_token',
         access_token_method='POST',
-        authorize_url="https://github.com/login/oauth/authorize",
-        app_key="GITHUB_APP_CREDENTIALS",
+        authorize_url='https://github.com/login/oauth/authorize',
+        app_key='GITHUB_APP_CREDENTIALS',
     )
 )
 
@@ -115,7 +115,7 @@ REMOTE_APP = dict(
 def account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
     gh = github3.login(token=resp['access_token'])
-    ghuser = gh.user()
+    ghuser = gh.me()
     email = ghuser.email
     if not email:
         record = next(gh.iter_emails(1))
@@ -142,7 +142,7 @@ def authorized(resp, remote):
         elif resp['error'] in ['incorrect_client_credentials',
                                'redirect_uri_mismatch']:
             raise OAuthResponseError(
-                "Application mis-configuration in GitHub", remote, resp
+                'Application mis-configuration in GitHub', remote, resp
             )
 
     return authorized_signup_handler(resp, remote)
