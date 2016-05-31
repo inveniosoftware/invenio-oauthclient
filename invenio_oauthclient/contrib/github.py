@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2016 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -81,6 +81,11 @@ In templates you can add a sign in/up link:
 """
 
 import github3
+from flask import redirect, url_for
+
+from invenio_oauthclient.errors import OAuthResponseError
+from invenio_oauthclient.handlers import authorized_signup_handler, \
+    oauth_error_handler
 
 REMOTE_APP = dict(
     title='GitHub',
@@ -123,3 +128,21 @@ def account_info(remote, resp):
 def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
     pass
+
+
+@oauth_error_handler
+def authorized(resp, remote):
+    """Authorized callback handler for GitHub."""
+    if resp and 'error' in resp:
+        if resp['error'] == 'bad_verification_code':
+            # See https://developer.github.com/v3/oauth/#bad-verification-code
+            # which recommends starting auth flow again.
+            return redirect(url_for('invenio_oauthclient.login',
+                                    remote_app='github'))
+        elif resp['error'] in ['incorrect_client_credentials',
+                               'redirect_uri_mismatch']:
+            raise OAuthResponseError(
+                "Application mis-configuration in GitHub", remote, resp
+            )
+
+    return authorized_signup_handler(resp, remote)
