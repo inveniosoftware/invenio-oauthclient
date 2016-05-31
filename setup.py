@@ -28,7 +28,6 @@ import os
 import sys
 
 from setuptools import find_packages, setup
-from setuptools.command.test import test as TestCommand
 
 readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
@@ -53,7 +52,7 @@ extras_require = {
         'invenio-admin>=1.0.0a2',
     ],
     'docs': [
-        "Sphinx>=1.3",
+        'Sphinx>=1.4',
     ],
     'github': [
         'github3.py>=0.9',
