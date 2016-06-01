@@ -28,9 +28,9 @@ from invenio_accounts.models import User
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.contrib.orcid import account_info
-from invenio_oauthclient.models import UserIdentity
+from invenio_oauthclient.models import RemoteAccount, RemoteToken, UserIdentity
 
-from .helpers import mock_response, get_state
+from .helpers import get_state, mock_response
 
 
 def test_account_info(app, example_orcid):
@@ -49,7 +49,7 @@ def test_account_info(app, example_orcid):
     assert account_info(ioc.remote_apps['orcid'], {}) == \
         dict(external_id=None,
              external_method="orcid",
-             nickname=None)
+             user=dict(profile=dict(username=None)))
 
 
 def test_login(app, example_orcid):
@@ -71,8 +71,9 @@ def test_login(app, example_orcid):
     assert params['state']
 
 
-def test_authorized_signup(app, example_orcid, orcid_bio):
+def test_authorized_signup(userprofiles_app, example_orcid, orcid_bio):
     """Test authorized callback with sign-up."""
+    app = userprofiles_app
     example_data, example_account_info = example_orcid
     example_email = "orcidtest@invenio-software.org"
 
@@ -107,10 +108,16 @@ def test_authorized_signup(app, example_orcid, orcid_bio):
             content_type="application/orcid+json; qs=2;charset=UTF-8",
         )
 
-        # User fills in email address.
-        resp = c.post(url_for('invenio_oauthclient.signup',
-                              remote_app='orcid'),
-                      data=dict(email=example_email))
+        # User fills form to register
+        resp = c.post(
+            url_for('invenio_oauthclient.signup', remote_app='orcid'),
+            data={
+                "email": example_email,
+                "password": "123456",
+                "profile.username": "pippo",
+                "profile.full_name": "pluto",
+            }
+        )
         assert resp.status_code == 302
         httpretty.disable()
 
@@ -140,6 +147,8 @@ def test_authorized_signup(app, example_orcid, orcid_bio):
             method='orcid', id_user=user.id,
             id=example_data['orcid']
         ).count()
+        assert RemoteAccount.query.filter_by(user_id=user.id).count() == 0
+        assert RemoteToken.query.count() == 0
 
 
 def test_authorized_reject(app, example_orcid):
@@ -162,9 +171,6 @@ def test_authorized_reject(app, example_orcid):
 def test_authorized_already_authenticated(models_fixture, example_orcid,
                                           orcid_bio):
     """Test authorized callback with sign-up."""
-    from invenio_oauthclient.models import UserIdentity
-    from invenio_accounts.models import User
-
     app = models_fixture
 
     datastore = app.extensions['invenio-accounts'].datastore
@@ -237,10 +243,6 @@ def test_authorized_already_authenticated(models_fixture, example_orcid,
         # User exists
         u = User.query.filter_by(email=existing_email).one()
         # UserIdentity removed.
-        assert 0 == UserIdentity.query.filter_by(
-            method='orcid', id_user=u.id,
-            id=example_data['orcid']
-        ).count()
         assert 0 == UserIdentity.query.filter_by(
             method='orcid', id_user=u.id,
             id=example_data['orcid']

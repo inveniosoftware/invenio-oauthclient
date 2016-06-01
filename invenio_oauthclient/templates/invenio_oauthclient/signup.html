@@ -23,30 +23,26 @@
 
 {% block page_body %}
 <div class="row">
-    {%- block signup_panel %}
-    <div class="col-md-6 well well-lg col-md-offset-3">
+  {%- block signup_panel %}
+  <div class="col-md-6 well well-lg col-md-offset-3">
     {%- block signup_header %}
-    {%- block signup_app_icon %}
-    {% if app_icon -%}
-    <span class="pull-right"><i class="{{app_icon}} fa-5x"></i></span>
-    {%- endif %}
-    {%- endblock %}
-    <h3> {{ _('Sign-up with %(title)s!', title=app_title) }}</h3>
-    <p>{{ _('Fill in your details to complete your registration. You only have to do this once.') }}</p>
-    <hr />
+      {%- block signup_app_icon %}
+        {% if app_icon -%}
+          <span class="pull-right"><i class="{{app_icon}} fa-5x"></i></span>
+        {%- endif %}
+      {%- endblock %}
+      <h3> {{ _('Sign-up with %(title)s!', title=app_title) }}</h3>
+      <p>{{ _('Fill in your details to complete your registration. You only have to do this once.') }}</p>
+      <hr />
     {% endblock %}
     {%- block signup_form %}
-        <form name="edit" method="post" role="form">
-          {%- for field in form %}
-            {{ render_field(field) }}
-          {%- endfor %}
-          <div class="form-actions">
-            <a href="/" class="btn btn-default"><i class="fa fa-times"></i> Cancel</a>
-            <button type="submit" name="continue" class="btn btn-warning"/><i class="fa fa-edit"></i> {{ _("Sign-up") }}</button>
-          </div>
-        </form>
-        {%- endblock %}
-    </div>
+    <form name="edit" method="post" role="form">
+      {%- for field in form %}
+        {{ render_field(field) }}
+      {%- endfor %}
+    </form>
     {%- endblock %}
+  </div>
+  {%- endblock %}
 </div>
 {% endblock %}

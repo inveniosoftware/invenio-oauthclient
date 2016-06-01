@@ -19,7 +19,6 @@
 
 """OAuth client test utility functions."""
 
-from flask import jsonify
 from flask_login import _create_identifier
 from mock import MagicMock
 

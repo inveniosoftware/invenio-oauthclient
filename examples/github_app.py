@@ -33,8 +33,8 @@ Usage:
 
    .. code-block:: console
 
-      cdvirtualenv src/invenio-oauthclient
-      pip install -e .[github]
+       $ cdvirtualenv src/invenio-oauthclient
+       $ pip install -e .[github]
 
 3. Grab the *Client ID* and *Client Secret* after registering the application
    and add them to your instance configuration as `consumer_key` and
@@ -50,8 +50,9 @@ Usage:
    .. code-block:: console
 
        $ cd examples
-       $ flask -a github_app.py db init
-       $ flask -a github_app.py db create
+       $ export FLASK_APP=github_app.py
+       $ flask db init
+       $ flask db create
 
 You can find the database in `examples/github_app.db`.
 
@@ -59,9 +60,9 @@ You can find the database in `examples/github_app.db`.
 
    .. code-block:: console
 
-       $ flask -a github_app.py run -p 5000 -h '0.0.0.0'
+       $ flask run -p 5000 -h '0.0.0.0'
 
-6. Open in a browser the page `http://0.0.0.0:5000/`.
+6. Open in a browser the page `http://0.0.0.0:5000/github`.
 
    You will be redirected to github to authorize the application.
 
@@ -89,6 +90,10 @@ from flask_security import current_user
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_user
 from invenio_db import InvenioDB
+from invenio_mail import InvenioMail
+from invenio_userprofiles import InvenioUserProfiles
+from invenio_userprofiles.views import \
+    blueprint_init as blueprint_userprofile_init
 
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib import github
@@ -114,7 +119,11 @@ app.config.update(
     GITHUB_APP_CREDENTIALS=GITHUB_APP_CREDENTIALS,
     DEBUG=True,
     SECRET_KEY='TEST',
+    SQLALCHEMY_ECHO=False,
     SECURITY_PASSWORD_SALT='security-password-salt',
+    MAIL_SUPPRESS_SEND=True,
+    TESTING=True,
+    USERPROFILES_EXTEND_SECURITY_FORMS=True,
 )
 
 FlaskCLI(app)
@@ -122,17 +131,26 @@ Babel(app)
 FlaskMenu(app)
 InvenioDB(app)
 InvenioAccounts(app)
+InvenioUserProfiles(app)
 FlaskOAuth(app)
 InvenioOAuthClient(app)
+InvenioMail(app)
 
 app.register_blueprint(blueprint_user)
 app.register_blueprint(blueprint_client)
 app.register_blueprint(blueprint_settings)
+app.register_blueprint(blueprint_userprofile_init)
 
 
 @app.route('/')
 def index():
-    """Home page: try to print user email or redirect to login with github."""
+    """Homepage."""
+    return "Home page (without any restrictions)"
+
+
+@app.route('/github')
+def github():
+    """Try to print user email or redirect to login with github."""
     if not current_user.is_authenticated:
         return redirect(url_for("invenio_oauthclient.login",
                                 remote_app='github'))

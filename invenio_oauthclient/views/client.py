@@ -21,10 +21,11 @@
 
 from __future__ import absolute_import
 
-from flask import Blueprint, abort, current_app, request, session, url_for
+from flask import Blueprint, abort, current_app, request, url_for
 from flask_login import _create_identifier
 from itsdangerous import BadData, TimedJSONWebSignatureSerializer
 from werkzeug.local import LocalProxy
+from invenio_db import db
 
 from ..handlers import set_session_next_url
 from ..proxies import current_oauthclient
@@ -146,4 +147,6 @@ def disconnect(remote_app):
     if remote_app not in current_oauthclient.disconnect_handlers:
         return abort(404)
 
-    return current_oauthclient.disconnect_handlers[remote_app]()
+    ret = current_oauthclient.disconnect_handlers[remote_app]()
+    db.session.commit()
+    return ret

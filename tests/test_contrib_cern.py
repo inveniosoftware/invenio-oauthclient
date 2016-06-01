@@ -25,11 +25,11 @@ from flask import session, url_for
 from six.moves.urllib_parse import parse_qs, urlparse
 
 import invenio_oauthclient.contrib.cern as cern
-from invenio_oauthclient.models import RemoteToken
 from invenio_oauthclient.contrib.cern import account_info, account_setup, \
     fetch_groups, get_dict_from_response
+from invenio_oauthclient.models import RemoteToken
 
-from .helpers import mock_remote_get, get_state
+from .helpers import get_state, mock_remote_get
 
 
 def test_fetch_groups(app, example_cern):
@@ -64,10 +64,16 @@ def test_account_info(app, example_cern):
         ioc.remote_apps['cern'], None) == example_account_info
 
     assert account_info(ioc.remote_apps['cern'], {}) == \
-        dict(email='test.account@cern.ch',
-             profile={'full_name': u'Test Account', 'nickname': u'taccount'},
-             external_id='123456', external_method="cern",
-             active=True)
+        dict(
+            user=dict(
+                email='test.account@cern.ch',
+                profile={
+                    'full_name': u'Test Account', 'username': u'taccount'
+                },
+            ),
+            external_id='123456', external_method="cern",
+            active=True
+        )
 
 
 def test_account_setup(app, example_cern, models_fixture):

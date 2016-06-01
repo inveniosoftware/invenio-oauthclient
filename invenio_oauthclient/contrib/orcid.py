@@ -85,6 +85,9 @@ import copy
 
 from flask import current_app, redirect, url_for
 from flask_security import current_user
+from invenio_oauthclient.models import RemoteAccount
+from invenio_oauthclient.utils import oauth_unlink_external_id, \
+    oauth_link_external_id
 from invenio_db import db
 
 REMOTE_APP = dict(
@@ -150,15 +153,16 @@ def account_info(remote, resp):
     return dict(
         external_id=orcid,
         external_method="orcid",
-        nickname=orcid,
+        user=dict(
+            profile=dict(
+                username=orcid,
+            )
+        )
     )
 
 
 def disconnect_handler(remote, *args, **kwargs):
     """Handle unlinking of remote account."""
-    from invenio_oauthclient.utils import oauth_unlink_external_id
-    from invenio_oauthclient.models import RemoteAccount
-
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
 
@@ -177,9 +181,6 @@ def disconnect_handler(remote, *args, **kwargs):
 
 def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
-    from invenio_oauthclient.utils import oauth_link_external_id
-    from invenio_db import db
-
     with db.session.begin_nested():
         # Retrieve ORCID from response.
         orcid = resp.get("orcid")

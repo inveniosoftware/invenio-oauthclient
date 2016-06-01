@@ -81,8 +81,13 @@ In templates you can add a sign in/up link:
 """
 
 import github3
-from flask import redirect, url_for
+from flask import redirect, url_for, current_app
+from flask_security import current_user
+from invenio_db import db
 
+from invenio_oauthclient.utils import oauth_unlink_external_id, \
+    oauth_link_external_id
+from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.handlers import authorized_signup_handler, \
     oauth_error_handler
@@ -93,7 +98,7 @@ REMOTE_APP = dict(
     icon='fa fa-github',
     authorized_handler='invenio_oauthclient.handlers'
                        ':authorized_signup_handler',
-    disconnect_handler='invenio_oauthclient.handlers'
+    disconnect_handler='invenio_oauthclient.contrib.github'
                        ':disconnect_handler',
     signup_handler=dict(
         info='invenio_oauthclient.contrib.github:account_info',
@@ -112,22 +117,36 @@ REMOTE_APP = dict(
 )
 
 
+def _extract_email(gh):
+    """Get user email from github."""
+    return next(
+        (x.email for x in gh.emails() if x.verified and x.primary), None)
+
+
 def account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
     gh = github3.login(token=resp['access_token'])
-    ghuser = gh.me()
-    email = ghuser.email
-    if not email:
-        record = next(gh.iter_emails(1))
-        email = record['email'] if 'email' in record else None
-    # FIXME get user informations accordly with invenio-userprofiles
-    return dict(email=email, external_id=ghuser.id,
-                external_method='github')
+    me = gh.me()
+    return dict(
+        user=dict(
+            email=_extract_email(gh),
+            profile=dict(
+                username=me.login,
+                full_name=me.name,
+            ),
+        ),
+        external_id=me.id,
+        external_method='github'
+    )
 
 
 def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
-    pass
+    gh = github3.login(token=resp['access_token'])
+    with db.session.begin_nested():
+        # Create user <-> external id link.
+        oauth_link_external_id(
+            token.remote_account.user, dict(id=gh.me().id, method="github"))
 
 
 @oauth_error_handler
@@ -146,3 +165,24 @@ def authorized(resp, remote):
             )
 
     return authorized_signup_handler(resp, remote)
+
+
+def disconnect_handler(remote, *args, **kwargs):
+    """Handle unlinking of remote account."""
+    if not current_user.is_authenticated:
+        return current_app.login_manager.unauthorized()
+
+    remote_account = RemoteAccount.get(user_id=current_user.get_id(),
+                                       client_id=remote.consumer_key)
+    external_method = 'github'
+    external_ids = [i.id for i in current_user.external_identifiers
+                    if i.method == external_method]
+
+    if external_ids:
+        oauth_unlink_external_id(dict(id=external_ids[0],
+                                      method=external_method))
+    if remote_account:
+        with db.session.begin_nested():
+            remote_account.delete()
+
+    return redirect(url_for('invenio_oauthclient_settings.index'))

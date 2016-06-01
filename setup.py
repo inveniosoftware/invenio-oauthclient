@@ -25,7 +25,6 @@
 """Invenio module that provides OAuth web authorization support."""
 
 import os
-import sys
 
 from setuptools import find_packages, setup
 
@@ -33,7 +32,6 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 tests_require = [
-    'Flask-CLI>=0.2.1',
     'check-manifest>=0.25',
     'coverage>=4.0',
     'httpretty>=0.8.14',
@@ -45,6 +43,7 @@ tests_require = [
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
     'simplejson>=3.8',
+    'invenio-userprofiles>=1.0.0a5',
 ]
 
 extras_require = {
@@ -57,9 +56,7 @@ extras_require = {
     'github': [
         'github3.py>=1.0.0a4',
     ],
-    'orcid': [
-        'invenio-mail>=1.0.0a2',
-    ],
+    'orcid': [],
     'mysql': [
         'invenio-db[mysql]>=1.0.0a9',
     ],
@@ -89,15 +86,17 @@ install_requires = [
     'Flask>=0.10.1',
     'Flask-BabelEx>=0.9.2',
     'Flask-Breadcrumbs>=0.3.0',
+    'Flask-CLI>=0.2.1',
     'Flask-OAuthlib>=0.6.0,<0.7',  # quick fix for issue invenio#2158
     'Flask-Security>=1.7.5',
-    'invenio-accounts>=1.0.0a6',
+    'invenio-accounts>=1.0.0a8',
+    'invenio-mail>=1.0.0a2',
     # FIXME
     #  'invenio-upgrader>=0.1.0',
     # FIXME new oauthlib release after 0.7.2 has some compatible problems with
     # the used Flask-Oauthlib version.
     'oauthlib==0.7.2',
-    'six>=1.7.2',
+    'six>=1.9',
     'sqlalchemy-utils>=0.31',
     'uritools>=1.0.1',
 ]

@@ -18,15 +18,13 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Views for OAuth."""
-from flask import Flask, url_for
+from flask import url_for
 from flask.ext.admin import Admin
-from invenio_admin import InvenioAdmin
 from invenio_db import db
-from werkzeug.local import LocalProxy
 
 from invenio_oauthclient import InvenioOAuthClient
-from invenio_oauthclient.admin import RemoteAccountView, RemoteTokenView, \
-    remote_account_adminview, remote_token_adminview
+from invenio_oauthclient.admin import remote_account_adminview, \
+    remote_token_adminview
 
 
 def test_admin(app):

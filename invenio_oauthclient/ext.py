@@ -27,7 +27,8 @@
 from __future__ import absolute_import, print_function
 
 from flask_login import user_logged_out
-from flask_oauthlib.client import OAuth as FlaskOAuth, OAuthRemoteApp
+from flask_oauthlib.client import OAuth as FlaskOAuth
+from flask_oauthlib.client import OAuthRemoteApp
 
 from . import config
 from .handlers import authorized_default_handler, disconnect_handler, \

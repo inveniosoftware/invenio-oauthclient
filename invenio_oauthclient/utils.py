@@ -29,6 +29,8 @@ from invenio_db import db
 from uritools import urisplit
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string
+#  from werkzeug.datastructures import MultiDict
+from copy import deepcopy
 
 from .models import RemoteAccount, RemoteToken, UserIdentity
 
@@ -89,22 +91,21 @@ def oauth_authenticate(client_id, user, require_existing_link=False,
     return False
 
 
-def oauth_register(account_info, form_data=None):
+def oauth_register(form):
     """Register user if possible."""
-    email = account_info.get("email")
-    if form_data and form_data.get("email"):
-        email = form_data.get("email")
+    data = deepcopy(form.data)
+    form = disable_csrf_form(form)
 
-    if email:
-        data = dict(**form_data) if form_data else {}
-        data['password'] = ''
-        data['email'] = email
+    if form.validate():
+        if not data.get('password'):
+            data['password'] = ''
+        if 'submit' in data:
+            del data['submit']
         user = register_user(**data)
-        user.password = None
+        if not data['password']:
+            user.password = None
         _datastore.commit()
         return user
-
-    return None
 
 
 def oauth_link_external_id(user, external_id=None):
@@ -153,3 +154,25 @@ def load_or_import_from_config(key, app=None, default=None):
     app = app or current_app
     imp = app.config.get(key)
     return obj_or_import_string(imp, default=default)
+
+
+def prefill_form(form, data):
+    """Prefill form."""
+    for (key, value) in data.items():
+        if hasattr(form, key):
+            if isinstance(value, dict):
+                prefill_form(getattr(form, key), value)
+            else:
+                getattr(form, key).data = value
+    return form
+
+
+def disable_csrf_form(form):
+    """Prefill form."""
+    form.csrf_enabled = False
+    for (key, value) in form.data.items():
+        if isinstance(value, dict):
+            field = getattr(form, key)
+            setattr(form, key, disable_csrf_form(field))
+            field.form._fields.pop('csrf_token')
+    return form

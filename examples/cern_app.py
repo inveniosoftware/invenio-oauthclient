@@ -93,21 +93,20 @@ from __future__ import absolute_import, print_function
 
 import os
 
-from flask import Flask, g, redirect, url_for
+from flask import Flask, redirect, url_for
 from flask_babelex import Babel
 from flask_cli import FlaskCLI
 from flask_login import current_user
 from flask_menu import Menu as FlaskMenu
 from flask_oauthlib.client import OAuth as FlaskOAuth
-
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_user
 from invenio_db import InvenioDB
+
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib import cern
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
-
 
 # [ Configure application credentials ]
 CERN_APP_CREDENTIALS = dict(

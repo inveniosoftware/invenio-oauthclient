@@ -26,8 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
-import os
 import json
+import os
 import shutil
 import tempfile
 
@@ -37,15 +37,21 @@ from flask_babelex import Babel
 from flask_cli import FlaskCLI
 from flask_mail import Mail
 from flask_menu import Menu as FlaskMenu
-from flask_oauthlib.client import OAuth as FlaskOAuth, OAuthResponse
+from flask_oauthlib.client import OAuth as FlaskOAuth
+from flask_oauthlib.client import OAuthResponse
 from invenio_accounts import InvenioAccounts
 from invenio_db import InvenioDB, db
+from invenio_userprofiles import InvenioUserProfiles
+from invenio_userprofiles.views import \
+    blueprint_init as blueprint_userprofile_init
 from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
+from invenio_userprofiles import UserProfile
 
 from invenio_oauthclient import InvenioOAuthClient
-from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCHID_REMOTE_APP
 from invenio_oauthclient.contrib.cern import REMOTE_APP as CERN_REMOTE_APP
+from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
+from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 
@@ -61,8 +67,13 @@ def base_app(request):
         LOGIN_DISABLED=False,
         CACHE_TYPE='simple',
         OAUTHCLIENT_REMOTE_APPS=dict(
-            orcid=ORCHID_REMOTE_APP,
             cern=CERN_REMOTE_APP,
+            orcid=ORCID_REMOTE_APP,
+            github=GITHUB_REMOTE_APP,
+        ),
+        GITHUB_APP_CREDENTIALS=dict(
+            consumer_key='changeme',
+            consumer_secret='changeme',
         ),
         ORCID_APP_CREDENTIALS=dict(
             consumer_key='changeme',
@@ -118,6 +129,17 @@ def app(base_app):
     base_app.register_blueprint(blueprint_client)
     base_app.register_blueprint(blueprint_settings)
     return base_app
+
+
+@pytest.fixture
+def userprofiles_app(app):
+    """Configure userprofiles module."""
+    app.config.update(
+        USERPROFILES_EXTEND_SECURITY_FORMS=True,
+    )
+    InvenioUserProfiles(app)
+    app.register_blueprint(blueprint_userprofile_init)
+    return app
 
 
 @pytest.fixture
@@ -211,6 +233,19 @@ def views_fixture(base_app, params):
 
 
 @pytest.fixture
+def example_github(request):
+    """ORCID example data."""
+    return {
+        "name": "Josiah Carberry",
+        "expires_in": 3599,
+        "access_token": "test_access_token",
+        "refresh_token": "test_refresh_token",
+        "scope": "/authenticate",
+        "token_type": "bearer",
+    }
+
+
+@pytest.fixture
 def example_orcid(request):
     """ORCID example data."""
     return {
@@ -223,7 +258,7 @@ def example_orcid(request):
         "token_type": "bearer"
     }, dict(external_id="0000-0002-1825-0097",
             external_method="orcid",
-            nickname="0000-0002-1825-0097")
+            user=dict(profile=dict(username="0000-0002-1825-0097")))
 
 
 @pytest.fixture()
@@ -272,8 +307,10 @@ def example_cern(request):
         expires_in=1199,
         refresh_token='test_refresh_token'
     ), dict(
-        email='test.account@cern.ch',
-        profile=dict(nickname='taccount', full_name='Test Account'),
+        user=dict(
+            email='test.account@cern.ch',
+            profile=dict(username='taccount', full_name='Test Account'),
+        ),
         external_id='123456', external_method='cern',
         active=True
     )
@@ -286,3 +323,16 @@ def orcid_bio():
     with open(file_path) as response_file:
         data = json.load(response_file)
     return data
+
+
+@pytest.fixture()
+def user(userprofiles_app):
+    """Create users."""
+    with db.session.begin_nested():
+        datastore = userprofiles_app.extensions['security'].datastore
+        user1 = datastore.create_user(email='info@invenio-software.org',
+                                      password='tester', active=True)
+        profile = UserProfile(username='mynick', user=user1)
+        db.session.add(profile)
+    db.session.commit()
+    return user1

@@ -55,11 +55,6 @@ Settings
 .. automodule:: invenio_oauthclient.views.settings
    :members:
 
-Forms
------
-
-.. automodule:: invenio_oauthclient.forms
-   :members:
 
 Signals
 -------

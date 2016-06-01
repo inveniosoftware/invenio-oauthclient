@@ -21,7 +21,6 @@
 
 from __future__ import absolute_import
 
-import os
 import time
 
 import pytest
@@ -37,8 +36,8 @@ from six.moves.urllib_parse import parse_qs, urlparse
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.handlers import token_getter
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
-from invenio_oauthclient.views.client import serializer
 from invenio_oauthclient.views.client import blueprint as blueprint_client
+from invenio_oauthclient.views.client import serializer
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 
 
@@ -475,5 +474,6 @@ def test_settings_view(views_fixture):
                            remote_app='test') in resp.data.decode("utf-8")
             assert url_for('invenio_oauthclient.login',
                            remote_app='full') in resp.data.decode("utf-8")
-            assert url_for('invenio_oauthclient.login',
-                           remote_app='test_invalid') in resp.data.decode("utf-8")
+            assert url_for(
+                'invenio_oauthclient.login',
+                remote_app='test_invalid') in resp.data.decode("utf-8")

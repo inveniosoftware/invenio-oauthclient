@@ -213,11 +213,14 @@ def account_info(remote, resp):
     nice = res['CommonName'][0]
     name = res['DisplayName'][0]
 
-    # FIXME get user informations accordly with invenio-userprofiles
-    return dict(email=email.lower(),
-                profile=dict(nickname=nice, full_name=name),
-                external_id=external_id, external_method='cern',
-                active=True)
+    return dict(
+        user=dict(
+            email=email.lower(),
+            profile=dict(username=nice, full_name=name),
+        ),
+        external_id=external_id, external_method='cern',
+        active=True
+    )
 
 
 def account_setup(remote, token, resp):

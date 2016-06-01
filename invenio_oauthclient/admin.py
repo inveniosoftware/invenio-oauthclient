@@ -22,9 +22,8 @@
 from __future__ import absolute_import, print_function
 
 from flask.ext.admin.contrib.sqla import ModelView
-from wtforms.fields import TextAreaField
 
-from .models import RemoteAccount, RemoteToken, UserIdentity
+from .models import RemoteAccount, RemoteToken
 
 
 def _(x):

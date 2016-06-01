@@ -90,6 +90,9 @@ from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_user
 from invenio_db import InvenioDB
 from invenio_mail import InvenioMail as Mail
+from invenio_userprofiles import InvenioUserProfiles
+from invenio_userprofiles.views import \
+    blueprint_init as blueprint_userprofile_init
 
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib import orcid
@@ -118,6 +121,7 @@ app.config.update(
     SECRET_KEY='TEST',
     SECURITY_PASSWORD_SALT='security-password-salt',
     SECURITY_LOGIN_WITHOUT_CONFIRMATION=False,
+    USERPROFILES_EXTEND_SECURITY_FORMS=True,
 )
 
 FlaskCLI(app)
@@ -126,12 +130,14 @@ FlaskMenu(app)
 Mail(app)
 InvenioDB(app)
 InvenioAccounts(app)
+InvenioUserProfiles(app)
 FlaskOAuth(app)
 InvenioOAuthClient(app)
 
 app.register_blueprint(blueprint_user)
 app.register_blueprint(blueprint_client)
 app.register_blueprint(blueprint_settings)
+app.register_blueprint(blueprint_userprofile_init)
 
 
 @app.route('/')

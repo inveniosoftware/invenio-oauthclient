@@ -33,11 +33,11 @@ from werkzeug.utils import import_string
 
 from .errors import OAuthClientError, OAuthError, OAuthRejectedRequestError, \
     OAuthResponseError
-from .forms import EmailSignUpForm
 from .models import RemoteAccount, RemoteToken
 from .proxies import current_oauthclient
 from .signals import account_info_received, account_setup_received
-from .utils import oauth_authenticate, oauth_get_user, oauth_register
+from .utils import oauth_authenticate, oauth_get_user, oauth_register, \
+    prefill_form, _security
 
 
 #
@@ -234,9 +234,15 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
 
         if user is None:
             # Auto sign-up if user not found
-            user = oauth_register(account_info)
+            class OAuthUserDataCheckForm(_security.confirm_register_form):
+                password = None
+
+            form = prefill_form(OAuthUserDataCheckForm(), account_info['user'])
+            user = oauth_register(form)
+
+            # if registration fails..
             if user is None:
-                # Auto sign-up requires extra information
+                # requires extra information
                 session[
                     token_session_key(remote.name) + '_autoregister'] = True
                 session[token_session_key(remote.name) +
@@ -315,18 +321,17 @@ def signup_handler(remote, *args, **kwargs):
     session_prefix = token_session_key(remote.name)
 
     # Test to see if this is coming from on authorized request
-    if not session.get(session_prefix + '_autoregister',
-                       False):
+    if not session.get(session_prefix + '_autoregister', False):
         return redirect(url_for('.login', remote_app=remote.name))
 
-    form = EmailSignUpForm(request.form)
+    form = _security.confirm_register_form(request.form)
 
     if form.validate_on_submit():
         account_info = session.get(session_prefix + '_account_info')
         response = session.get(session_prefix + '_response')
 
         # Register user
-        user = oauth_register(account_info, form.data)
+        user = oauth_register(form)
 
         if user is None:
             raise OAuthError('Could not create user.', remote)
@@ -373,8 +378,13 @@ def signup_handler(remote, *args, **kwargs):
         else:
             return redirect('/')
 
+    # prefill form
+    account_info = session.get(session_prefix + '_account_info')
+    if not form.submit.data:
+        form = prefill_form(form, account_info['user'])
+
     return render_template(
-        'invenio_oauthclient/signup.html',
+        current_app.config['OAUTHCLIENT_FORM_SIGNUP'],
         form=form,
         remote=remote,
         app_title=current_app.config['OAUTHCLIENT_REMOTE_APPS'][
