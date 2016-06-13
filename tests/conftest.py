@@ -41,12 +41,10 @@ from flask_oauthlib.client import OAuth as FlaskOAuth
 from flask_oauthlib.client import OAuthResponse
 from invenio_accounts import InvenioAccounts
 from invenio_db import InvenioDB, db
-from invenio_userprofiles import InvenioUserProfiles
-from invenio_userprofiles.views import \
-    blueprint_init as blueprint_userprofile_init
+from invenio_userprofiles import InvenioUserProfiles, UserProfile
+from invenio_userprofiles.views import blueprint_ui_init
 from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
-from invenio_userprofiles import UserProfile
 
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib.cern import REMOTE_APP as CERN_REMOTE_APP
@@ -138,7 +136,7 @@ def userprofiles_app(app):
         USERPROFILES_EXTEND_SECURITY_FORMS=True,
     )
     InvenioUserProfiles(app)
-    app.register_blueprint(blueprint_userprofile_init)
+    app.register_blueprint(blueprint_ui_init)
     return app
 
 
@@ -258,7 +256,7 @@ def example_orcid(request):
         "token_type": "bearer"
     }, dict(external_id="0000-0002-1825-0097",
             external_method="orcid",
-            user=dict(profile=dict(username="0000-0002-1825-0097")))
+            user=dict())
 
 
 @pytest.fixture()

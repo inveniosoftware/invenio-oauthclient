@@ -19,6 +19,8 @@
 
 """Utility methods to help find, authenticate or register a remote user."""
 
+from __future__ import absolute_import, print_function
+
 import six
 from flask import after_this_request, current_app, request
 from flask_security import login_user, logout_user
@@ -26,12 +28,13 @@ from flask_security.confirmable import requires_confirmation
 from flask_security.registerable import register_user
 from invenio_accounts.models import User
 from invenio_db import db
+from sqlalchemy.exc import IntegrityError
 from uritools import urisplit
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string
-#  from werkzeug.datastructures import MultiDict
-from copy import deepcopy
+from wtforms.fields.core import FormField
 
+from .errors import AlreadyLinkedError
 from .models import RemoteAccount, RemoteToken, UserIdentity
 
 _security = LocalProxy(lambda: current_app.extensions['security'])
@@ -93,14 +96,10 @@ def oauth_authenticate(client_id, user, require_existing_link=False,
 
 def oauth_register(form):
     """Register user if possible."""
-    data = deepcopy(form.data)
-    form = disable_csrf_form(form)
-
     if form.validate():
+        data = form.to_dict()
         if not data.get('password'):
             data['password'] = ''
-        if 'submit' in data:
-            del data['submit']
         user = register_user(**data)
         if not data['password']:
             user.password = None
@@ -110,11 +109,15 @@ def oauth_register(form):
 
 def oauth_link_external_id(user, external_id=None):
     """Link a user to an external id."""
-    oauth_unlink_external_id(external_id)
-    with db.session.begin_nested():
-        db.session.add(UserIdentity(
-            id=external_id['id'], method=external_id['method'], id_user=user.id
-        ))
+    try:
+        with db.session.begin_nested():
+            db.session.add(UserIdentity(
+                id=external_id['id'],
+                method=external_id['method'],
+                id_user=user.id
+            ))
+    except IntegrityError:
+        raise AlreadyLinkedError(user, external_id)
 
 
 def oauth_unlink_external_id(external_id):
@@ -156,23 +159,21 @@ def load_or_import_from_config(key, app=None, default=None):
     return obj_or_import_string(imp, default=default)
 
 
-def prefill_form(form, data):
+def fill_form(form, data):
     """Prefill form."""
     for (key, value) in data.items():
         if hasattr(form, key):
             if isinstance(value, dict):
-                prefill_form(getattr(form, key), value)
+                fill_form(getattr(form, key), value)
             else:
                 getattr(form, key).data = value
     return form
 
 
-def disable_csrf_form(form):
-    """Prefill form."""
+def disable_csrf(form):
+    """Disable CSRF protection."""
     form.csrf_enabled = False
-    for (key, value) in form.data.items():
-        if isinstance(value, dict):
-            field = getattr(form, key)
-            setattr(form, key, disable_csrf_form(field))
-            field.form._fields.pop('csrf_token')
+    for f in form:
+        if isinstance(f, FormField):
+            disable_csrf(f.form)
     return form

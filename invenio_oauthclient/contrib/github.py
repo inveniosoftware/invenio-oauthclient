@@ -135,7 +135,7 @@ def account_info(remote, resp):
                 full_name=me.name,
             ),
         ),
-        external_id=me.id,
+        external_id=str(me.id),
         external_method='github'
     )
 
@@ -144,9 +144,16 @@ def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
     gh = github3.login(token=resp['access_token'])
     with db.session.begin_nested():
+        me = gh.me()
+
+        token.remote_account.extra_data = {"login": me.login, "id": me.id}
+
         # Create user <-> external id link.
         oauth_link_external_id(
-            token.remote_account.user, dict(id=gh.me().id, method="github"))
+            token.remote_account.user, dict(
+                id=str(me.id),
+                method="github")
+        )
 
 
 @oauth_error_handler

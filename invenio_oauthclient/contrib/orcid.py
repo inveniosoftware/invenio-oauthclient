@@ -150,14 +150,11 @@ REMOTE_SANDBOX_APP['params'].update(dict(
 def account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
     orcid = resp.get("orcid")
+
     return dict(
         external_id=orcid,
         external_method="orcid",
-        user=dict(
-            profile=dict(
-                username=orcid,
-            )
-        )
+        user=dict()
     )
 
 
@@ -191,29 +188,3 @@ def account_setup(remote, token, resp):
 
         # Create user <-> external id link.
         oauth_link_external_id(user, dict(id=orcid, method="orcid"))
-
-        # FIXME put these data in user profile!
-        # Fill user full name if not already set
-        # if user and not any([user.given_names, user.family_name]):
-        # Query ORCID to get the real name
-        #     response = remote.get("{0}/orcid-bio".format(orcid),
-        #                           headers={'Accept':
-        #                                    'application/orcid+json'},
-        #                           content_type="application/json")
-        #
-        #     if response.status == 200:
-        #         try:
-        #             name = response.data["orcid-profile"]["orcid-bio"][
-        #                 "personal-details"]
-        #             user.given_names = name["given-names"]["value"]
-        #             user.family_name = name["family-name"]["value"]
-        #         except KeyError:
-        #             current_app.logger.exception(
-        #                 "Unexpected return format from ORCID: {0}".format(
-        #                     repr(response.data)))
-        #             return
-        #
-        #         db.session.add(user)
-        #
-        # Refresh user cache
-        #         current_user.reload()

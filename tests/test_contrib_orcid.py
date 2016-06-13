@@ -49,7 +49,7 @@ def test_account_info(app, example_orcid):
     assert account_info(ioc.remote_apps['orcid'], {}) == \
         dict(external_id=None,
              external_method="orcid",
-             user=dict(profile=dict(username=None)))
+             user=dict())
 
 
 def test_login(app, example_orcid):

@@ -43,7 +43,7 @@ tests_require = [
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
     'simplejson>=3.8',
-    'invenio-userprofiles>=1.0.0a5',
+    'invenio-userprofiles>=1.0.0a6',
 ]
 
 extras_require = {

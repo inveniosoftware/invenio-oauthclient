@@ -19,7 +19,7 @@
 
 """Handlers for customizing oauthclient endpoints."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 from functools import partial, wraps
 
@@ -31,13 +31,13 @@ from flask_security import current_user
 from invenio_db import db
 from werkzeug.utils import import_string
 
-from .errors import OAuthClientError, OAuthError, OAuthRejectedRequestError, \
-    OAuthResponseError
+from .errors import AlreadyLinkedError, OAuthClientError, OAuthError, \
+    OAuthRejectedRequestError, OAuthResponseError
 from .models import RemoteAccount, RemoteToken
 from .proxies import current_oauthclient
 from .signals import account_info_received, account_setup_received
-from .utils import oauth_authenticate, oauth_get_user, oauth_register, \
-    prefill_form, _security
+from .utils import _security, disable_csrf, fill_form, oauth_authenticate, \
+    oauth_get_user, oauth_register
 
 
 #
@@ -188,6 +188,10 @@ def oauth_error_handler(f):
             flash(_('You rejected the authentication request.'),
                   category='info')
             return redirect('/')
+        except AlreadyLinkedError:
+            flash(_('External service is already linked to another account.'),
+                  category='danger')
+            return redirect(url_for('invenio_oauthclient_settings.index'))
     return inner
 
 
@@ -234,10 +238,13 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
 
         if user is None:
             # Auto sign-up if user not found
-            class OAuthUserDataCheckForm(_security.confirm_register_form):
+            class RegistrationForm(_security.confirm_register_form):
                 password = None
 
-            form = prefill_form(OAuthUserDataCheckForm(), account_info['user'])
+            form = fill_form(
+                disable_csrf(RegistrationForm()),
+                account_info['user']
+            )
             user = oauth_register(form)
 
             # if registration fails..
@@ -324,7 +331,10 @@ def signup_handler(remote, *args, **kwargs):
     if not session.get(session_prefix + '_autoregister', False):
         return redirect(url_for('.login', remote_app=remote.name))
 
-    form = _security.confirm_register_form(request.form)
+    class RegistrationForm(_security.confirm_register_form):
+        password = None
+
+    form = RegistrationForm(request.form)
 
     if form.validate_on_submit():
         account_info = session.get(session_prefix + '_account_info')
@@ -378,13 +388,13 @@ def signup_handler(remote, *args, **kwargs):
         else:
             return redirect('/')
 
-    # prefill form
+    # Pre-fill form
     account_info = session.get(session_prefix + '_account_info')
-    if not form.submit.data:
-        form = prefill_form(form, account_info['user'])
+    if not form.is_submitted():
+        form = fill_form(form, account_info['user'])
 
     return render_template(
-        current_app.config['OAUTHCLIENT_FORM_SIGNUP'],
+        current_app.config['OAUTHCLIENT_SIGNUP_TEMPLATE'],
         form=form,
         remote=remote,
         app_title=current_app.config['OAUTHCLIENT_REMOTE_APPS'][

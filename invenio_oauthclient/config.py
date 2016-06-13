@@ -222,5 +222,5 @@ OAUTHCLIENT_STATE_EXPIRES = 300
 OAUTHCLIENT_STATE_ENABLED = True
 """Internal variable used to disable state validation during tests."""
 
-OAUTHCLIENT_FORM_SIGNUP = 'invenio_oauthclient/signup.html'
+OAUTHCLIENT_SIGNUP_TEMPLATE = 'invenio_oauthclient/signup.html'
 """Template for the signup page."""
