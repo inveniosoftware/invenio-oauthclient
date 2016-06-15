@@ -1,8 +1,8 @@
 ==============================
- Invenio-OAuthClient v1.0.0a5
+ Invenio-OAuthClient v1.0.0a6
 ==============================
 
-Invenio-OAuthClient v1.0.0a5 was released on June 14, 2016.
+Invenio-OAuthClient v1.0.0a6 was released on June 15, 2016.
 
 About
 -----
@@ -19,7 +19,7 @@ What's new
 Installation
 ------------
 
-   $ pip install invenio-oauthclient==1.0.0a5
+   $ pip install invenio-oauthclient==1.0.0a6
 
 Documentation
 -------------
