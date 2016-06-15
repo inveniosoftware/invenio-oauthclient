@@ -36,8 +36,8 @@ from .errors import AlreadyLinkedError, OAuthClientError, OAuthError, \
 from .models import RemoteAccount, RemoteToken
 from .proxies import current_oauthclient
 from .signals import account_info_received, account_setup_received
-from .utils import _security, disable_csrf, fill_form, oauth_authenticate, \
-    oauth_get_user, oauth_register
+from .utils import disable_csrf, fill_form, oauth_authenticate, \
+    oauth_get_user, oauth_register, registrationform_cls
 
 
 #
@@ -238,11 +238,9 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
 
         if user is None:
             # Auto sign-up if user not found
-            class RegistrationForm(_security.confirm_register_form):
-                password = None
-
+            form_cls = registrationform_cls()
             form = fill_form(
-                disable_csrf(RegistrationForm()),
+                disable_csrf(form_cls()),
                 account_info['user']
             )
             user = oauth_register(form)
@@ -331,10 +329,7 @@ def signup_handler(remote, *args, **kwargs):
     if not session.get(session_prefix + '_autoregister', False):
         return redirect(url_for('.login', remote_app=remote.name))
 
-    class RegistrationForm(_security.confirm_register_form):
-        password = None
-
-    form = RegistrationForm(request.form)
+    form = registrationform_cls()(request.form)
 
     if form.validate_on_submit():
         account_info = session.get(session_prefix + '_account_info')

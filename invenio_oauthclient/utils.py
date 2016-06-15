@@ -159,6 +159,14 @@ def load_or_import_from_config(key, app=None, default=None):
     return obj_or_import_string(imp, default=default)
 
 
+def registrationform_cls():
+    """Make a registration form."""
+    class RegistrationForm(_security.confirm_register_form):
+        password = None
+        recaptcha = None
+    return RegistrationForm
+
+
 def fill_form(form, data):
     """Prefill form."""
     for (key, value) in data.items():
