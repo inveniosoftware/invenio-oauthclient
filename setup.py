@@ -81,21 +81,16 @@ setup_requires = [
 ]
 
 install_requires = [
-    'blinker>=1.4',
-    'cryptography>=0.6',  # sqlalchemy-utils dependency
-    'Flask>=0.10.1',
     'Flask-BabelEx>=0.9.2',
     'Flask-Breadcrumbs>=0.3.0',
     'Flask-CLI>=0.2.1',
-    'Flask-OAuthlib>=0.6.0,<0.7',  # quick fix for issue invenio#2158
+    'Flask-OAuthlib>=0.9.3',
     'Flask-Security>=1.7.5',
+    'Flask>=0.10.1',
+    'blinker>=1.4',
+    'cryptography>=0.6',  # sqlalchemy-utils dependency
     'invenio-accounts>=1.0.0a8',
     'invenio-mail>=1.0.0a2',
-    # FIXME
-    #  'invenio-upgrader>=0.1.0',
-    # FIXME new oauthlib release after 0.7.2 has some compatible problems with
-    # the used Flask-Oauthlib version.
-    'oauthlib==0.7.2',
     'six>=1.9',
     'sqlalchemy-utils>=0.31',
     'uritools>=1.0.1',

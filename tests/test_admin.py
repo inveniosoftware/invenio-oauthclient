@@ -19,7 +19,7 @@
 
 """Views for OAuth."""
 from flask import url_for
-from flask.ext.admin import Admin
+from flask_admin import Admin
 from invenio_db import db
 
 from invenio_oauthclient import InvenioOAuthClient
