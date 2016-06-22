@@ -51,7 +51,7 @@ extras_require = {
         'invenio-admin>=1.0.0a2',
     ],
     'docs': [
-        'Sphinx>=1.4',
+        'Sphinx>=1.4.2',
     ],
     'github': [
         'github3.py>=1.0.0a4',
