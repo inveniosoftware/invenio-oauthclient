@@ -35,20 +35,20 @@ from ..models import RemoteAccount
 blueprint = Blueprint(
     'invenio_oauthclient_settings',
     __name__,
-    url_prefix="/account/settings/linkedaccounts",
-    static_folder="../static",
-    template_folder="../templates",
+    url_prefix='/account/settings/linkedaccounts',
+    static_folder='../static',
+    template_folder='../templates',
 )
 
 
-@blueprint.route("/", methods=['GET', 'POST'])
+@blueprint.route('/', methods=['GET', 'POST'])
 @login_required
 @register_menu(
     blueprint, 'settings.oauthclient',
     _('%(icon)s Linked accounts', icon='<i class="fa fa-link fa-fw"></i>'),
     order=3,
     active_when=lambda: request.endpoint.startswith(
-        "invenio_oauthclient_settings.")
+        'invenio_oauthclient_settings.')
 )
 @register_breadcrumb(
     blueprint, 'breadcrumbs.settings.oauthclient', _('Linked accounts')
@@ -87,6 +87,6 @@ def index():
     services.sort(key=itemgetter('title'))
 
     return render_template(
-        "invenio_oauthclient/settings/index.html",
+        'invenio_oauthclient/settings/index.html',
         services=services
     )

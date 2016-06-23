@@ -94,25 +94,25 @@ REMOTE_APP = dict(
     title='ORCID',
     description='Connecting Research and Researchers.',
     icon='',
-    authorized_handler="invenio_oauthclient.handlers"
-                       ":authorized_signup_handler",
-    disconnect_handler="invenio_oauthclient.contrib.orcid"
-                       ":disconnect_handler",
+    authorized_handler='invenio_oauthclient.handlers'
+                       ':authorized_signup_handler',
+    disconnect_handler='invenio_oauthclient.contrib.orcid'
+                       ':disconnect_handler',
     signup_handler=dict(
-        info="invenio_oauthclient.contrib.orcid:account_info",
-        setup="invenio_oauthclient.contrib.orcid:account_setup",
-        view="invenio_oauthclient.handlers:signup_handler",
+        info='invenio_oauthclient.contrib.orcid:account_info',
+        setup='invenio_oauthclient.contrib.orcid:account_setup',
+        view='invenio_oauthclient.handlers:signup_handler',
     ),
     params=dict(
         request_token_params={'scope': '/authenticate',
                               'show_login': 'true'},
         base_url='https://pub.orcid.org/v1.2/',
         request_token_url=None,
-        access_token_url="https://pub.orcid.org/oauth/token",
+        access_token_url='https://pub.orcid.org/oauth/token',
         access_token_method='POST',
-        authorize_url="https://orcid.org/oauth/authorize",
-        app_key="ORCID_APP_CREDENTIALS",
-        content_type="application/json",
+        authorize_url='https://orcid.org/oauth/authorize',
+        app_key='ORCID_APP_CREDENTIALS',
+        content_type='application/json',
     )
 )
 """ ORCID Remote Application. """
@@ -121,8 +121,8 @@ REMOTE_MEMBER_APP = copy.deepcopy(REMOTE_APP)
 """ORCID Remote Application with member API."""
 
 REMOTE_MEMBER_APP['params'].update(dict(
-    base_url="https://api.orcid.org/",
-    access_token_url="https://api.orcid.org/oauth/token",
+    base_url='https://api.orcid.org/',
+    access_token_url='https://api.orcid.org/oauth/token',
 ))
 """ORCID sandbox member API."""
 
@@ -130,9 +130,9 @@ REMOTE_SANDBOX_MEMBER_APP = copy.deepcopy(REMOTE_APP)
 """ORCID Sandbox Remote Application with member API."""
 
 REMOTE_SANDBOX_MEMBER_APP['params'].update(dict(
-    base_url="https://api.sandbox.orcid.org/",
-    access_token_url="https://api.sandbox.orcid.org/oauth/token",
-    authorize_url="https://sandbox.orcid.org/oauth/authorize#show_login",
+    base_url='https://api.sandbox.orcid.org/',
+    access_token_url='https://api.sandbox.orcid.org/oauth/token',
+    authorize_url='https://sandbox.orcid.org/oauth/authorize#show_login',
 ))
 """ORCID sandbox member API."""
 
@@ -140,20 +140,20 @@ REMOTE_SANDBOX_APP = copy.deepcopy(REMOTE_APP)
 """ORCID Sandbox Remote Application with public API."""
 
 REMOTE_SANDBOX_APP['params'].update(dict(
-    base_url="https://pub.sandbox.orcid.org/",
-    access_token_url="https://pub.sandbox.orcid.org/oauth/token",
-    authorize_url="https://sandbox.orcid.org/oauth/authorize#show_login",
+    base_url='https://pub.sandbox.orcid.org/',
+    access_token_url='https://pub.sandbox.orcid.org/oauth/token',
+    authorize_url='https://sandbox.orcid.org/oauth/authorize#show_login',
 ))
 """ORCID sandbox public API."""
 
 
 def account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
-    orcid = resp.get("orcid")
+    orcid = resp.get('orcid')
 
     return dict(
         external_id=orcid,
-        external_method="orcid",
+        external_method='orcid',
         user=dict()
     )
 
@@ -180,11 +180,11 @@ def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
     with db.session.begin_nested():
         # Retrieve ORCID from response.
-        orcid = resp.get("orcid")
+        orcid = resp.get('orcid')
 
         # Set ORCID in extra_data.
-        token.remote_account.extra_data = {"orcid": orcid}
+        token.remote_account.extra_data = {'orcid': orcid}
         user = token.remote_account.user
 
         # Create user <-> external id link.
-        oauth_link_external_id(user, dict(id=orcid, method="orcid"))
+        oauth_link_external_id(user, dict(id=orcid, method='orcid'))

@@ -34,9 +34,9 @@ from ..utils import get_safe_redirect_target
 blueprint = Blueprint(
     'invenio_oauthclient',
     __name__,
-    url_prefix="/oauth",
-    static_folder="../static",
-    template_folder="../templates",
+    url_prefix='/oauth',
+    static_folder='../static',
+    template_folder='../templates',
 )
 
 
@@ -54,20 +54,20 @@ def post_ext_init(state):
     app = state.app
 
     app.config.setdefault(
-        "OAUTHCLIENT_SITENAME",
-        app.config.get("THEME_SITENAME", "Invenio"))
+        'OAUTHCLIENT_SITENAME',
+        app.config.get('THEME_SITENAME', 'Invenio'))
     app.config.setdefault(
-        "OAUTHCLIENT_BASE_TEMPLATE",
-        app.config.get("BASE_TEMPLATE",
-                       "invenio_oauthclient/base.html"))
+        'OAUTHCLIENT_BASE_TEMPLATE',
+        app.config.get('BASE_TEMPLATE',
+                       'invenio_oauthclient/base.html'))
     app.config.setdefault(
-        "OAUTHCLIENT_COVER_TEMPLATE",
-        app.config.get("COVER_TEMPLATE",
-                       "invenio_oauthclient/base_cover.html"))
+        'OAUTHCLIENT_COVER_TEMPLATE',
+        app.config.get('COVER_TEMPLATE',
+                       'invenio_oauthclient/base_cover.html'))
     app.config.setdefault(
-        "OAUTHCLIENT_SETTINGS_TEMPLATE",
-        app.config.get("SETTINGS_TEMPLATE",
-                       "invenio_oauthclient/settings/base.html"))
+        'OAUTHCLIENT_SETTINGS_TEMPLATE',
+        app.config.get('SETTINGS_TEMPLATE',
+                       'invenio_oauthclient/settings/base.html'))
 
 
 @blueprint.route('/login/<remote_app>/')

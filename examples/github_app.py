@@ -145,13 +145,13 @@ app.register_blueprint(blueprint_userprofile_init)
 @app.route('/')
 def index():
     """Homepage."""
-    return "Home page (without any restrictions)"
+    return 'Home page (without any restrictions)'
 
 
 @app.route('/github')
 def github():
     """Try to print user email or redirect to login with github."""
     if not current_user.is_authenticated:
-        return redirect(url_for("invenio_oauthclient.login",
+        return redirect(url_for('invenio_oauthclient.login',
                                 remote_app='github'))
-    return "hello {}".format(current_user.email)
+    return 'hello {}'.format(current_user.email)

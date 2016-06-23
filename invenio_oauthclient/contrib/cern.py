@@ -124,26 +124,26 @@ CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE = (
 )
 
 REMOTE_APP = dict(
-    title="CERN",
-    description="Connecting to CERN Organization.",
-    icon="",
-    authorized_handler="invenio_oauthclient.handlers"
-                       ":authorized_signup_handler",
-    disconnect_handler="invenio_oauthclient.handlers"
-                       ":disconnect_handler",
+    title='CERN',
+    description='Connecting to CERN Organization.',
+    icon='',
+    authorized_handler='invenio_oauthclient.handlers'
+                       ':authorized_signup_handler',
+    disconnect_handler='invenio_oauthclient.handlers'
+                       ':disconnect_handler',
     signup_handler=dict(
-        info="invenio_oauthclient.contrib.cern:account_info",
-        setup="invenio_oauthclient.contrib.cern:account_setup",
-        view="invenio_oauthclient.handlers:signup_handler",
+        info='invenio_oauthclient.contrib.cern:account_info',
+        setup='invenio_oauthclient.contrib.cern:account_setup',
+        view='invenio_oauthclient.handlers:signup_handler',
     ),
     params=dict(
-        base_url="https://oauth.web.cern.ch/",
+        base_url='https://oauth.web.cern.ch/',
         request_token_url=None,
-        access_token_url="https://oauth.web.cern.ch/OAuth/Token",
-        access_token_method="POST",
-        authorize_url="https://oauth.web.cern.ch/OAuth/Authorize",
-        app_key="CERN_APP_CREDENTIALS",
-        content_type="application/json",
+        access_token_url='https://oauth.web.cern.ch/OAuth/Token',
+        access_token_method='POST',
+        authorize_url='https://oauth.web.cern.ch/OAuth/Authorize',
+        app_key='CERN_APP_CREDENTIALS',
+        content_type='application/json',
         request_token_params={'scope': 'Name Email Bio Groups',
                               'show_login': 'true'}
     )
@@ -153,14 +153,14 @@ REMOTE_APP = dict(
 REMOTE_SANDBOX_APP = copy.deepcopy(REMOTE_APP)
 """CERN Sandbox Remote Application."""
 
-REMOTE_SANDBOX_APP["params"].update(dict(
-    base_url="https://test-oauth.web.cern.ch/",
-    access_token_url="https://test-oauth.web.cern.ch/OAuth/Token",
-    authorize_url="https://test-oauth.web.cern.ch/OAuth/Authorize",
+REMOTE_SANDBOX_APP['params'].update(dict(
+    base_url='https://test-oauth.web.cern.ch/',
+    access_token_url='https://test-oauth.web.cern.ch/OAuth/Token',
+    authorize_url='https://test-oauth.web.cern.ch/OAuth/Authorize',
 ))
 
-REMOTE_APP_RESOURCE_API_URL = "https://oauthresource.web.cern.ch/api/Me"
-REMOTE_APP_RESOURCE_SCHEMA = "http://schemas.xmlsoap.org/claims/"
+REMOTE_APP_RESOURCE_API_URL = 'https://oauthresource.web.cern.ch/api/Me'
+REMOTE_APP_RESOURCE_SCHEMA = 'http://schemas.xmlsoap.org/claims/'
 
 
 def fetch_groups(groups):
@@ -233,7 +233,7 @@ def account_setup(remote, token, resp):
         external_id = res['PersonID'][0]
 
         # Create user <-> external id link.
-        oauth_link_external_id(user, dict(id=external_id, method="cern"))
+        oauth_link_external_id(user, dict(id=external_id, method='cern'))
 
     groups = fetch_groups(res['Group'])
     session['identity.cern_provides'] = [RoleNeed(group) for group in groups]

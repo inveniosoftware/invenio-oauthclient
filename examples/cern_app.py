@@ -149,7 +149,7 @@ principal = app.extensions['security'].principal
 def index():
     """Home page: try to print user email or redirect to login with cern."""
     if not current_user.is_authenticated:
-        return redirect(url_for("invenio_oauthclient.login",
+        return redirect(url_for('invenio_oauthclient.login',
                                 remote_app='cern'))
 
-    return "hello {}".format(current_user.email)
+    return 'hello {}'.format(current_user.email)

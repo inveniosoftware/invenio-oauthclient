@@ -146,13 +146,13 @@ def account_setup(remote, token, resp):
     with db.session.begin_nested():
         me = gh.me()
 
-        token.remote_account.extra_data = {"login": me.login, "id": me.id}
+        token.remote_account.extra_data = {'login': me.login, 'id': me.id}
 
         # Create user <-> external id link.
         oauth_link_external_id(
             token.remote_account.user, dict(
                 id=str(me.id),
-                method="github")
+                method='github')
         )
 
 

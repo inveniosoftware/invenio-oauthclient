@@ -213,7 +213,7 @@ setting ``remote_app`` in your remote application configuration.
 OAUTHCLIENT_REMOTE_APPS = {}
 """Configuration of remote applications."""
 
-OAUTHCLIENT_SESSION_KEY_PREFIX = "oauth_token"
+OAUTHCLIENT_SESSION_KEY_PREFIX = 'oauth_token'
 """Session key prefix used when storing the access token for a remote app."""
 
 OAUTHCLIENT_STATE_EXPIRES = 300

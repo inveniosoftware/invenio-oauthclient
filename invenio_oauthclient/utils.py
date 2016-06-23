@@ -49,7 +49,7 @@ def _commit(response=None):
 
 def _get_external_id(account_info):
     """Get external id from account info."""
-    if all(k in account_info for k in ("external_id", "external_method")):
+    if all(k in account_info for k in ('external_id', 'external_method')):
         return dict(id=account_info['external_id'],
                     method=account_info['external_method'])
     return None
