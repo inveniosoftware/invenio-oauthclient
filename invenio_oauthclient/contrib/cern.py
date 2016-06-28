@@ -87,7 +87,7 @@ import copy
 import re
 
 from flask import current_app, session
-from flask_principal import RoleNeed, identity_loaded
+from flask_principal import UserNeed, RoleNeed, identity_loaded
 
 from invenio_oauthclient.utils import oauth_link_external_id
 from invenio_db import db
@@ -236,7 +236,9 @@ def account_setup(remote, token, resp):
         oauth_link_external_id(user, dict(id=external_id, method='cern'))
 
     groups = fetch_groups(res['Group'])
-    session['identity.cern_provides'] = [RoleNeed(group) for group in groups]
+    provides = [UserNeed(user.email)] + \
+               [RoleNeed('{0}@cern.ch'.format(group)) for group in groups]
+    session['identity.cern_provides'] = provides
 
 
 @identity_loaded.connect
