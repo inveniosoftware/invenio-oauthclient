@@ -60,7 +60,7 @@ def test_redirect_uri(views_fixture):
         # Test redirect
         resp = client.get(
             url_for("invenio_oauthclient.login", remote_app='test',
-                    next='http://invenio-software.org')
+                    next='http://inveniosoftware.org')
         )
         assert resp.status_code == 302
 
@@ -450,13 +450,13 @@ def test_settings_view(views_fixture):
 
     @app.route('/foo_login')
     def login():
-        user = datastore.find_user(email="existing@invenio-software.org")
+        user = datastore.find_user(email="existing@inveniosoftware.org")
         login_user(user)
         return "Logged In"
 
     with app.app_context():
         with app.test_client() as client:
-            user = datastore.find_user(email="existing@invenio-software.org")
+            user = datastore.find_user(email="existing@inveniosoftware.org")
             RemoteAccount.create(user.get_id(), 'testid', None)
 
             resp = client.get(url_for('invenio_oauthclient_settings.index'),

@@ -112,7 +112,7 @@ setup(
     keywords='invenio oauth authentication',
     license='GPLv2',
     author='CERN',
-    author_email='info@invenio-software.org',
+    author_email='info@inveniosoftware.org',
     url='https://github.com/inveniosoftware/invenio-oauthclient',
     packages=packages,
     zip_safe=False,

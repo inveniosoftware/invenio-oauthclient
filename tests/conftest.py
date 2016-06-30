@@ -146,17 +146,17 @@ def models_fixture(app):
     with app.app_context():
         datastore = app.extensions['security'].datastore
         datastore.create_user(
-            email="existing@invenio-software.org",
+            email="existing@inveniosoftware.org",
             password='tester',
             active=True
         )
         datastore.create_user(
-            email="test2@invenio-software.org",
+            email="test2@inveniosoftware.org",
             password='tester',
             active=True
         )
         datastore.create_user(
-            email="test3@invenio-software.org",
+            email="test3@inveniosoftware.org",
             password='tester',
             active=True
         )
@@ -187,17 +187,17 @@ def views_fixture(base_app, params):
     with base_app.app_context():
         datastore = base_app.extensions['security'].datastore
         datastore.create_user(
-            email="existing@invenio-software.org",
+            email="existing@inveniosoftware.org",
             password='tester',
             active=True
         )
         datastore.create_user(
-            email="test2@invenio-software.org",
+            email="test2@inveniosoftware.org",
             password='tester',
             active=True
         )
         datastore.create_user(
-            email="test3@invenio-software.org",
+            email="test3@inveniosoftware.org",
             password='tester',
             active=True
         )
@@ -328,7 +328,7 @@ def user(userprofiles_app):
     """Create users."""
     with db.session.begin_nested():
         datastore = userprofiles_app.extensions['security'].datastore
-        user1 = datastore.create_user(email='info@invenio-software.org',
+        user1 = datastore.create_user(email='info@inveniosoftware.org',
                                       password='tester', active=True)
         profile = UserProfile(username='mynick', user=user1)
         db.session.add(profile)

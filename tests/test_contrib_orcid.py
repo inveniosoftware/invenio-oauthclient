@@ -75,7 +75,7 @@ def test_authorized_signup(userprofiles_app, example_orcid, orcid_bio):
     """Test authorized callback with sign-up."""
     app = userprofiles_app
     example_data, example_account_info = example_orcid
-    example_email = "orcidtest@invenio-software.org"
+    example_email = "orcidtest@inveniosoftware.org"
 
     with app.test_client() as c:
         # Ensure remote apps have been loaded (due to before first
@@ -177,7 +177,7 @@ def test_authorized_already_authenticated(models_fixture, example_orcid,
     login_manager = app.login_manager
 
     example_data, example_account_info = example_orcid
-    existing_email = "existing@invenio-software.org"
+    existing_email = "existing@inveniosoftware.org"
     user = datastore.find_user(email=existing_email)
 
     @login_manager.user_loader

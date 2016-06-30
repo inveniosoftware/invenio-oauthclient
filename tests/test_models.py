@@ -43,7 +43,7 @@ def test_get_create_remote_account(models_fixture):
 def test_get_create_remote_token(models_fixture):
     """Test create remote token."""
     app = models_fixture
-    existing_email = "existing@invenio-software.org"
+    existing_email = "existing@inveniosoftware.org"
     datastore = app.extensions['invenio-accounts'].datastore
     user = datastore.find_user(email=existing_email)
 
@@ -77,8 +77,8 @@ def test_get_regression(models_fixture):
     app = models_fixture
     datastore = app.extensions['invenio-accounts'].datastore
 
-    email2 = "test2@invenio-software.org"
-    email3 = "test3@invenio-software.org"
+    email2 = "test2@inveniosoftware.org"
+    email3 = "test3@inveniosoftware.org"
 
     user2 = datastore.find_user(email=email2)
     user3 = datastore.find_user(email=email3)

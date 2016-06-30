@@ -91,7 +91,7 @@ def test_account_setup(app, example_cern, models_fixture):
 
     app = models_fixture
     datastore = app.extensions['invenio-accounts'].datastore
-    user = datastore.find_user(email="existing@invenio-software.org")
+    user = datastore.find_user(email="existing@inveniosoftware.org")
     token = RemoteToken.create(
         user.id, 'client_id', example_token['access_token'], 'secret',
         token_type=example_token['token_type']

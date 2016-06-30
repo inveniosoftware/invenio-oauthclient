@@ -80,12 +80,12 @@ class MockGh(object):
 
 def test_authorized_signup_valid_user(app, example_github):
     """Test authorized callback with sign-up."""
-    example_email = "info@invenio-software.org"
+    example_email = "info@inveniosoftware.org"
 
     with app.test_client() as c:
         # User login with email 'info'
         with mock.patch('github3.login') as MockLogin:
-            MockLogin.return_value = MockGh(email='info@invenio-software.org')
+            MockLogin.return_value = MockGh(email='info@inveniosoftware.org')
 
             # Ensure remote apps have been loaded (due to before first
             # request)
@@ -128,7 +128,7 @@ def test_authorized_signup_valid_user(app, example_github):
 
         # User login with another email ('info2')
         with mock.patch('github3.login') as MockLogin:
-            MockLogin.return_value = MockGh(email='info2@invenio-software.org')
+            MockLogin.return_value = MockGh(email='info2@inveniosoftware.org')
 
             # User authorized the requests and is redirect back
             resp = c.get(
@@ -235,7 +235,7 @@ def test_authorized_already_authenticated(models_fixture, example_github):
     datastore = app.extensions['invenio-accounts'].datastore
     login_manager = app.login_manager
 
-    existing_email = "existing@invenio-software.org"
+    existing_email = "existing@inveniosoftware.org"
     user = datastore.find_user(email=existing_email)
 
     @login_manager.user_loader
@@ -248,7 +248,7 @@ def test_authorized_already_authenticated(models_fixture, example_github):
         return "Logged In"
 
     with mock.patch('github3.login') as MockLogin:
-        MockLogin.return_value = MockGh(email='info@invenio-software.org')
+        MockLogin.return_value = MockGh(email='info@inveniosoftware.org')
 
         with app.test_client() as client:
 
