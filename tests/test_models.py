@@ -90,3 +90,17 @@ def test_get_regression(models_fixture):
         t3.remote_account.user_id
     assert RemoteToken.get(user3.id, "dev").remote_account.user_id == \
         t4.remote_account.user_id
+
+
+def test_repr(models_fixture):
+    """Test representation of RemoteAccount adn RemoteToken."""
+    datastore = models_fixture.extensions['invenio-accounts'].datastore
+    user = datastore.find_user(email="existing@inveniosoftware.org")
+
+    assert 'Remote Token <token_type=type access_token=mytoken>' == \
+           repr(RemoteToken.create(user.id, "dev",
+                                   "mytoken", "mysecret",
+                                   token_type='type'))
+
+    assert 'Remote Account <id=1, user_id=1>' == \
+           repr(RemoteAccount.get(user.id, "dev"))

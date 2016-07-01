@@ -305,6 +305,11 @@ def test_no_remote_app(views_fixture):
         )
         assert resp.status_code == 404
 
+        resp = client.get(
+            url_for("invenio_oauthclient.signup", remote_app='invalid')
+        )
+        assert resp.status_code == 404
+
 
 def test_token_getter_setter(views_fixture, monkeypatch):
     """Test token getter setter."""

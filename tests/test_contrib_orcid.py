@@ -23,6 +23,7 @@ from __future__ import absolute_import
 
 import httpretty
 from flask import session, url_for
+from flask_login import current_user
 from flask_security.utils import login_user
 from invenio_accounts.models import User
 from six.moves.urllib_parse import parse_qs, urlparse
@@ -247,3 +248,13 @@ def test_authorized_already_authenticated(models_fixture, example_orcid,
             method='orcid', id_user=u.id,
             id=example_data['orcid']
         ).count()
+
+
+def test_not_authenticated(models_fixture):
+    """Test disconnect when user is not authenticated."""
+    app = models_fixture
+    with app.test_client() as client:
+        assert not current_user.is_authenticated
+        resp = client.get(
+            url_for("invenio_oauthclient.disconnect", remote_app='orcid'))
+        assert resp.status_code == 302

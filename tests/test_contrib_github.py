@@ -24,16 +24,19 @@ from __future__ import absolute_import
 from collections import namedtuple
 
 import mock
+import pytest
 from flask import session, url_for
-from flask_login import _create_identifier
+from flask_login import _create_identifier, current_user
 from flask_security.utils import login_user
 from invenio_accounts.models import User
 from six.moves.urllib_parse import parse_qs, urlparse
 
+from invenio_oauthclient.contrib.github import authorized
+from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken, UserIdentity
 from invenio_oauthclient.views.client import serializer
 
-from .helpers import mock_response
+from .helpers import check_redirect_location, mock_response
 
 
 def _get_state():
@@ -295,3 +298,36 @@ def test_authorized_already_authenticated(models_fixture, example_github):
             ).count()
             assert RemoteAccount.query.filter_by(user_id=u.id).count() == 0
             assert RemoteToken.query.count() == 0
+
+
+def test_not_authenticated(app):
+    """Test disconnect when user is not authenticated."""
+    with app.test_client() as client:
+        assert not current_user.is_authenticated
+        resp = client.get(
+            url_for("invenio_oauthclient.disconnect", remote_app='github'))
+        assert resp.status_code == 302
+
+
+def test_authorized_handler(app, remote):
+    """Test authorized callback handler."""
+
+    # General error
+    example_response = {'error': 'error'}
+    resp = authorized(example_response, remote)
+    check_redirect_location(resp, '/')
+
+    # Bad verification error
+    example_response = {'error': 'bad_verification_code'}
+    resp = authorized(example_response, remote)
+    check_redirect_location(resp, '/oauth/login/github/')
+
+    # Incorrect client credentials
+    example_response = {'error': 'incorrect_client_credentials'}
+    with pytest.raises(OAuthResponseError):
+        authorized(example_response, remote)
+
+        # Redirect uri mismatch
+        example_response = {'error': 'redirect_uri_mismatch'}
+        with pytest.raises(OAuthResponseError):
+            authorized(example_response, remote)

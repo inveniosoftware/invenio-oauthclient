@@ -182,6 +182,22 @@ def params():
 
 
 @pytest.fixture
+def remote():
+    """Fixture for remote app."""
+    return type("test_remote", (),
+                dict(
+                    name='example_remote',
+                    request_token_params={'scope': ''},
+                    base_url='https://foo.bar/',
+                    request_token_url=None,
+                    access_token_url="https://foo.bar/oauth/access_token",
+                    authorize_url="https://foo.bar/oauth/authorize",
+                    consumer_key='testkey',
+                    consumer_secret='testsecret',
+                ))()
+
+
+@pytest.fixture
 def views_fixture(base_app, params):
     """Flask application with example data used to test views."""
     with base_app.app_context():

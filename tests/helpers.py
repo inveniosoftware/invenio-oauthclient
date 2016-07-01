@@ -19,6 +19,9 @@
 
 """OAuth client test utility functions."""
 
+from inspect import isfunction
+
+import six
 from flask_login import _create_identifier
 from mock import MagicMock
 
@@ -43,3 +46,12 @@ def mock_remote_get(oauth, remote_app='test', data=None):
     oauth.remote_apps[remote_app].get = MagicMock(
         return_value=data
     )
+
+
+def check_redirect_location(resp, loc):
+    """Check response redirect location."""
+    assert resp._status_code == 302
+    if isinstance(loc, six.string_types):
+        assert resp.headers['Location'] == loc
+    elif isfunction(loc):
+        assert loc(resp.headers['Location'])
