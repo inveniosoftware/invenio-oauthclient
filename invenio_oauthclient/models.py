@@ -25,6 +25,7 @@ from invenio_db import db
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy_utils import JSONType
 from sqlalchemy_utils.types.encrypted import EncryptedType
+from sqlalchemy.orm import backref
 
 
 def _secret_key():
@@ -65,17 +66,10 @@ class RemoteAccount(db.Model):
     """Extra data associated with this linked account."""
 
     #
-    # Relationships propoerties
+    # Relationships properties
     #
-    user = db.relationship('User')
+    user = db.relationship(User, backref='remote_accounts')
     """SQLAlchemy relationship to user."""
-
-    tokens = db.relationship(
-        'RemoteToken',
-        backref='remote_account',
-        cascade='all, delete-orphan'
-    )
-    """SQLAlchemy relationship to RemoteToken objects."""
 
     @classmethod
     def get(cls, user_id, client_id):
@@ -145,6 +139,15 @@ class RemoteToken(db.Model):
 
     secret = db.Column(db.Text(), default='', nullable=False)
     """Used only by OAuth 1."""
+
+    #
+    # Relationships properties
+    #
+    remote_account = db.relationship(
+        RemoteAccount,
+        backref=backref('remote_tokens', cascade='all, delete-orphan')
+    )
+    """SQLAlchemy relationship to RemoteAccount objects."""
 
     def __repr__(self):
         """String representation for model."""

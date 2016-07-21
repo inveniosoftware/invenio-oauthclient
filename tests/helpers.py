@@ -26,6 +26,7 @@ from invenio_oauthclient.views.client import serializer
 
 
 def get_state(app='test'):
+    """Get state."""
     return serializer.dumps({'app': app, 'sid': _create_identifier(),
                              'next': None, })
 

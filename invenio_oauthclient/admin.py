@@ -41,7 +41,7 @@ class RemoteAccountView(ModelView):
         'user_id',
         'client_id',
         'extra_data',
-        'tokens',
+        'remote_tokens',
     )
 
     remote_account_columns = (
