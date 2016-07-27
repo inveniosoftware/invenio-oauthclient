@@ -63,3 +63,22 @@ Example subscriber:
         # process response
 
 """
+
+
+account_setup_committed = _signals.signal(
+    'oauthclient-account-setup-committed')
+"""Signal is sent after account setup has been committed to database.
+
+Example subscriber:
+
+.. code-block:: python
+
+    from invenio_oauthclient.signals import account_setup_committed
+
+    # During overlay initialization.
+    @account_setup_committed.connect
+    def fetch_info(remote):
+        response = remote.get('https://example.org/api/resource')
+        # process response
+
+"""

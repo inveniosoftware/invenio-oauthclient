@@ -35,7 +35,8 @@ from .errors import AlreadyLinkedError, OAuthClientError, OAuthError, \
     OAuthRejectedRequestError, OAuthResponseError
 from .models import RemoteAccount, RemoteToken
 from .proxies import current_oauthclient
-from .signals import account_info_received, account_setup_received
+from .signals import account_info_received, account_setup_committed, \
+    account_setup_received
 from .utils import disable_csrf, fill_form, oauth_authenticate, \
     oauth_get_user, oauth_register, registrationform_cls
 
@@ -245,7 +246,7 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
             )
             user = oauth_register(form)
 
-            # if registration fails..
+            # if registration fails ...
             if user is None:
                 # requires extra information
                 session[
@@ -281,10 +282,13 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
         account_setup_received.send(
             remote, token=token, response=resp, account_setup=account_setup
         )
+        db.session.commit()
+        account_setup_committed.send(remote, token=token)
+    else:
+        db.session.commit()
 
     # Redirect to next
     next_url = get_session_next_url(remote.name)
-    db.session.commit()
     if next_url:
         return redirect(next_url)
     return redirect(url_for('invenio_oauthclient_settings.index'))
@@ -358,9 +362,12 @@ def signup_handler(remote, *args, **kwargs):
                 remote, token=token, response=response,
                 account_setup=account_setup
             )
-
-        # Registration has been finished
-        db.session.commit()
+            # Registration has been finished
+            db.session.commit()
+            account_setup_committed.send(remote, token=token)
+        else:
+            # Registration has been finished
+            db.session.commit()
 
         # Authenticate the user
         if not oauth_authenticate(remote.consumer_key, user,
