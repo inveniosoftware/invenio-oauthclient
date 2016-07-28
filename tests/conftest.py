@@ -146,17 +146,17 @@ def models_fixture(app):
     with app.app_context():
         datastore = app.extensions['security'].datastore
         datastore.create_user(
-            email="existing@inveniosoftware.org",
+            email='existing@inveniosoftware.org',
             password='tester',
             active=True
         )
         datastore.create_user(
-            email="test2@inveniosoftware.org",
+            email='test2@inveniosoftware.org',
             password='tester',
             active=True
         )
         datastore.create_user(
-            email="test3@inveniosoftware.org",
+            email='test3@inveniosoftware.org',
             password='tester',
             active=True
         )
@@ -172,8 +172,8 @@ def params():
             request_token_params={'scope': ''},
             base_url='https://foo.bar/',
             request_token_url=None,
-            access_token_url="https://foo.bar/oauth/access_token",
-            authorize_url="https://foo.bar/oauth/authorize",
+            access_token_url='https://foo.bar/oauth/access_token',
+            authorize_url='https://foo.bar/oauth/authorize',
             consumer_key=x,
             consumer_secret='testsecret',
         )
@@ -184,14 +184,14 @@ def params():
 @pytest.fixture
 def remote():
     """Fixture for remote app."""
-    return type("test_remote", (),
+    return type('test_remote', (),
                 dict(
                     name='example_remote',
                     request_token_params={'scope': ''},
                     base_url='https://foo.bar/',
                     request_token_url=None,
-                    access_token_url="https://foo.bar/oauth/access_token",
-                    authorize_url="https://foo.bar/oauth/authorize",
+                    access_token_url='https://foo.bar/oauth/access_token',
+                    authorize_url='https://foo.bar/oauth/authorize',
                     consumer_key='testkey',
                     consumer_secret='testsecret',
                 ))()
@@ -203,17 +203,17 @@ def views_fixture(base_app, params):
     with base_app.app_context():
         datastore = base_app.extensions['security'].datastore
         datastore.create_user(
-            email="existing@inveniosoftware.org",
+            email='existing@inveniosoftware.org',
             password='tester',
             active=True
         )
         datastore.create_user(
-            email="test2@inveniosoftware.org",
+            email='test2@inveniosoftware.org',
             password='tester',
             active=True
         )
         datastore.create_user(
-            email="test3@inveniosoftware.org",
+            email='test3@inveniosoftware.org',
             password='tester',
             active=True
         )
@@ -222,17 +222,17 @@ def views_fixture(base_app, params):
     base_app.config['OAUTHCLIENT_REMOTE_APPS'].update(
         dict(
             test=dict(
-                authorized_handler=lambda *args, **kwargs: "TEST",
+                authorized_handler=lambda *args, **kwargs: 'TEST',
                 params=params('testid'),
                 title='MyLinkedTestAccount',
             ),
             test_invalid=dict(
-                authorized_handler=lambda *args, **kwargs: "TEST",
+                authorized_handler=lambda *args, **kwargs: 'TEST',
                 params=params('test_invalidid'),
                 title='Test Invalid',
             ),
             full=dict(
-                params=params("fullid"),
+                params=params('fullid'),
                 title='Full',
             ),
         )
@@ -250,12 +250,12 @@ def views_fixture(base_app, params):
 def example_github(request):
     """ORCID example data."""
     return {
-        "name": "Josiah Carberry",
-        "expires_in": 3599,
-        "access_token": "test_access_token",
-        "refresh_token": "test_refresh_token",
-        "scope": "/authenticate",
-        "token_type": "bearer",
+        'name': 'Josiah Carberry',
+        'expires_in': 3599,
+        'access_token': 'test_access_token',
+        'refresh_token': 'test_refresh_token',
+        'scope': '/authenticate',
+        'token_type': 'bearer',
     }
 
 
@@ -263,15 +263,15 @@ def example_github(request):
 def example_orcid(request):
     """ORCID example data."""
     return {
-        "name": "Josiah Carberry",
-        "expires_in": 3599,
-        "orcid": "0000-0002-1825-0097",
-        "access_token": "test_access_token",
-        "refresh_token": "test_refresh_token",
-        "scope": "/authenticate",
-        "token_type": "bearer"
-    }, dict(external_id="0000-0002-1825-0097",
-            external_method="orcid",
+        'name': 'Josiah Carberry',
+        'expires_in': 3599,
+        'orcid': '0000-0002-1825-0097',
+        'access_token': 'test_access_token',
+        'refresh_token': 'test_refresh_token',
+        'scope': '/authenticate',
+        'token_type': 'bearer'
+    }, dict(external_id='0000-0002-1825-0097',
+            external_method='orcid',
             user=dict())
 
 

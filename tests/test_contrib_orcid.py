@@ -40,7 +40,7 @@ def test_account_info(app, example_orcid):
     ioc = app.extensions['oauthlib.client']
     # Ensure remote apps have been loaded (due to before first
     # request)
-    client.get(url_for("invenio_oauthclient.login", remote_app='orcid'))
+    client.get(url_for('invenio_oauthclient.login', remote_app='orcid'))
 
     example_data, example_account_info = example_orcid
 
@@ -49,7 +49,7 @@ def test_account_info(app, example_orcid):
 
     assert account_info(ioc.remote_apps['orcid'], {}) == \
         dict(external_id=None,
-             external_method="orcid",
+             external_method='orcid',
              user=dict())
 
 
@@ -58,7 +58,7 @@ def test_login(app, example_orcid):
     client = app.test_client()
 
     resp = client.get(
-        url_for("invenio_oauthclient.login", remote_app='orcid',
+        url_for('invenio_oauthclient.login', remote_app='orcid',
                 next='/someurl/')
     )
     assert resp.status_code == 302
@@ -76,23 +76,23 @@ def test_authorized_signup(userprofiles_app, example_orcid, orcid_bio):
     """Test authorized callback with sign-up."""
     app = userprofiles_app
     example_data, example_account_info = example_orcid
-    example_email = "orcidtest@inveniosoftware.org"
+    example_email = 'orcidtest@inveniosoftware.org'
 
     with app.test_client() as c:
         # Ensure remote apps have been loaded (due to before first
         # request)
-        c.get(url_for("invenio_oauthclient.login", remote_app='orcid'))
+        c.get(url_for('invenio_oauthclient.login', remote_app='orcid'))
 
         mock_response(app.extensions['oauthlib.client'], 'orcid', example_data)
 
         # User authorized the requests and is redirect back
         resp = c.get(
-            url_for("invenio_oauthclient.authorized",
+            url_for('invenio_oauthclient.authorized',
                     remote_app='orcid', code='test',
                     state=get_state('orcid')))
         assert resp.status_code == 302
         assert resp.location == (
-            "http://localhost" +
+            'http://localhost' +
             url_for('invenio_oauthclient.signup', remote_app='orcid')
         )
 
@@ -104,19 +104,19 @@ def test_authorized_signup(userprofiles_app, example_orcid, orcid_bio):
         httpretty.enable()
         httpretty.register_uri(
             httpretty.GET,
-            "http://orcid.org/{0}/orcid-bio".format(example_data['orcid']),
+            'http://orcid.org/{0}/orcid-bio'.format(example_data['orcid']),
             body=orcid_bio,
-            content_type="application/orcid+json; qs=2;charset=UTF-8",
+            content_type='application/orcid+json; qs=2;charset=UTF-8',
         )
 
         # User fills form to register
         resp = c.post(
             url_for('invenio_oauthclient.signup', remote_app='orcid'),
             data={
-                "email": example_email,
-                "password": "123456",
-                "profile.username": "pippo",
-                "profile.full_name": "pluto",
+                'email': example_email,
+                'password': '123456',
+                'profile.username': 'pippo',
+                'profile.full_name': 'pluto',
             }
         )
         assert resp.status_code == 302
@@ -129,8 +129,8 @@ def test_authorized_signup(userprofiles_app, example_orcid, orcid_bio):
             id=example_data['orcid']
         ).one()
         # FIXME see contrib/orcid.py line 167
-        #  assert user.given_names == "Josiah"
-        #  assert user.family_name == "Carberry"
+        #  assert user.given_names == 'Josiah'
+        #  assert user.family_name == 'Carberry'
         # check that the user's email is not yet validated
         assert user.active
         # check that the validation email has been sent
@@ -138,7 +138,7 @@ def test_authorized_signup(userprofiles_app, example_orcid, orcid_bio):
 
         # Disconnect link
         resp = c.get(
-            url_for("invenio_oauthclient.disconnect", remote_app='orcid'))
+            url_for('invenio_oauthclient.disconnect', remote_app='orcid'))
         assert resp.status_code == 302
 
         # User exists
@@ -155,15 +155,15 @@ def test_authorized_signup(userprofiles_app, example_orcid, orcid_bio):
 def test_authorized_reject(app, example_orcid):
     """Test a rejected request."""
     with app.test_client() as c:
-        c.get(url_for("invenio_oauthclient.login", remote_app='orcid'))
+        c.get(url_for('invenio_oauthclient.login', remote_app='orcid'))
         resp = c.get(
-            url_for("invenio_oauthclient.authorized",
+            url_for('invenio_oauthclient.authorized',
                     remote_app='orcid', error='access_denied',
                     error_description='User denied access',
                     state=get_state('orcid')))
         assert resp.status_code in (301, 302)
         assert resp.location == (
-            "http://localhost/"
+            'http://localhost/'
         )
         # Check message flash
         assert session['_flashes'][0][0] == 'info'
@@ -178,7 +178,7 @@ def test_authorized_already_authenticated(models_fixture, example_orcid,
     login_manager = app.login_manager
 
     example_data, example_account_info = example_orcid
-    existing_email = "existing@inveniosoftware.org"
+    existing_email = 'existing@inveniosoftware.org'
     user = datastore.find_user(email=existing_email)
 
     @login_manager.user_loader
@@ -188,7 +188,7 @@ def test_authorized_already_authenticated(models_fixture, example_orcid,
     @app.route('/foo_login')
     def login():
         login_user(user)
-        return "Logged In"
+        return 'Logged In'
 
     with app.test_client() as client:
 
@@ -197,7 +197,7 @@ def test_authorized_already_authenticated(models_fixture, example_orcid,
 
         # Ensure remote apps have been loaded (due to before first
         # request)
-        client.get(url_for("invenio_oauthclient.login", remote_app='orcid'))
+        client.get(url_for('invenio_oauthclient.login', remote_app='orcid'))
 
         # Mock access token request
         mock_response(app.extensions['oauthlib.client'], 'orcid', example_data)
@@ -206,22 +206,22 @@ def test_authorized_already_authenticated(models_fixture, example_orcid,
         httpretty.enable()
         httpretty.register_uri(
             httpretty.GET,
-            "https://pub.orcid.org/v1.2/{0}/orcid-bio".format(
+            'https://pub.orcid.org/v1.2/{0}/orcid-bio'.format(
                 example_data['orcid']),
             body=orcid_bio,
-            content_type="application/orcid+json; qs=2;charset=UTF-8",
+            content_type='application/orcid+json; qs=2;charset=UTF-8',
         )
 
-        # User then goes to "Linked accounts" and clicks "Connect"
+        # User then goes to 'Linked accounts' and clicks 'Connect'
         resp = client.get(
-            url_for("invenio_oauthclient.login", remote_app='orcid',
+            url_for('invenio_oauthclient.login', remote_app='orcid',
                     next='/someurl/')
         )
         assert resp.status_code == 302
 
         # User authorized the requests and is redirected back
         resp = client.get(
-            url_for("invenio_oauthclient.authorized",
+            url_for('invenio_oauthclient.authorized',
                     remote_app='orcid', code='test',
                     state=get_state('orcid')))
         httpretty.disable()
@@ -233,12 +233,12 @@ def test_authorized_already_authenticated(models_fixture, example_orcid,
             id=example_data['orcid']
         ).one()
         # FIXME see contrib/orcid.py line 167
-        # assert u.given_names == "Josiah"
-        # assert u.family_name == "Carberry"
+        # assert u.given_names == 'Josiah'
+        # assert u.family_name == 'Carberry'
 
         # Disconnect link
         resp = client.get(
-            url_for("invenio_oauthclient.disconnect", remote_app='orcid'))
+            url_for('invenio_oauthclient.disconnect', remote_app='orcid'))
         assert resp.status_code == 302
 
         # User exists
@@ -256,5 +256,5 @@ def test_not_authenticated(models_fixture):
     with app.test_client() as client:
         assert not current_user.is_authenticated
         resp = client.get(
-            url_for("invenio_oauthclient.disconnect", remote_app='orcid'))
+            url_for('invenio_oauthclient.disconnect', remote_app='orcid'))
         assert resp.status_code == 302

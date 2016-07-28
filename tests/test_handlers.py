@@ -45,18 +45,18 @@ def test_token_setter(app, remote):
 
     # OAuth1
     resp_oauth1 = {
-        "name": "Josiah Carberry",
-        "expires_in": 3599,
-        "oauth_token": "test_access_token",
-        "oauth_token_secret": "test_refresh_token",
-        "scope": "/authenticate",
-        "token_type": "bearer",
+        'name': 'Josiah Carberry',
+        'expires_in': 3599,
+        'oauth_token': 'test_access_token',
+        'oauth_token_secret': 'test_refresh_token',
+        'scope': '/authenticate',
+        'token_type': 'bearer',
     }
     assert not response_token_setter(remote, resp_oauth1)
 
     # Bad request
     resp_bad = {
-        "invalid": "invalid",
+        'invalid': 'invalid',
     }
     with pytest.raises(OAuthResponseError):
         response_token_setter(remote, resp_bad)
@@ -187,6 +187,6 @@ def test_dummy_handler(base_app):
     base_app.register_blueprint(blueprint_settings)
 
     # Try to sign-up client
-    base_app.test_client().get(url_for("invenio_oauthclient.signup",
+    base_app.test_client().get(url_for('invenio_oauthclient.signup',
                                        remote_app='cern',
                                        next='/someurl/'))

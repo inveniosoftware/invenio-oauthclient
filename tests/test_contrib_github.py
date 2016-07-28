@@ -83,7 +83,7 @@ class MockGh(object):
 
 def test_authorized_signup_valid_user(app, example_github):
     """Test authorized callback with sign-up."""
-    example_email = "info@inveniosoftware.org"
+    example_email = 'info@inveniosoftware.org'
 
     with app.test_client() as c:
         # User login with email 'info'
@@ -175,7 +175,7 @@ def test_authorized_signup_username_already_exists(app, example_github, user):
                         state=_get_state()))
             assert resp.status_code == 302
             assert resp.location == (
-                "http://localhost" +
+                'http://localhost' +
                 url_for('invenio_oauthclient.signup', remote_app='github')
             )
 
@@ -183,10 +183,10 @@ def test_authorized_signup_username_already_exists(app, example_github, user):
             resp = c.post(
                 resp.headers['Location'],
                 data={
-                    "email": example_email,
-                    "password": "123456",
-                    "profile.username": "pippo2",
-                    "profile.full_name": "pluto",
+                    'email': example_email,
+                    'password': '123456',
+                    'profile.username': 'pippo2',
+                    'profile.full_name': 'pluto',
                 }
             )
             assert resp.status_code == 302
@@ -225,7 +225,7 @@ def test_authorized_reject(app):
                     state=_get_state()))
         assert resp.status_code in (301, 302)
         assert resp.location == (
-            "http://localhost/"
+            'http://localhost/'
         )
         # Check message flash
         assert session['_flashes'][0][0] == 'info'
@@ -238,7 +238,7 @@ def test_authorized_already_authenticated(models_fixture, example_github):
     datastore = app.extensions['invenio-accounts'].datastore
     login_manager = app.login_manager
 
-    existing_email = "existing@inveniosoftware.org"
+    existing_email = 'existing@inveniosoftware.org'
     user = datastore.find_user(email=existing_email)
 
     @login_manager.user_loader
@@ -248,7 +248,7 @@ def test_authorized_already_authenticated(models_fixture, example_github):
     @app.route('/foo_login')
     def login():
         login_user(user)
-        return "Logged In"
+        return 'Logged In'
 
     with mock.patch('github3.login') as MockLogin:
         MockLogin.return_value = MockGh(email='info@inveniosoftware.org')
@@ -267,7 +267,7 @@ def test_authorized_already_authenticated(models_fixture, example_github):
             mock_response(app.extensions['oauthlib.client'], 'github',
                           example_github)
 
-            # User then goes to "Linked accounts" and clicks "Connect"
+            # User then goes to 'Linked accounts' and clicks 'Connect'
             resp = client.get(
                 url_for('invenio_oauthclient.login', remote_app='github',
                         next='/someurl/')
@@ -305,7 +305,7 @@ def test_not_authenticated(app):
     with app.test_client() as client:
         assert not current_user.is_authenticated
         resp = client.get(
-            url_for("invenio_oauthclient.disconnect", remote_app='github'))
+            url_for('invenio_oauthclient.disconnect', remote_app='github'))
         assert resp.status_code == 302
 
 
