@@ -26,7 +26,7 @@ from flask import session, url_for
 from flask_login import current_user, login_user, logout_user
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from flask_security.confirmable import _security
-from tests.helpers import check_redirect_location
+from helpers import check_redirect_location
 from werkzeug.routing import BuildError
 
 from invenio_oauthclient import InvenioOAuthClient, current_oauthclient

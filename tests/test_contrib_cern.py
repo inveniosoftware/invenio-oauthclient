@@ -22,14 +22,13 @@
 from __future__ import absolute_import
 
 from flask import session, url_for
+from helpers import get_state, mock_remote_get
 from six.moves.urllib_parse import parse_qs, urlparse
 
 import invenio_oauthclient.contrib.cern as cern
 from invenio_oauthclient.contrib.cern import account_info, account_setup, \
     fetch_groups, get_dict_from_response
 from invenio_oauthclient.models import RemoteToken
-
-from .helpers import get_state, mock_remote_get
 
 
 def test_fetch_groups(app, example_cern):

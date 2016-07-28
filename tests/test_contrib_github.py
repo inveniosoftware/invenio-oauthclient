@@ -28,6 +28,7 @@ import pytest
 from flask import session, url_for
 from flask_login import _create_identifier, current_user
 from flask_security.utils import login_user
+from helpers import check_redirect_location, mock_response
 from invenio_accounts.models import User
 from six.moves.urllib_parse import parse_qs, urlparse
 
@@ -35,8 +36,6 @@ from invenio_oauthclient.contrib.github import authorized
 from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken, UserIdentity
 from invenio_oauthclient.views.client import serializer
-
-from .helpers import check_redirect_location, mock_response
 
 
 def _get_state():
