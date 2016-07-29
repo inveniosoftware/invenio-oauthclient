@@ -1,8 +1,8 @@
 ==============================
- Invenio-OAuthClient v1.0.0a7
+ Invenio-OAuthClient v1.0.0a8
 ==============================
 
-Invenio-OAuthClient v1.0.0a7 was released on July 7, 2016.
+Invenio-OAuthClient v1.0.0a8 was released on July 29, 2016.
 
 About
 -----
@@ -19,7 +19,7 @@ What's new
 Installation
 ------------
 
-   $ pip install invenio-oauthclient==1.0.0a7
+   $ pip install invenio-oauthclient==1.0.0a8
 
 Documentation
 -------------
