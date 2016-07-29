@@ -93,7 +93,7 @@ from invenio_oauthclient.utils import oauth_link_external_id
 from invenio_db import db
 
 #: Tunable list of groups to be hidden.
-CFG_EXTERNAL_AUTH_HIDDEN_GROUPS = (
+OAUTHCLIENT_CERN_HIDDEN_GROUPS = (
     'All Exchange People',
     'CERN Users',
     'cern-computing-postmasters',
@@ -117,7 +117,7 @@ CFG_EXTERNAL_AUTH_HIDDEN_GROUPS = (
 )
 
 #: Tunable list of regexps of groups to be hidden.
-CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE = (
+OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE = (
     re.compile(r'Users by Letter [A-Z]'),
     re.compile(r'building-[\d]+'),
     re.compile(r'Users by Home CERNHOME[A-Z]'),
@@ -166,10 +166,10 @@ REMOTE_APP_RESOURCE_SCHEMA = 'http://schemas.xmlsoap.org/claims/'
 def fetch_groups(groups):
     """Prepare list of allowed group names."""
     hidden_groups = current_app.config.get(
-        'CFG_EXTERNAL_AUTH_HIDDEN_GROUPS', CFG_EXTERNAL_AUTH_HIDDEN_GROUPS)
+        'OAUTHCLIENT_CERN_HIDDEN_GROUPS', OAUTHCLIENT_CERN_HIDDEN_GROUPS)
     hidden_groups_re = current_app.config.get(
-        'CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE',
-        CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE)
+        'OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE',
+        OAUTHCLIENT_CERN_HIDDEN_GROUPS)
     groups = [group for group in groups if group not in hidden_groups]
     filter_groups = []
     for regexp in hidden_groups_re:
