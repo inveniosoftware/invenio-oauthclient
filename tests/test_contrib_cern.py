@@ -22,12 +22,13 @@
 from __future__ import absolute_import
 
 from flask import session, url_for
+from flask_security import login_user
 from helpers import get_state, mock_remote_get
 from six.moves.urllib_parse import parse_qs, urlparse
 
 import invenio_oauthclient.contrib.cern as cern
 from invenio_oauthclient.contrib.cern import account_info, account_setup, \
-    fetch_groups, get_dict_from_response
+    disconnect_handler, fetch_groups, get_dict_from_response
 from invenio_oauthclient.models import RemoteToken
 
 
@@ -92,10 +93,17 @@ def test_account_setup(app, example_cern, models_fixture):
     datastore = app.extensions['invenio-accounts'].datastore
     user = datastore.find_user(email="existing@inveniosoftware.org")
     token = RemoteToken.create(
-        user.id, 'client_id', example_token['access_token'], 'secret',
+        user.id, ioc.remote_apps['cern'].consumer_key,
+        example_token['access_token'], 'secret',
         token_type=example_token['token_type']
     )
     account_setup(ioc.remote_apps['cern'], token, None)
+    with app.test_request_context():
+        resp = disconnect_handler(ioc.remote_apps['cern'])
+        assert resp.status_code >= 300
+
+        login_user(user)
+        disconnect_handler(ioc.remote_apps['cern'])
 
 
 def test_login(app):

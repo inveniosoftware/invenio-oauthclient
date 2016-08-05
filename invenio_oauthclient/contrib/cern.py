@@ -86,11 +86,13 @@ In templates you can add a sign in/up link:
 import copy
 import re
 
-from flask import current_app, session
+from flask import current_app, redirect, session, url_for
 from flask_principal import UserNeed, RoleNeed, identity_loaded
-
-from invenio_oauthclient.utils import oauth_link_external_id
+from flask_security import current_user
 from invenio_db import db
+from invenio_oauthclient.models import RemoteAccount
+from invenio_oauthclient.utils import oauth_unlink_external_id, \
+    oauth_link_external_id
 
 #: Tunable list of groups to be hidden.
 OAUTHCLIENT_CERN_HIDDEN_GROUPS = (
@@ -129,7 +131,7 @@ REMOTE_APP = dict(
     icon='',
     authorized_handler='invenio_oauthclient.handlers'
                        ':authorized_signup_handler',
-    disconnect_handler='invenio_oauthclient.handlers'
+    disconnect_handler='invenio_oauthclient.contrib.cern'
                        ':disconnect_handler',
     signup_handler=dict(
         info='invenio_oauthclient.contrib.cern:account_info',
@@ -223,14 +225,35 @@ def account_info(remote, resp):
     )
 
 
+def disconnect_handler(remote, *args, **kwargs):
+    """Handle unlinking of remote account."""
+    if not current_user.is_authenticated:
+        return current_app.login_manager.unauthorized()
+
+    account = RemoteAccount.get(user_id=current_user.get_id(),
+                                client_id=remote.consumer_key)
+    external_id = account.extra_data.get('external_id')
+
+    if external_id:
+        oauth_unlink_external_id(dict(id=external_id, method='cern'))
+    if account:
+        with db.session.begin_nested():
+            account.delete()
+
+    return redirect(url_for('invenio_oauthclient_settings.index'))
+
+
 def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
     res = get_resource(remote)
     session.pop('cern_resource')
 
     with db.session.begin_nested():
-        user = token.remote_account.user
         external_id = res['PersonID'][0]
+
+        # Set CERN person ID in extra_date.
+        token.remote_account.extra_data = {'external_id': external_id}
+        user = token.remote_account.user
 
         # Create user <-> external id link.
         oauth_link_external_id(user, dict(id=external_id, method='cern'))
