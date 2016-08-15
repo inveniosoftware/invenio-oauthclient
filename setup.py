@@ -58,13 +58,13 @@ extras_require = {
     ],
     'orcid': [],
     'mysql': [
-        'invenio-db[mysql]>=1.0.0a9',
+        'invenio-db[mysql]>=1.0.0b1',
     ],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.0a9',
+        'invenio-db[postgresql]>=1.0.0b1',
     ],
     'sqlite': [
-        'invenio-db>=1.0.0a9',
+        'invenio-db>=1.0.0b1',
     ],
     'tests': tests_require,
 }
@@ -86,7 +86,7 @@ install_requires = [
     'Flask-CLI>=0.2.1',
     'Flask-OAuthlib>=0.9.3',
     'Flask-Security>=1.7.5',
-    'Flask>=0.10.1',
+    'Flask>=0.11.1',
     'blinker>=1.4',
     'cryptography>=0.6',  # sqlalchemy-utils dependency
     'invenio-accounts>=1.0.0a8',

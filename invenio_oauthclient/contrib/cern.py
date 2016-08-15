@@ -171,7 +171,7 @@ def fetch_groups(groups):
         'OAUTHCLIENT_CERN_HIDDEN_GROUPS', OAUTHCLIENT_CERN_HIDDEN_GROUPS)
     hidden_groups_re = current_app.config.get(
         'OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE',
-        OAUTHCLIENT_CERN_HIDDEN_GROUPS)
+        OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE)
     groups = [group for group in groups if group not in hidden_groups]
     filter_groups = []
     for regexp in hidden_groups_re:

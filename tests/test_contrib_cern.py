@@ -40,7 +40,7 @@ def test_fetch_groups(app, example_cern):
     # Override hidden group configuration
     import re
     cern.OAUTHCLIENT_CERN_HIDDEN_GROUPS = ('hidden_group',)
-    cern.OAUTHCLIENT_CERN_HIDDEN_GROUPS = (re.compile(r'Group[1-3]'),)
+    cern.OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE = (re.compile(r'Group[1-3]'),)
 
     # Check that groups were hidden as required
     groups = fetch_groups(res['Group'])
