@@ -1,111 +1,103 @@
-# French translations for invenio-oauthclient.
-# Copyright (C) 2015 CERN
+# Translations template for invenio-oauthclient.
+# Copyright (C) 2016 CERN
 # This file is distributed under the same license as the invenio-oauthclient
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
-#
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+# 
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-oauthclient 0.1.1.dev20150804\n"
+"Project-Id-Version: invenio-oauthclient 1.0.0a10.dev20160817\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
-"POT-Creation-Date: 2016-02-01 09:14+0100\n"
-"PO-Revision-Date: 2015-09-01 14:57+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: fr\n"
-"Language-Team: fr <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"POT-Creation-Date: 2016-08-18 17:33+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Alizee Pace <alizee.pace@gmail.com>, 2016\n"
+"Language-Team: French (https://www.transifex.com/inveniosoftware/teams/23537/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
+"Generated-By: Babel 2.3.4\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: invenio_oauthclient/admin.py:64
+msgid "ID"
+msgstr "ID"
 
 #: invenio_oauthclient/admin.py:65
-msgid "ID"
-msgstr ""
+msgid "User ID"
+msgstr "ID d'Utilisateur"
 
 #: invenio_oauthclient/admin.py:66
-msgid "User ID"
-msgstr ""
-
-#: invenio_oauthclient/admin.py:67
 msgid "Client ID"
-msgstr ""
+msgstr "ID de Client"
 
-#: invenio_oauthclient/admin.py:96
+#: invenio_oauthclient/admin.py:95
 msgid "ID Remote Account"
-msgstr ""
+msgstr "ID du Compte Externe"
 
-#: invenio_oauthclient/admin.py:103 invenio_oauthclient/admin.py:109
+#: invenio_oauthclient/admin.py:102 invenio_oauthclient/admin.py:108
 msgid "User Management"
-msgstr ""
+msgstr "Gestion Utilisateur"
 
-#: invenio_oauthclient/handlers.py:188
+#: invenio_oauthclient/handlers.py:189
 msgid "You rejected the authentication request."
-msgstr ""
+msgstr "Vous avez rejeté la demande d'authentification."
 
-#: invenio_oauthclient/handlers.py:418
+#: invenio_oauthclient/handlers.py:193
+msgid "External service is already linked to another account."
+msgstr "Le service externe est déjà lié à un autre compte."
+
+#: invenio_oauthclient/handlers.py:447
 msgid "Authorization with remote service failed."
-msgstr ""
+msgstr "Echec de l'autorisation du service externe."
 
 #: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:40
 msgid "Close"
-msgstr ""
+msgstr "Fermer"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:58
 #, python-format
 msgid "Sign in with %(title)s"
-msgstr ""
+msgstr "Inscription avec %(title)s"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:34
 #, python-format
 msgid "Sign-up with %(title)s!"
-msgstr ""
+msgstr "Connexion avec %(title)s!"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:35
 msgid ""
-"Fill in your details to complete your registration. You only have to do "
-"this once."
+"Fill in your details to complete your registration. You only have to do this"
+" once."
 msgstr ""
+"Remplissez vos informations pour compléter votre inscription. Vous n'aurez à"
+" faire ceci qu'une fois."
 
-#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:45
-msgid "Sign-up"
-msgstr ""
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:25
+#: invenio_oauthclient/views/settings.py:54
+msgid "Linked accounts"
+msgstr "Comptes liés"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:28
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
 #, python-format
 msgid ""
-"Tired of entering password for %(sitename)s every time you sign in? Setup"
-" single sign-on with one or more of the services below:"
+"Tired of entering password for %(sitename)s every time you sign in? Setup "
+"single sign-on with one or more of the services below:"
 msgstr ""
+"Vous n'avez pas envie d'entrer votre mot de passe pour %(sitename)s à chaque"
+" fois que vous vous connectez? Etablissez une connexion unique avec un ou "
+"plusieurs des services ci-dessous:"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:38
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:41
 msgid "Disconnect"
-msgstr ""
+msgstr "Déconnexion"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:40
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:43
 msgid "Connect"
-msgstr ""
+msgstr "Connexion"
 
 #: invenio_oauthclient/views/settings.py:48
 #, python-format
 msgid "%(icon)s Linked accounts"
-msgstr ""
-
-#: invenio_oauthclient/views/settings.py:53
-msgid "Linked accounts"
-msgstr ""
-
-#~ msgid "Email address"
-#~ msgstr ""
-
-#~ msgid "Required."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Email address %(addr)s already exists in"
-#~ " the database. If this is your "
-#~ "address, please sign-in and go to"
-#~ " Profile > Linked Accounts to link"
-#~ " your account."
-#~ msgstr ""
-
+msgstr "%(icon)s Comptes liés"

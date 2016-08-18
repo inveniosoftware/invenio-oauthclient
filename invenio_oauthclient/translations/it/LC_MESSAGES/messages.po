@@ -1,111 +1,102 @@
-# Italian translations for invenio-oauthclient.
-# Copyright (C) 2015 CERN
+# Translations template for invenio-oauthclient.
+# Copyright (C) 2016 CERN
 # This file is distributed under the same license as the invenio-oauthclient
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
-#
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+# 
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-oauthclient 0.1.1.dev20150804\n"
+"Project-Id-Version: invenio-oauthclient 1.0.0a10.dev20160817\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
-"POT-Creation-Date: 2016-02-01 09:14+0100\n"
-"PO-Revision-Date: 2015-09-01 14:57+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: it\n"
-"Language-Team: it <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"POT-Creation-Date: 2016-08-18 17:33+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Alizee Pace <alizee.pace@gmail.com>, 2016\n"
+"Language-Team: Italian (https://www.transifex.com/inveniosoftware/teams/23537/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
+"Generated-By: Babel 2.3.4\n"
+"Language: it\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: invenio_oauthclient/admin.py:64
+msgid "ID"
+msgstr "ID"
 
 #: invenio_oauthclient/admin.py:65
-msgid "ID"
-msgstr ""
+msgid "User ID"
+msgstr "ID Utente"
 
 #: invenio_oauthclient/admin.py:66
-msgid "User ID"
-msgstr ""
-
-#: invenio_oauthclient/admin.py:67
 msgid "Client ID"
-msgstr ""
+msgstr "ID Cliente"
 
-#: invenio_oauthclient/admin.py:96
+#: invenio_oauthclient/admin.py:95
 msgid "ID Remote Account"
-msgstr ""
+msgstr "ID Conto Esterno"
 
-#: invenio_oauthclient/admin.py:103 invenio_oauthclient/admin.py:109
+#: invenio_oauthclient/admin.py:102 invenio_oauthclient/admin.py:108
 msgid "User Management"
-msgstr ""
+msgstr "Gestione Utenti"
 
-#: invenio_oauthclient/handlers.py:188
+#: invenio_oauthclient/handlers.py:189
 msgid "You rejected the authentication request."
-msgstr ""
+msgstr "Hai rifiutato la richiesta d'autenticazione."
 
-#: invenio_oauthclient/handlers.py:418
+#: invenio_oauthclient/handlers.py:193
+msgid "External service is already linked to another account."
+msgstr "Il servizio esterno è già collegato a un altro conto."
+
+#: invenio_oauthclient/handlers.py:447
 msgid "Authorization with remote service failed."
-msgstr ""
+msgstr "L'autorizzazione con il servizio esterno ha fallito."
 
 #: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:40
 msgid "Close"
-msgstr ""
+msgstr "Chiudi"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:58
 #, python-format
 msgid "Sign in with %(title)s"
-msgstr ""
+msgstr "Registra con %(title)s"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:34
 #, python-format
 msgid "Sign-up with %(title)s!"
-msgstr ""
+msgstr "Accedi con %(title)s"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:35
 msgid ""
-"Fill in your details to complete your registration. You only have to do "
-"this once."
+"Fill in your details to complete your registration. You only have to do this"
+" once."
 msgstr ""
+"Completa i tuoi dettagli per finire la registrazione. Devi farlo una volta "
+"sola."
 
-#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:45
-msgid "Sign-up"
-msgstr ""
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:25
+#: invenio_oauthclient/views/settings.py:54
+msgid "Linked accounts"
+msgstr "Conti legati"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:28
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
 #, python-format
 msgid ""
-"Tired of entering password for %(sitename)s every time you sign in? Setup"
-" single sign-on with one or more of the services below:"
+"Tired of entering password for %(sitename)s every time you sign in? Setup "
+"single sign-on with one or more of the services below:"
 msgstr ""
+"Non vuoi inserire la password ogni volta che accedi a %(sitename)s? "
+"Configura un accesso unico con uno o più servizi di seguito:"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:38
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:41
 msgid "Disconnect"
-msgstr ""
+msgstr "Scollega"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:40
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:43
 msgid "Connect"
-msgstr ""
+msgstr "Collega"
 
 #: invenio_oauthclient/views/settings.py:48
 #, python-format
 msgid "%(icon)s Linked accounts"
-msgstr ""
-
-#: invenio_oauthclient/views/settings.py:53
-msgid "Linked accounts"
-msgstr ""
-
-#~ msgid "Email address"
-#~ msgstr ""
-
-#~ msgid "Required."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Email address %(addr)s already exists in"
-#~ " the database. If this is your "
-#~ "address, please sign-in and go to"
-#~ " Profile > Linked Accounts to link"
-#~ " your account."
-#~ msgstr ""
-
+msgstr "%(icon)s Conti legati"
