@@ -73,8 +73,8 @@ def oauth_get_user(client_id, account_info=None, access_token=None):
                 id=external_id['id'], method=external_id['method']).first()
             if user_identity:
                 return user_identity.user
-        if account_info.get('email'):
-            return User.query.filter_by(email=account_info['email']).first()
+        if account_info.get('user').get('email'):
+            return User.query.filter_by(email=account_info['user']['email']).first()
     return None
 
 
