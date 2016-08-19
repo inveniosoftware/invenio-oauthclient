@@ -209,11 +209,18 @@ def get_resource(remote):
 def account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
     res = get_resource(remote)
+    session.pop('cern_resource')
 
     email = res['EmailAddress'][0]
     external_id = res['PersonID'][0]
     nice = res['CommonName'][0]
     name = res['DisplayName'][0]
+
+    groups = fetch_groups(res['Group'])
+    provides = [UserNeed(email)] + \
+               [RoleNeed('{0}@cern.ch'.format(group)) for group in groups]
+
+    session['identity.cern_provides'] = provides
 
     return dict(
         user=dict(
@@ -257,11 +264,6 @@ def account_setup(remote, token, resp):
 
         # Create user <-> external id link.
         oauth_link_external_id(user, dict(id=external_id, method='cern'))
-
-    groups = fetch_groups(res['Group'])
-    provides = [UserNeed(user.email)] + \
-               [RoleNeed('{0}@cern.ch'.format(group)) for group in groups]
-    session['identity.cern_provides'] = provides
 
 
 @identity_loaded.connect
