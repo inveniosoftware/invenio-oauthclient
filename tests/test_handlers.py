@@ -111,11 +111,11 @@ def test_unauthorized_signup(remote, models_fixture):
     user = datastore.find_user(email=existing_email)
 
     example_response = {'access_token': 'test_access_token'}
-    example_account_info = {
+    example_account_info = {'user': {
         'email': existing_email,
         'external_id': '1234',
         'external_method': 'test_method'
-    }
+    }}
 
     # Mock remote app's handler
     current_oauthclient.signup_handlers[remote.name] = {

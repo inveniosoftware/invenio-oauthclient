@@ -87,7 +87,8 @@ import copy
 import re
 
 from flask import current_app, redirect, session, url_for
-from flask_principal import RoleNeed, UserNeed, identity_loaded
+from flask_principal import UserNeed, RoleNeed, identity_loaded, \
+    AnonymousIdentity
 from flask_security import current_user
 from invenio_db import db
 
@@ -197,7 +198,7 @@ def get_dict_from_response(response):
 
 def get_resource(remote):
     """Query CERN Resources to get user info and groups."""
-    cached_resource = session.get('cern_resource')
+    cached_resource = session.pop('cern_resource', None)
     if cached_resource:
         return cached_resource
 
@@ -247,25 +248,35 @@ def disconnect_handler(remote, *args, **kwargs):
 def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
     res = get_resource(remote)
-    session.pop('cern_resource')
 
+    groups = fetch_groups(res['Group'])
     with db.session.begin_nested():
         external_id = res['PersonID'][0]
 
         # Set CERN person ID in extra_date.
-        token.remote_account.extra_data = {'external_id': external_id}
+        token.remote_account.extra_data = {
+            'external_id': external_id,
+            'groups': groups,
+            # TODO: Add timestamp for refreshing token
+        }
         user = token.remote_account.user
 
         # Create user <-> external id link.
         oauth_link_external_id(user, dict(id=external_id, method='cern'))
 
-    groups = fetch_groups(res['Group'])
-    provides = [UserNeed(user.email)] + \
-               [RoleNeed('{0}@cern.ch'.format(group)) for group in groups]
-    session['identity.cern_provides'] = provides
-
 
 @identity_loaded.connect
 def on_identity_loaded(sender, identity):
     """Store groups in session whenever identity changes."""
-    identity.provides.update(session.get('identity.cern_provides', []))
+    if isinstance(identity, AnonymousIdentity):
+        return
+
+    identity.provides |= set([UserNeed(current_user.email)])
+    account = RemoteAccount.get(
+        user_id=current_user.get_id(),
+        client_id=current_app.config['CERN_APP_CREDENTIALS']['consumer_key'],
+    )
+    groups = account.extra_data.get('groups', []) if account else []
+    identity.provides |= set([
+        RoleNeed('{0}@cern.ch'.format(name)) for name in groups
+    ])

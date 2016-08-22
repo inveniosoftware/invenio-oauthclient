@@ -58,7 +58,7 @@ def test_utilities(models_fixture):
 
     assert oauth_get_user('dev', access_token=t.access_token) == user
     assert \
-        oauth_get_user('dev', account_info={'email': existing_email}) == user
+        oauth_get_user('dev', account_info={'user': {'email': existing_email}}) == user
 
     # Link user to external id
     external_id = {'id': '123', 'method': 'test_method'}
