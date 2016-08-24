@@ -141,9 +141,9 @@ html_theme_options = {
     'show_powered_by': False,
     'extra_nav_links': {
         'invenio-oauthclient@GitHub':
-            'http://github.com/inveniosoftware/invenio-oauthclient',
+            'https://github.com/inveniosoftware/invenio-oauthclient',
         'invenio-oauthclient@PyPI':
-            'http://pypi.python.org/pypi/invenio-oauthclient/',
+            'https://pypi.python.org/pypi/invenio-oauthclient/',
     }
 }
 
@@ -334,3 +334,6 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
+
+# Autodoc configuraton.
+autoclass_content = 'both'
