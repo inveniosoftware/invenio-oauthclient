@@ -95,7 +95,6 @@ import os
 
 from flask import Flask, redirect, url_for
 from flask_babelex import Babel
-from flask_cli import FlaskCLI
 from flask_login import current_user
 from flask_menu import Menu as FlaskMenu
 from flask_oauthlib.client import OAuth as FlaskOAuth
@@ -131,7 +130,6 @@ app.config.update(
     SECURITY_SEND_REGISTER_EMAIL=False,
 )
 
-FlaskCLI(app)
 Babel(app)
 FlaskMenu(app)
 InvenioDB(app)

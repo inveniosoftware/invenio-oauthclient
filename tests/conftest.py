@@ -34,7 +34,6 @@ import tempfile
 import pytest
 from flask import Flask
 from flask_babelex import Babel
-from flask_cli import FlaskCLI
 from flask_mail import Mail
 from flask_menu import Menu as FlaskMenu
 from flask_oauthlib.client import OAuth as FlaskOAuth
@@ -92,7 +91,6 @@ def base_app(request):
         SECURITY_PASSWORD_HASH='plaintext',
         SECURITY_PASSWORD_SCHEMES=['plaintext'],
     )
-    FlaskCLI(base_app)
     FlaskMenu(base_app)
     Babel(base_app)
     Mail(base_app)

@@ -48,7 +48,6 @@ import os
 
 from flask import Flask
 from flask_babelex import Babel
-from flask_cli import FlaskCLI
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from invenio_accounts import InvenioAccounts
 from invenio_admin import InvenioAdmin
@@ -74,7 +73,6 @@ app.config.update(
     SECURITY_PASSWORD_SALT='CHANGE_ME_ALSO',
 )
 
-FlaskCLI(app)
 Babel(app)
 InvenioDB(app)
 InvenioAccounts(app)

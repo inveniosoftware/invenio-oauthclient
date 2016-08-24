@@ -83,7 +83,6 @@ import os
 
 from flask import Flask, redirect, url_for
 from flask_babelex import Babel
-from flask_cli import FlaskCLI
 from flask_menu import Menu as FlaskMenu
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from flask_security import current_user
@@ -126,7 +125,6 @@ app.config.update(
     USERPROFILES_EXTEND_SECURITY_FORMS=True,
 )
 
-FlaskCLI(app)
 Babel(app)
 FlaskMenu(app)
 InvenioDB(app)

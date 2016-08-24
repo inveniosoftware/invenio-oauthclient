@@ -25,7 +25,6 @@ import os
 from copy import deepcopy
 
 from flask import Flask
-from flask_cli import FlaskCLI
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from flask_oauthlib.client import OAuthRemoteApp
 from invenio_db import InvenioDB, db
@@ -44,18 +43,15 @@ def test_version():
 def test_init():
     """Test extension initialization."""
     app = Flask('testapp')
-    FlaskCLI(app)
     FlaskOAuth(app)
     ext = InvenioOAuthClient(app)
     assert 'invenio-oauthclient' in app.extensions
 
     app = Flask('testapp')
-    FlaskCLI(app)
     ext = InvenioOAuthClient(app)
     assert 'invenio-oauthclient' in app.extensions
 
     app = Flask('testapp')
-    FlaskCLI(app)
     FlaskOAuth(app)
     ext = InvenioOAuthClient()
     assert 'invenio-oauthclient' not in app.extensions
@@ -121,7 +117,6 @@ def test_db(request):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
         'SQLALCHEMY_DATABASE_URI', 'sqlite://'
     )
-    FlaskCLI(app)
     InvenioDB(app)
     FlaskOAuth(app)
     InvenioOAuthClient(app)
