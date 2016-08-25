@@ -1,0 +1,98 @@
+# Translations template for invenio-oauthclient.
+# Copyright (C) 2016 CERN
+# This file is distributed under the same license as the invenio-oauthclient
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: invenio-oauthclient 1.0.0a10.dev20160817\n"
+"Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
+"POT-Creation-Date: 2016-08-18 17:33+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Jiří Kunčar <jiri.kuncar@gmail.com>, 2016\n"
+"Language-Team: Czech (https://www.transifex.com/inveniosoftware/teams/23537/cs/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: invenio_oauthclient/admin.py:64
+msgid "ID"
+msgstr "ID"
+
+#: invenio_oauthclient/admin.py:65
+msgid "User ID"
+msgstr "ID uživatele"
+
+#: invenio_oauthclient/admin.py:66
+msgid "Client ID"
+msgstr "ID klienta"
+
+#: invenio_oauthclient/admin.py:95
+msgid "ID Remote Account"
+msgstr "ID vzdáleného účtu"
+
+#: invenio_oauthclient/admin.py:102 invenio_oauthclient/admin.py:108
+msgid "User Management"
+msgstr "Správa uživatelů"
+
+#: invenio_oauthclient/handlers.py:189
+msgid "You rejected the authentication request."
+msgstr ""
+
+#: invenio_oauthclient/handlers.py:193
+msgid "External service is already linked to another account."
+msgstr ""
+
+#: invenio_oauthclient/handlers.py:447
+msgid "Authorization with remote service failed."
+msgstr ""
+
+#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:40
+msgid "Close"
+msgstr "Zavřít"
+
+#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:58
+#, python-format
+msgid "Sign in with %(title)s"
+msgstr ""
+
+#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:34
+#, python-format
+msgid "Sign-up with %(title)s!"
+msgstr ""
+
+#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:35
+msgid ""
+"Fill in your details to complete your registration. You only have to do this"
+" once."
+msgstr ""
+
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:25
+#: invenio_oauthclient/views/settings.py:54
+msgid "Linked accounts"
+msgstr "Propojené účty"
+
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
+#, python-format
+msgid ""
+"Tired of entering password for %(sitename)s every time you sign in? Setup "
+"single sign-on with one or more of the services below:"
+msgstr ""
+
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:41
+msgid "Disconnect"
+msgstr "Odpojit"
+
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:43
+msgid "Connect"
+msgstr "Připojit"
+
+#: invenio_oauthclient/views/settings.py:48
+#, python-format
+msgid "%(icon)s Linked accounts"
+msgstr "%(icon)s Propojené účty"
