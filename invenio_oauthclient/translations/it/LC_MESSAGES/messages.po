@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-oauthclient 1.0.0a10.dev20160817\n"
+"Project-Id-Version: invenio-oauthclient 1.0.0a10\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
-"POT-Creation-Date: 2016-08-18 17:33+0200\n"
+"POT-Creation-Date: 2016-09-09 15:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Alizee Pace <alizee.pace@gmail.com>, 2016\n"
 "Language-Team: Italian (https://www.transifex.com/inveniosoftware/teams/23537/it/)\n"
@@ -82,7 +82,7 @@ msgstr "Conti legati"
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
 #, python-format
 msgid ""
-"Tired of entering password for %(sitename)s every time you sign in? Setup "
+"Tired of entering password for %(sitename)s every time you sign in? Set up "
 "single sign-on with one or more of the services below:"
 msgstr ""
 "Non vuoi inserire la password ogni volta che accedi a %(sitename)s? "
