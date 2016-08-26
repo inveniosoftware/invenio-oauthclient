@@ -44,7 +44,7 @@
 Invenio module that provides OAuth web authorization support.
 
 OAuth client support is typically used to allow features such as social login
-(e.g. Sign in with Twitter) and access to resources owner by a specific user
+(e.g. Sign in with Twitter) and access to resources owned by a specific user
 at a remote service. Both OAuth 1.0 and OAuth 2.0 are supported.
 
 Features
