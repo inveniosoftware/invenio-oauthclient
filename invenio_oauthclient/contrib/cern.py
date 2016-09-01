@@ -87,12 +87,13 @@ import copy
 import re
 
 from flask import current_app, redirect, session, url_for
-from flask_principal import UserNeed, RoleNeed, identity_loaded
+from flask_principal import RoleNeed, UserNeed, identity_loaded
 from flask_security import current_user
 from invenio_db import db
+
 from invenio_oauthclient.models import RemoteAccount
-from invenio_oauthclient.utils import oauth_unlink_external_id, \
-    oauth_link_external_id
+from invenio_oauthclient.utils import oauth_link_external_id, \
+    oauth_unlink_external_id
 
 #: Tunable list of groups to be hidden.
 OAUTHCLIENT_CERN_HIDDEN_GROUPS = (

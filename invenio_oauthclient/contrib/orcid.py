@@ -85,10 +85,11 @@ import copy
 
 from flask import current_app, redirect, url_for
 from flask_security import current_user
-from invenio_oauthclient.models import RemoteAccount
-from invenio_oauthclient.utils import oauth_unlink_external_id, \
-    oauth_link_external_id
 from invenio_db import db
+
+from invenio_oauthclient.models import RemoteAccount
+from invenio_oauthclient.utils import oauth_link_external_id, \
+    oauth_unlink_external_id
 
 REMOTE_APP = dict(
     title='ORCID',

@@ -81,16 +81,16 @@ In templates you can add a sign in/up link:
 """
 
 import github3
-from flask import redirect, url_for, current_app
+from flask import current_app, redirect, url_for
 from flask_security import current_user
 from invenio_db import db
 
-from invenio_oauthclient.utils import oauth_unlink_external_id, \
-    oauth_link_external_id
-from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.handlers import authorized_signup_handler, \
     oauth_error_handler
+from invenio_oauthclient.models import RemoteAccount
+from invenio_oauthclient.utils import oauth_link_external_id, \
+    oauth_unlink_external_id
 
 REMOTE_APP = dict(
     title='GitHub',

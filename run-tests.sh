@@ -24,6 +24,7 @@
 
 
 pydocstyle invenio_oauthclient tests && \
+isort -rc -c -df **/*.py && \
 check-manifest --ignore ".travis-*" && \
 sphinx-build -qnNW docs docs/_build/html && \
 python setup.py test && \
