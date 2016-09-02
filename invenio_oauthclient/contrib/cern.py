@@ -49,7 +49,7 @@
 
 2. Register a new application with CERN. When registering the
    application ensure that the *Redirect URI* points to:
-   ``CFG_SITE_SECURE_URL/oauth/authorized/cern/`` (note, CERN does not
+   ``http://localhost:5000/oauth/authorized/cern/`` (note, CERN does not
    allow localhost to be used, thus testing on development machines is
    somewhat complicated by this).
 
@@ -64,11 +64,11 @@
            consumer_secret="<CLIENT SECRET>",
        )
 
-4. Now go to ``CFG_SITE_SECURE_URL/oauth/login/cern/`` (e.g.
-   http://localhost:4000/oauth/login/cern/)
+4. Now login using CERN OAuth:
+   http://localhost:5000/oauth/login/cern/.
 
 5. Also, you should see CERN listed under Linked accounts:
-   http://localhost:4000/account/settings/linkedaccounts/
+   http://localhost:5000/account/settings/linkedaccounts/
 
 By default the CERN module will try first look if a link already exists
 between a CERN account and a user. If no link is found, the user is asked
@@ -78,25 +78,27 @@ In templates you can add a sign in/up link:
 
 .. code-block:: jinja
 
-    <a href="{{url_for("invenio_oauthclient.login", remote_app="cern")}}">
+    <a href="{{ url_for("invenio_oauthclient.login", remote_app="cern") }}">
       Sign in with CERN
     </a>
 """
 
 import copy
 import re
+from datetime import datetime, timedelta
 
-from flask import current_app, redirect, session, url_for
-from flask_principal import UserNeed, RoleNeed, identity_loaded, \
-    AnonymousIdentity
+from flask import current_app, g, redirect, session, \
+    url_for
+from flask_principal import AnonymousIdentity, RoleNeed, UserNeed, \
+    identity_changed, identity_loaded
 from flask_security import current_user
 from invenio_db import db
 
 from invenio_oauthclient.models import RemoteAccount
+from invenio_oauthclient.proxies import current_oauthclient
 from invenio_oauthclient.utils import oauth_link_external_id, \
     oauth_unlink_external_id
 
-#: Tunable list of groups to be hidden.
 OAUTHCLIENT_CERN_HIDDEN_GROUPS = (
     'All Exchange People',
     'CERN Users',
@@ -119,13 +121,20 @@ OAUTHCLIENT_CERN_HIDDEN_GROUPS = (
     'NICE Users',
     'NICE VPN Users',
 )
+"""Tunable list of groups to be hidden."""
 
-#: Tunable list of regexps of groups to be hidden.
 OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE = (
     re.compile(r'Users by Letter [A-Z]'),
     re.compile(r'building-[\d]+'),
     re.compile(r'Users by Home CERNHOME[A-Z]'),
 )
+"""Tunable list of regexps of groups to be hidden."""
+
+OAUTHCLIENT_CERN_REFRESH_TIMEDELTA = timedelta(minutes=-5)
+"""Default interval for refreshing CERN extra data (e.g. groups)."""
+
+OAUTHCLIENT_CERN_SESSION_KEY = 'identity.cern_provides'
+"""Name of session key where CERN roles are stored."""
 
 REMOTE_APP = dict(
     title='CERN',
@@ -167,6 +176,13 @@ REMOTE_APP_RESOURCE_API_URL = 'https://oauthresource.web.cern.ch/api/Me'
 REMOTE_APP_RESOURCE_SCHEMA = 'http://schemas.xmlsoap.org/claims/'
 
 
+def find_remote_by_client_id(client_id):
+    """Return a remote application based with given client ID."""
+    for remote in current_oauthclient.oauth.remote_apps.values():
+        if remote.name == 'cern' and remote.consumer_key == client_id:
+            return remote
+
+
 def fetch_groups(groups):
     """Prepare list of allowed group names."""
     hidden_groups = current_app.config.get(
@@ -185,9 +201,47 @@ def fetch_groups(groups):
     return groups
 
 
+def account_groups(account, resource, refresh_timedelta=None):
+    """Fetch account groups from resource if necessary."""
+    updated = datetime.utcnow()
+    modified_since = updated
+    if refresh_timedelta is not None:
+        modified_since += refresh_timedelta
+    modified_since = modified_since.isoformat()
+    last_update = account.extra_data.get('updated', modified_since)
+
+    if last_update > modified_since:
+        return account.extra_data.get('groups', [])
+
+    groups = fetch_groups(resource['Group'])
+    account.extra_data.update(
+        groups=groups,
+        updated=updated.isoformat(),
+    )
+    return groups
+
+
+def extend_identity(identity, groups):
+    """Extend identity with roles based on CERN groups."""
+    provides = set([UserNeed(current_user.email)] + [
+        RoleNeed('{0}@cern.ch'.format(name)) for name in groups
+    ])
+    identity.provides |= provides
+    session[OAUTHCLIENT_CERN_SESSION_KEY] = provides
+
+
+def disconnect_identity(identity):
+    """Disconnect identity from CERN groups."""
+    provides = session.pop(OAUTHCLIENT_CERN_SESSION_KEY, {})
+    identity.provides -= provides
+
+
 def get_dict_from_response(response):
     """Prepare new mapping with 'Value's groupped by 'Type'."""
     result = {}
+    if getattr(response, '_resp') and response._resp.code > 400:
+        return result
+
     for i in response.data:
         # strip the schema from the key
         k = i['Type'].replace(REMOTE_APP_RESOURCE_SCHEMA, '')
@@ -210,12 +264,12 @@ def get_resource(remote):
 
 def account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
-    res = get_resource(remote)
+    resource = get_resource(remote)
 
-    email = res['EmailAddress'][0]
-    external_id = res['PersonID'][0]
-    nice = res['CommonName'][0]
-    name = res['DisplayName'][0]
+    email = resource['EmailAddress'][0]
+    external_id = resource['PersonID'][0]
+    nice = resource['CommonName'][0]
+    name = resource['DisplayName'][0]
 
     return dict(
         user=dict(
@@ -242,41 +296,59 @@ def disconnect_handler(remote, *args, **kwargs):
         with db.session.begin_nested():
             account.delete()
 
+    disconnect_identity(g.identity)
+
     return redirect(url_for('invenio_oauthclient_settings.index'))
 
 
 def account_setup(remote, token, resp):
     """Perform additional setup after user have been logged in."""
-    res = get_resource(remote)
+    resource = get_resource(remote)
 
-    groups = fetch_groups(res['Group'])
     with db.session.begin_nested():
-        external_id = res['PersonID'][0]
+        external_id = resource['PersonID'][0]
 
-        # Set CERN person ID in extra_date.
+        # Set CERN person ID in extra_data.
         token.remote_account.extra_data = {
             'external_id': external_id,
-            'groups': groups,
-            # TODO: Add timestamp for refreshing token
         }
+        groups = account_groups(token.remote_account, resource)
+        assert not isinstance(g.identity, AnonymousIdentity)
+        extend_identity(g.identity, groups)
+
         user = token.remote_account.user
 
         # Create user <-> external id link.
         oauth_link_external_id(user, dict(id=external_id, method='cern'))
 
 
-@identity_loaded.connect
-def on_identity_loaded(sender, identity):
+@identity_changed.connect
+def on_identity_changed(sender, identity):
     """Store groups in session whenever identity changes."""
     if isinstance(identity, AnonymousIdentity):
         return
 
-    identity.provides |= set([UserNeed(current_user.email)])
+    client_id = current_app.config['CERN_APP_CREDENTIALS']['consumer_key']
     account = RemoteAccount.get(
         user_id=current_user.get_id(),
-        client_id=current_app.config['CERN_APP_CREDENTIALS']['consumer_key'],
+        client_id=client_id,
     )
-    groups = account.extra_data.get('groups', []) if account else []
-    identity.provides |= set([
-        RoleNeed('{0}@cern.ch'.format(name)) for name in groups
-    ])
+    groups = []
+    if account:
+        remote = find_remote_by_client_id(client_id)
+        resource = get_resource(remote)
+        refresh = current_app.config.get(
+            'OAUTHCLIENT_CERN_REFRESH_TIMEDELTA',
+            OAUTHCLIENT_CERN_REFRESH_TIMEDELTA
+        )
+        groups.extend(
+            account_groups(account, resource, refresh_timedelta=refresh)
+        )
+
+    extend_identity(identity, groups)
+
+
+@identity_loaded.connect
+def on_identity_loaded(sender, identity):
+    """Store groups in session whenever identity is loaded."""
+    identity.provides.update(session.get(OAUTHCLIENT_CERN_SESSION_KEY, []))

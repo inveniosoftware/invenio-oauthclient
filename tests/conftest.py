@@ -69,16 +69,16 @@ def base_app(request):
             github=GITHUB_REMOTE_APP,
         ),
         GITHUB_APP_CREDENTIALS=dict(
-            consumer_key='changeme',
-            consumer_secret='changeme',
+            consumer_key='github_key_changeme',
+            consumer_secret='github_secret_changeme',
         ),
         ORCID_APP_CREDENTIALS=dict(
-            consumer_key='changeme',
-            consumer_secret='changeme',
+            consumer_key='orcid_key_changeme',
+            consumer_secret='orcid_secret_changeme',
         ),
         CERN_APP_CREDENTIALS=dict(
-            consumer_key='changeme',
-            consumer_secret='changeme',
+            consumer_key='cern_key_changeme',
+            consumer_secret='cern_secret_changeme',
         ),
         # use local memory mailbox
         EMAIL_BACKEND='flask_email.backends.locmem.Mail',
@@ -182,17 +182,16 @@ def params():
 @pytest.fixture
 def remote():
     """Fixture for remote app."""
-    return type('test_remote', (),
-                dict(
-                    name='example_remote',
-                    request_token_params={'scope': ''},
-                    base_url='https://foo.bar/',
-                    request_token_url=None,
-                    access_token_url='https://foo.bar/oauth/access_token',
-                    authorize_url='https://foo.bar/oauth/authorize',
-                    consumer_key='testkey',
-                    consumer_secret='testsecret',
-                ))()
+    return type('test_remote', (), dict(
+        name='example_remote',
+        request_token_params={'scope': ''},
+        base_url='https://foo.bar/',
+        request_token_url=None,
+        access_token_url='https://foo.bar/oauth/access_token',
+        authorize_url='https://foo.bar/oauth/authorize',
+        consumer_key='testkey',
+        consumer_secret='testsecret',
+    ))()
 
 
 @pytest.fixture
