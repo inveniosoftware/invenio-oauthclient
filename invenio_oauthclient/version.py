@@ -28,4 +28,4 @@ This file is imported by ``invenio_oauthclient.__init__``,
 and parsed by ``setup.py``.
 """
 
-__version__ = '1.0.0a10'
+__version__ = '1.0.0a11.dev20160906'
