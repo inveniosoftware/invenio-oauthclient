@@ -55,6 +55,7 @@ extras_require = {
     ],
     'github': [
         'github3.py>=1.0.0a4',
+        'uritemplate.py>=0.2.0,<2.0',
     ],
     'orcid': [],
     'mysql': [
@@ -87,7 +88,7 @@ install_requires = [
     'Flask-Security>=1.7.5',
     'Flask>=0.11.1',
     'blinker>=1.4',
-    'cryptography>=0.6',  # sqlalchemy-utils dependency
+    'cryptography>=1.5',
     'invenio-accounts>=1.0.0a13',
     'invenio-mail>=1.0.0a2',
     'six>=1.9',
