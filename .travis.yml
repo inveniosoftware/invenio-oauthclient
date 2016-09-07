@@ -54,6 +54,9 @@ python:
   - "2.7"
   - "3.5"
 
+matrix:
+  fast_finish: true
+
 before_install:
   - "travis_retry pip install --upgrade pip setuptools py"
   - "travis_retry pip install twine wheel coveralls requirements-builder"
