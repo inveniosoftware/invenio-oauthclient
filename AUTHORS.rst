@@ -26,6 +26,7 @@ Authors
 
 Invenio module that provides OAuth web authorization support.
 
+- Alizee Pace <alizee.pace@gmail.com>
 - Bruno Cuc <bruno.cuc@cern.ch>
 - Eirini Psallida <eirini.psallida@cern.ch>
 - Esteban J. G. Gabancho <esteban.gabancho@gmail.com>
