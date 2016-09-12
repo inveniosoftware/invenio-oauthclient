@@ -88,7 +88,8 @@ install_requires = [
     'Flask-Security>=1.7.5',
     'Flask>=0.11.1',
     'blinker>=1.4',
-    'cryptography>=1.5',
+    # fix issue with cryptography old version and cffi new version
+    'cryptography>=1.5',  # sqlalchemy-utils dependency
     'invenio-accounts>=1.0.0a13',
     'invenio-mail>=1.0.0a2',
     'six>=1.9',

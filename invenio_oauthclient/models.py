@@ -77,6 +77,7 @@ class RemoteAccount(db.Model):
 
         :param user_id: User id
         :param client_id: Client id.
+        :returns: A :class:`invenio_oauthclient.models.RemoteAccount` instance.
         """
         return cls.query.filter_by(
             user_id=user_id,
@@ -90,7 +91,8 @@ class RemoteAccount(db.Model):
         :param user_id: User id.
         :param client_id: Client id.
         :param extra_data: JSON-serializable dictionary of any extra data that
-                           needs to be save together with this link.
+            needs to be save together with this link.
+        :returns: A :class:`invenio_oauthclient.models.RemoteAccount` instance.
         """
         with db.session.begin_nested():
             account = cls(
@@ -159,7 +161,11 @@ class RemoteToken(db.Model):
         return (self.access_token, self.secret)
 
     def update_token(self, token, secret):
-        """Update token with new values."""
+        """Update token with new values.
+
+        :param token: The token value.
+        :param secret: The secret key.
+        """
         if self.access_token != token or self.secret != secret:
             with db.session.begin_nested():
                 self.access_token = token
@@ -168,7 +174,15 @@ class RemoteToken(db.Model):
 
     @classmethod
     def get(cls, user_id, client_id, token_type='', access_token=None):
-        """Get RemoteToken for user."""
+        """Get RemoteToken for user.
+
+        :param user_id: The user id.
+        :param client_id: The client id.
+        :param token_type: The token type. (Default: ``''``)
+        :param access_token: If set, will filter also by access token.
+            (Default: ``None``)
+        :returns: A :class:`invenio_oauthclient.models.RemoteToken` instance.
+        """
         args = [
             RemoteAccount.id == RemoteToken.id_remote_account,
             RemoteAccount.user_id == user_id,
@@ -185,7 +199,13 @@ class RemoteToken(db.Model):
 
     @classmethod
     def get_by_token(cls, client_id, access_token, token_type=''):
-        """Get RemoteAccount object for token."""
+        """Get RemoteAccount object for token.
+
+        :param client_id: The client id.
+        :param access_token: The access token.
+        :param token_type: The token type. (Default: ``''``)
+        :returns: A :class:`invenio_oauthclient.models.RemoteToken` instance.
+        """
         return cls.query.options(db.joinedload('remote_account')).filter(
             RemoteAccount.id == RemoteToken.id_remote_account,
             RemoteAccount.client_id == client_id,
@@ -198,7 +218,17 @@ class RemoteToken(db.Model):
                token_type='', extra_data=None):
         """Create a new access token.
 
-        Creates RemoteAccount as well if it does not exists.
+        .. note:: Creates RemoteAccount as well if it does not exists.
+
+        :param user_id: The user id.
+        :param client_id: The client id.
+        :param token: The token.
+        :param secret: The secret key.
+        :param token_type: The token type. (Default: ``''``)
+        :param extra_data: Extra data to set in the remote account if the
+            remote account doesn't exists. (Default: ``None``)
+        :returns: A :class:`invenio_oauthclient.models.RemoteToken` instance.
+
         """
         account = RemoteAccount.get(user_id, client_id)
 

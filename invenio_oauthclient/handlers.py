@@ -45,26 +45,47 @@ from .utils import disable_csrf, fill_form, oauth_authenticate, \
 # Token handling
 #
 def get_session_next_url(remote_app):
-    """Return redirect url stored in session."""
+    """Return redirect url stored in session.
+
+    :param remote_app: The remote application.
+    :returns: The redirect URL.
+    """
     return session.get(
         '%s_%s' % (token_session_key(remote_app), 'next_url')
     )
 
 
 def set_session_next_url(remote_app, url):
-    """Store redirect url in session for security reasons."""
+    """Store redirect url in session for security reasons.
+
+    :param remote_app: The remote application.
+    :param url: the redirect URL.
+    """
     session['%s_%s' % (token_session_key(remote_app), 'next_url')] = \
         url
 
 
 def token_session_key(remote_app):
-    """Generate a session key used to store the token for a remote app."""
+    """Generate a session key used to store the token for a remote app.
+
+    :param remote_app: The remote application.
+    :returns: The session key.
+    """
     return '%s_%s' % (current_app.config['OAUTHCLIENT_SESSION_KEY_PREFIX'],
                       remote_app)
 
 
 def response_token_setter(remote, resp):
-    """Extract token from response and set it for the user."""
+    """Extract token from response and set it for the user.
+
+    :param remote: The remote application.
+    :param resp: The response.
+    :raises invenio_oauthclient.errors.OAuthClientError: If authorization with
+        remote service failed.
+    :raises invenio_oauthclient.errors.OAuthResponseError: In case of bad
+        authorized request.
+    :returns: The token.
+    """
     if resp is None:
         raise OAuthRejectedRequestError('User rejected request.', remote, resp)
     else:
@@ -81,7 +102,14 @@ def response_token_setter(remote, resp):
 
 
 def oauth1_token_setter(remote, resp, token_type='', extra_data=None):
-    """Set an OAuth1 token."""
+    """Set an OAuth1 token.
+
+    :param remote: The remote application.
+    :param resp: The response.
+    :param token_type: The token type. (Default: ``''``)
+    :param extra_data: Extra information. (Default: ``None``)
+    :returns: A :class:`invenio_oauthclient.models.RemoteToken` instance.
+    """
     return token_setter(
         remote,
         resp['oauth_token'],
@@ -98,6 +126,12 @@ def oauth2_token_setter(remote, resp, token_type='', extra_data=None):
     the old one is expired. It is saved in the database for long term use.
     A refresh_token will be present only if `access_type=offline` is included
     in the authorization code request.
+
+    :param remote: The remote application.
+    :param resp: The response.
+    :param token_type: The token type. (Default: ``''``)
+    :param extra_data: Extra information. (Default: ``None``)
+    :returns: A :class:`invenio_oauthclient.models.RemoteToken` instance.
     """
     return token_setter(
         remote,
@@ -110,7 +144,17 @@ def oauth2_token_setter(remote, resp, token_type='', extra_data=None):
 
 def token_setter(remote, token, secret='', token_type='', extra_data=None,
                  user=None):
-    """Set token for user."""
+    """Set token for user.
+
+    :param remote: The remote application.
+    :param token: The token to set.
+    :param token_type: The token type. (Default: ``''``)
+    :param extra_data: Extra information. (Default: ``None``)
+    :param user: The user owner of the remote token. If it's not defined,
+        the current user is used automatically. (Default: ``None``)
+    :returns: A :class:`invenio_oauthclient.models.RemoteToken` instance or
+        ``None``.
+    """
     session[token_session_key(remote.name)] = (token, secret)
     user = user or current_user
 
@@ -139,8 +183,10 @@ def token_getter(remote, token=''):
 
     Used by flask-oauthlib to get the access token when making requests.
 
+    :param remote: The remote application.
     :param token: Type of token to get. Data passed from ``oauth.request()`` to
-         identify which token to retrieve.
+        identify which token to retrieve. (Default: ``''``)
+    :returns: The token.
     """
     session_key = token_session_key(remote.name)
 
@@ -163,7 +209,13 @@ def token_getter(remote, token=''):
 
 
 def token_delete(remote, token=''):
-    """Remove OAuth access tokens from session."""
+    """Remove OAuth access tokens from session.
+
+    :param remote: The remote application.
+    :param token: Type of token to get. Data passed from ``oauth.request()`` to
+        identify which token to retrieve. (Default: ``''``)
+    :returns: The token.
+    """
     session_key = token_session_key(remote.name)
     return session.pop(session_key, None)
 
@@ -204,6 +256,10 @@ def authorized_default_handler(resp, remote, *args, **kwargs):
     """Store access token in session.
 
     Default authorized handler.
+
+    :param remote: The remote application.
+    :param resp: The response.
+    :returns: Redirect response.
     """
     response_token_setter(remote, resp)
     db.session.commit()
@@ -212,7 +268,12 @@ def authorized_default_handler(resp, remote, *args, **kwargs):
 
 @oauth_error_handler
 def authorized_signup_handler(resp, remote, *args, **kwargs):
-    """Handle sign-in/up functionality."""
+    """Handle sign-in/up functionality.
+
+    :param remote: The remote application.
+    :param resp: The response.
+    :returns: Redirect response.
+    """
     # Remove any previously stored auto register session key
     session.pop(token_session_key(remote.name) + '_autoregister', None)
 
@@ -300,6 +361,9 @@ def disconnect_handler(remote, *args, **kwargs):
     This default handler will just delete the remote account link. You may
     wish to extend this module to perform clean-up in the remote service
     before removing the link (e.g. removing install webhooks).
+
+    :param remote: The remote application.
+    :returns: Redirect response.
     """
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
@@ -317,7 +381,11 @@ def disconnect_handler(remote, *args, **kwargs):
 
 
 def signup_handler(remote, *args, **kwargs):
-    """Handle extra signup information."""
+    """Handle extra signup information.
+
+    :param remote: The remote application.
+    :returns: Redirect response or the template rendered.
+    """
     # User already authenticated so move on
     if current_user.is_authenticated:
         return redirect('/')

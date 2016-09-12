@@ -184,7 +184,11 @@ def find_remote_by_client_id(client_id):
 
 
 def fetch_groups(groups):
-    """Prepare list of allowed group names."""
+    """Prepare list of allowed group names.
+
+    :param groups: The complete list of groups.
+    :returns: A filtered list of groups.
+    """
     hidden_groups = current_app.config.get(
         'OAUTHCLIENT_CERN_HIDDEN_GROUPS', OAUTHCLIENT_CERN_HIDDEN_GROUPS)
     hidden_groups_re = current_app.config.get(
@@ -324,7 +328,10 @@ def account_setup(remote, token, resp):
 
 @identity_changed.connect
 def on_identity_changed(sender, identity):
-    """Store groups in session whenever identity changes."""
+    """Store groups in session whenever identity changes.
+
+    :param identity: The user identity where information are stored.
+    """
     if isinstance(identity, AnonymousIdentity):
         return
 

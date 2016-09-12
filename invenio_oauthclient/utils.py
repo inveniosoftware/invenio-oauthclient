@@ -60,6 +60,12 @@ def oauth_get_user(client_id, account_info=None, access_token=None):
 
     Uses either the access token or extracted account information to retrieve
     the user object.
+
+    :param client_id: The client id.
+    :param account_info: The dictionary with the account info.
+        (Default: ``None``)
+    :param access_token: The access token. (Default: ``None``)
+    :returns: A :class:`invenio_accounts.models.User` instance or ``None``.
     """
     if access_token:
         token = RemoteToken.get_by_token(client_id, access_token)
@@ -81,7 +87,14 @@ def oauth_get_user(client_id, account_info=None, access_token=None):
 
 def oauth_authenticate(client_id, user, require_existing_link=False,
                        remember=False):
-    """Authenticate an oauth authorized callback."""
+    """Authenticate an oauth authorized callback.
+
+    :param client_id: The client id.
+    :param user: A user instance.
+    :param require_existing_link: If ``True``, check if remote account exists.
+        (Default: ``False``)
+    :returns: ``True`` if the user is successfully authenticated.
+    """
     # Authenticate via the access token (access token used to get user_id)
     if not requires_confirmation(user):
         after_this_request(_commit)
@@ -96,7 +109,11 @@ def oauth_authenticate(client_id, user, require_existing_link=False,
 
 
 def oauth_register(form):
-    """Register user if possible."""
+    """Register user if possible.
+
+    :param form: A form instance.
+    :returns: A :class:`invenio_accounts.models.User` instance.
+    """
     if form.validate():
         data = form.to_dict()
         if not data.get('password'):
@@ -109,7 +126,14 @@ def oauth_register(form):
 
 
 def oauth_link_external_id(user, external_id=None):
-    """Link a user to an external id."""
+    """Link a user to an external id.
+
+    :param user: A :class:`invenio_accounts.models.User` instance.
+    :param external_id: The external id associated with the user.
+        (Default: ``None``)
+    :raises invenio_oauthclient.errors.AlreadyLinkedError: Raised if already
+        exists a link.
+    """
     try:
         with db.session.begin_nested():
             db.session.add(UserIdentity(
@@ -122,14 +146,21 @@ def oauth_link_external_id(user, external_id=None):
 
 
 def oauth_unlink_external_id(external_id):
-    """Unlink a user from an external id."""
+    """Unlink a user from an external id.
+
+    :param external_id: The external id associated with the user.
+    """
     with db.session.begin_nested():
         UserIdentity.query.filter_by(id=external_id['id'],
                                      method=external_id['method']).delete()
 
 
 def is_local_url(target):
-    """Determine if URL is a local."""
+    """Determine if URL is a local.
+
+    :param target: The URL to check.
+    :returns: ``True`` if the target is a local url.
+    """
     server_name = current_app.config['SERVER_NAME']
     test_url = urisplit(target)
     return not test_url.host or test_url.scheme in ('http', 'https') and \
@@ -137,7 +168,11 @@ def is_local_url(target):
 
 
 def get_safe_redirect_target(arg='next'):
-    """Get URL to redirect to and ensure that it is local."""
+    """Get URL to redirect to and ensure that it is local.
+
+    :param arg: URL argument.
+    :returns: The redirect target or ``None``.
+    """
     for target in request.args.get(arg), request.referrer:
         if target and is_local_url(target):
             return target
@@ -169,7 +204,12 @@ def registrationform_cls():
 
 
 def fill_form(form, data):
-    """Prefill form."""
+    """Prefill form with data.
+
+    :param form: The form to fill.
+    :param data: The data to insert in the form.
+    :returns: A pre-filled form.
+    """
     for (key, value) in data.items():
         if hasattr(form, key):
             if isinstance(value, dict):

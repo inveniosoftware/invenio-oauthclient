@@ -116,7 +116,7 @@ REMOTE_APP = dict(
         content_type='application/json',
     )
 )
-""" ORCID Remote Application. """
+"""ORCID Remote Application."""
 
 REMOTE_MEMBER_APP = copy.deepcopy(REMOTE_APP)
 """ORCID Remote Application with member API."""
@@ -149,7 +149,22 @@ REMOTE_SANDBOX_APP['params'].update(dict(
 
 
 def account_info(remote, resp):
-    """Retrieve remote account information used to find local user."""
+    """Retrieve remote account information used to find local user.
+
+    It returns a dictionary with the following structure:
+
+    .. code-block:: python
+
+        {
+            'user': {},
+            'external_id': 'github-unique-identifier',
+            'external_method': 'github',
+        }
+
+    :param remote: The remote application.
+    :param resp: The response.
+    :returns: A dictionary with the user information.
+    """
     orcid = resp.get('orcid')
 
     return dict(
@@ -160,7 +175,10 @@ def account_info(remote, resp):
 
 
 def disconnect_handler(remote, *args, **kwargs):
-    """Handle unlinking of remote account."""
+    """Handle unlinking of remote account.
+
+    :param remote: The remote application.
+    """
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
 
@@ -178,7 +196,12 @@ def disconnect_handler(remote, *args, **kwargs):
 
 
 def account_setup(remote, token, resp):
-    """Perform additional setup after user have been logged in."""
+    """Perform additional setup after user have been logged in.
+
+    :param remote: The remote application.
+    :param token: The token value.
+    :param resp: The response.
+    """
     with db.session.begin_nested():
         # Retrieve ORCID from response.
         orcid = resp.get('orcid')

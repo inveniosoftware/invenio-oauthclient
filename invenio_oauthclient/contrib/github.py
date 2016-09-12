@@ -115,6 +115,7 @@ REMOTE_APP = dict(
         app_key='GITHUB_APP_CREDENTIALS',
     )
 )
+"""GitHub remote application configuration."""
 
 
 def _extract_email(gh):
@@ -124,7 +125,32 @@ def _extract_email(gh):
 
 
 def account_info(remote, resp):
-    """Retrieve remote account information used to find local user."""
+    """Retrieve remote account information used to find local user.
+
+    It returns a dictionary with the following structure:
+
+    .. code-block:: python
+
+        {
+            'user': {
+                'email': '...',
+                'profile': {
+                    'username': '...',
+                    'full_name': '...',
+                }
+            },
+            'external_id': 'github-unique-identifier',
+            'external_method': 'github',
+        }
+
+    Information inside the user dictionary are available for other modules.
+    For example, they are used from the module invenio-userprofiles to fill
+    the user profile.
+
+    :param remote: The remote application.
+    :param resp: The response.
+    :returns: A dictionary with the user information.
+    """
     gh = github3.login(token=resp['access_token'])
     me = gh.me()
     return dict(
@@ -141,7 +167,12 @@ def account_info(remote, resp):
 
 
 def account_setup(remote, token, resp):
-    """Perform additional setup after user have been logged in."""
+    """Perform additional setup after user have been logged in.
+
+    :param remote: The remote application.
+    :param token: The token value.
+    :param resp: The response.
+    """
     gh = github3.login(token=resp['access_token'])
     with db.session.begin_nested():
         me = gh.me()
@@ -158,7 +189,11 @@ def account_setup(remote, token, resp):
 
 @oauth_error_handler
 def authorized(resp, remote):
-    """Authorized callback handler for GitHub."""
+    """Authorized callback handler for GitHub.
+
+    :param resp: The response.
+    :param remote: The remote application.
+    """
     if resp and 'error' in resp:
         if resp['error'] == 'bad_verification_code':
             # See https://developer.github.com/v3/oauth/#bad-verification-code
@@ -175,7 +210,11 @@ def authorized(resp, remote):
 
 
 def disconnect_handler(remote, *args, **kwargs):
-    """Handle unlinking of remote account."""
+    """Handle unlinking of remote account.
+
+    :param remote: The remote application.
+    :returns: The HTML response.
+    """
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
 
