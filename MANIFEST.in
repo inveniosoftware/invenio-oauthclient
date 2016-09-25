@@ -27,6 +27,7 @@ include *.sh
 include *.txt
 include LICENSE
 include babel.ini
+include docs/requirements.txt
 include pytest.ini
 include tox.ini
 include .dockerignore

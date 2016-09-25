@@ -24,7 +24,7 @@ Installation
 Documentation
 -------------
 
-   http://pythonhosted.org/invenio-oauthclient/
+   http://invenio-oauthclient.readthedocs.io/
 
 Happy hacking and thanks for flying Invenio-OAuthClient.
 

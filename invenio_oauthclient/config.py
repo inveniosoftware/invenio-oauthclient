@@ -93,7 +93,7 @@ Flask-OAuthlib parameters
 The Flask-OAuthlib parameters defines the remote application OAuth endpoints as
 well as the client id and secret. Full description of these parameters are
 given in the `Flask-OAuthlib documentation
-<https://flask-oauthlib.readthedocs.org/en/latest/client.html>`_.
+<https://flask-oauthlib.readthedocs.io/en/latest/client.html>`_.
 
 Normally you will have to browse the remote application's API documentation to
 find which URLs and scopes to use.

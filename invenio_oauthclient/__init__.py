@@ -149,9 +149,9 @@ Further reading:
   <http://aaronparecki.com/articles/2012/07/29/1/oauth2-simplified>`_
 
 - `Flask-OAuthlib
-  <http://flask-oauthlib.readthedocs.org/en/latest/client.html>`_
+  <http://flask-oauthlib.readthedocs.io/en/latest/client.html>`_
 
-- `OAuthlib <http://oauthlib.readthedocs.org/en/latest/>`_
+- `OAuthlib <http://oauthlib.readthedocs.io/en/latest/>`_
 
 Usage
 -----
