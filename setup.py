@@ -36,7 +36,7 @@ tests_require = [
     'check-manifest>=0.25',
     'coverage>=4.0',
     'httpretty>=0.8.14',
-    'invenio-accounts>=1.0.0b1',
+    'invenio-accounts>=1.0.0b3',
     'invenio-userprofiles>=1.0.0a9',
     'isort>=4.2.2',
     'mock>=1.3.0',
@@ -50,7 +50,7 @@ tests_require = [
 
 extras_require = {
     'admin': [
-        'invenio-admin>=1.0.0a3',
+        'invenio-admin>=1.0.0b1',
     ],
     'docs': [
         'Sphinx>=1.5.1',
@@ -94,7 +94,7 @@ install_requires = [
     # fix issue with cryptography old version and cffi new version
     'cryptography>=1.5',  # sqlalchemy-utils dependency
     'invenio-accounts>=1.0.0b3',
-    'invenio-mail>=1.0.0a5',
+    'invenio-mail>=1.0.0b1',
     'six>=1.9',
     'sqlalchemy-utils>=0.31',
     'uritools>=1.0.1',
