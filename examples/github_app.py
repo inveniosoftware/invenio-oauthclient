@@ -49,10 +49,10 @@ Usage:
 
    .. code-block:: console
 
+       $ pip install -e .[all]
        $ cd examples
        $ export FLASK_APP=github_app.py
-       $ flask db init
-       $ flask db create
+       $ ./app-setup.py
 
 You can find the database in `examples/github_app.db`.
 
@@ -75,6 +75,13 @@ You can find the database in `examples/github_app.db`.
    Now, you will be again in homepage but this time it say: `hello fuu@bar.it`.
 
    You have completed the user registration.
+
+7. To be able to uninstall the example app:
+
+   .. code-block:: console
+
+       $ ./app-teardown.sh
+
 """
 
 from __future__ import absolute_import, print_function

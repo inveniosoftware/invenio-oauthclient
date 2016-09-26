@@ -57,9 +57,10 @@ Usage:
 
    .. code-block:: console
 
+       $ pip install -e .[all]
        $ cd examples
-       $ flask -a cern_app.py db init
-       $ flask -a cern_app.py db create
+       $ export FLASK_APP=cern_app.py
+       $ ./app-setup.py
 
 You can find the database in `examples/cern_app.db`.
 
@@ -76,7 +77,7 @@ You can find the database in `examples/cern_app.db`.
 
        $ gunicorn -b :5000 --certfile=ssl.crt --keyfile=ssl.key cern_app:app
 
-7. Open in a browser the page `https://localhost:5000/`.
+7. Open in a browser the page `https://localhost:5000/cern`.
 
    You will be redirected to CERN to authorize the application.
 
@@ -87,6 +88,12 @@ You can find the database in `examples/cern_app.db`.
    `hello youremail@cern.ch`.
 
    You have completed the user authorization.
+
+8. To be able to uninstall the example app:
+
+   .. code-block:: console
+
+       $ ./app-teardown.sh
 """
 
 from __future__ import absolute_import, print_function
@@ -145,6 +152,12 @@ principal = app.extensions['security'].principal
 
 @app.route('/')
 def index():
+    """Homepage."""
+    return 'Home page (without any restrictions)'
+
+
+@app.route('/cern')
+def cern():
     """Home page: try to print user email or redirect to login with cern."""
     if not current_user.is_authenticated:
         return redirect(url_for('invenio_oauthclient.login',

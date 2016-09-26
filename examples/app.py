@@ -22,24 +22,30 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-
 """Minimal Flask application example for development.
 
-Run example development server:
+Run Redis server on background.
+
+Install requirements:
 
 .. code-block:: console
 
+   $ pip install -e .[all]
    $ cd examples
-   $ flask -a app.py shell
+   $ export FLASK_APP=app.py
+   $ ./app-setup.sh
 
-Create the database tables inside a SQLite database:
+Run the server:
 
 .. code-block:: console
 
-   >> from invenio_db import db
-   >> db.create_all()
+   $ flask run --debugger -p 5000
 
-You can find the database in `examples/app.db`.
+To be able to uninstall the example app:
+
+.. code-block:: console
+
+   $ ./app-teardown.sh
 """
 
 from __future__ import absolute_import, print_function
@@ -48,12 +54,16 @@ import os
 
 from flask import Flask
 from flask_babelex import Babel
+from flask_menu import Menu
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from invenio_accounts import InvenioAccounts
+from invenio_accounts.views import blueprint as blueprint_accounts
 from invenio_admin import InvenioAdmin
 from invenio_db import InvenioDB
 
 from invenio_oauthclient import InvenioOAuthClient
+from invenio_oauthclient.views.client import blueprint as blueprint_client
+from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 
 # Create Flask application
 app = Flask(__name__)
@@ -74,10 +84,15 @@ app.config.update(
 )
 
 Babel(app)
+Menu(app)
 InvenioDB(app)
 InvenioAccounts(app)
 FlaskOAuth(app)
 InvenioOAuthClient(app)
+
+app.register_blueprint(blueprint_client)
+app.register_blueprint(blueprint_settings)
+app.register_blueprint(blueprint_accounts)
 
 InvenioAdmin(app, permission_factory=lambda x: x,
              view_class_factory=lambda x: x)

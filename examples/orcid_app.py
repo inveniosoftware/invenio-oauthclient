@@ -49,9 +49,10 @@ Usage:
 
    .. code-block:: console
 
+       $ pip install -e .[all]
        $ cd examples
-       $ flask -a orcid_app.py db init
-       $ flask -a orcid_app.py db create
+       $ export FLASK_APP=orcid_app.py
+       $ ./app-setup.py
 
 You can find the database in `examples/orcid_app.db`.
 
@@ -61,7 +62,7 @@ You can find the database in `examples/orcid_app.db`.
 
        $ flask -a orcid_app.py run -p 5000 -h '0.0.0.0'
 
-6. Open in a browser the page `http://0.0.0.0:5000/`.
+6. Open in a browser the page `http://0.0.0.0:5000/orcid`.
 
    You will be redirected to orcid to authorize the application.
 
@@ -74,6 +75,13 @@ You can find the database in `examples/orcid_app.db`.
    Now, you will be again in homepage but this time it say: `hello fuu@bar.it`.
 
    You have completed the user registration.
+
+7. To be able to uninstall the example app:
+
+   .. code-block:: console
+
+       $ ./app-teardown.sh
+
 """
 
 from __future__ import absolute_import, print_function
@@ -91,7 +99,9 @@ from invenio_db import InvenioDB
 from invenio_mail import InvenioMail as Mail
 from invenio_userprofiles import InvenioUserProfiles
 from invenio_userprofiles.views import \
-    blueprint_init as blueprint_userprofile_init
+    blueprint_api_init as blueprint_userprofile_api_init
+from invenio_userprofiles.views import \
+    blueprint_ui_init as blueprint_userprofile_ui_init
 
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib import orcid
@@ -135,12 +145,19 @@ InvenioOAuthClient(app)
 app.register_blueprint(blueprint_user)
 app.register_blueprint(blueprint_client)
 app.register_blueprint(blueprint_settings)
-app.register_blueprint(blueprint_userprofile_init)
+app.register_blueprint(blueprint_userprofile_api_init)
+app.register_blueprint(blueprint_userprofile_ui_init)
 
 
 @app.route('/')
 def index():
-    """Home page: try to print user email or redirect to login with orcid."""
+    """Homepage."""
+    return 'Home page (without any restrictions)'
+
+
+@app.route('/orcid')
+def orcid():
+    """Try to print user email or redirect to login with orcid."""
     if not current_user.is_authenticated:
         return redirect(url_for('invenio_oauthclient.login',
                                 remote_app='orcid'))
