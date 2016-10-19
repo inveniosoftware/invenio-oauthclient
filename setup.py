@@ -43,7 +43,8 @@ tests_require = [
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
     'simplejson>=3.8',
-    'invenio-userprofiles>=1.0.0a6',
+    'invenio-accounts>=1.0.0a15',
+    'invenio-userprofiles>=1.0.0a8',
 ]
 
 extras_require = {
@@ -82,7 +83,7 @@ setup_requires = [
 ]
 
 install_requires = [
-    'Flask-BabelEx>=0.9.2',
+    'Flask-BabelEx>=0.9.3',
     'Flask-Breadcrumbs>=0.3.0',
     'Flask-OAuthlib>=0.9.3',
     'Flask-Security>=1.7.5',
