@@ -30,6 +30,7 @@ from invenio_accounts.models import User
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.contrib.orcid import account_info
+from invenio_oauthclient.handlers import token_session_key
 from invenio_oauthclient.models import RemoteAccount, RemoteToken, UserIdentity
 
 
@@ -49,7 +50,12 @@ def test_account_info(app, example_orcid):
     assert account_info(ioc.remote_apps['orcid'], {}) == \
         dict(external_id=None,
              external_method='orcid',
-             user=dict())
+             user=dict(
+                 profile=dict(
+                     full_name=None
+                 )
+             )
+        )
 
 
 def test_login(app, example_orcid):
@@ -99,6 +105,14 @@ def test_authorized_signup(userprofiles_app, example_orcid, orcid_bio):
         resp = c.get(url_for('invenio_oauthclient.signup', remote_app='orcid'))
         assert resp.status_code == 200
 
+        account_info = session[token_session_key('orcid') + '_account_info']
+        data = {
+            'email': example_email,
+            'password': '123456',
+            'profile.username': 'pippo',
+            'profile.full_name': account_info['user']['profile']['full_name'],
+        }
+
         # Mock request to ORCID to get user bio.
         httpretty.enable()
         httpretty.register_uri(
@@ -111,12 +125,7 @@ def test_authorized_signup(userprofiles_app, example_orcid, orcid_bio):
         # User fills form to register
         resp = c.post(
             url_for('invenio_oauthclient.signup', remote_app='orcid'),
-            data={
-                'email': example_email,
-                'password': '123456',
-                'profile.username': 'pippo',
-                'profile.full_name': 'pluto',
-            }
+            data=data,
         )
         assert resp.status_code == 302
         httpretty.disable()
@@ -128,6 +137,7 @@ def test_authorized_signup(userprofiles_app, example_orcid, orcid_bio):
             id=example_data['orcid']
         ).one()
         # FIXME see contrib/orcid.py line 167
+        assert user.profile.full_name == 'Josiah Carberry'
         #  assert user.given_names == 'Josiah'
         #  assert user.family_name == 'Carberry'
         # check that the user's email is not yet validated

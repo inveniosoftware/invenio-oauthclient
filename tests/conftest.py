@@ -269,7 +269,12 @@ def example_orcid(request):
         'token_type': 'bearer'
     }, dict(external_id='0000-0002-1825-0097',
             external_method='orcid',
-            user=dict())
+            user=dict(
+                profile=dict(
+                    full_name='Josiah Carberry'
+                )
+            )
+        )
 
 
 @pytest.fixture()

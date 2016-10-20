@@ -156,7 +156,11 @@ def account_info(remote, resp):
     .. code-block:: python
 
         {
-            'user': {},
+            'user': {
+                'profile': {
+                    'full_name': 'Full Name',
+                },
+            },
             'external_id': 'github-unique-identifier',
             'external_method': 'github',
         }
@@ -167,11 +171,15 @@ def account_info(remote, resp):
     """
     orcid = resp.get('orcid')
 
-    return dict(
-        external_id=orcid,
-        external_method='orcid',
-        user=dict()
-    )
+    return {
+        'external_id': orcid,
+        'external_method': 'orcid',
+        'user': {
+            'profile': {
+                'full_name': resp.get('name'),
+            },
+        },
+    }
 
 
 def disconnect_handler(remote, *args, **kwargs):
@@ -187,7 +195,7 @@ def disconnect_handler(remote, *args, **kwargs):
     orcid = account.extra_data.get('orcid')
 
     if orcid:
-        oauth_unlink_external_id(dict(id=orcid, method='orcid'))
+        oauth_unlink_external_id({'id': orcid, 'method': 'orcid'})
     if account:
         with db.session.begin_nested():
             account.delete()
@@ -205,10 +213,15 @@ def account_setup(remote, token, resp):
     with db.session.begin_nested():
         # Retrieve ORCID from response.
         orcid = resp.get('orcid')
+        full_name = resp.get('name')
 
         # Set ORCID in extra_data.
-        token.remote_account.extra_data = {'orcid': orcid}
+        token.remote_account.extra_data = {
+            'orcid': orcid,
+            'full_name': full_name,
+        }
+
         user = token.remote_account.user
 
         # Create user <-> external id link.
-        oauth_link_external_id(user, dict(id=orcid, method='orcid'))
+        oauth_link_external_id(user, {'id': orcid, 'method': 'orcid'})
