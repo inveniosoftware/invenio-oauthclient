@@ -49,7 +49,7 @@ tests_require = [
 
 extras_require = {
     'admin': [
-        'invenio-admin>=1.0.0a2',
+        'invenio-admin>=1.0.0a3',
     ],
     'docs': [
         'Sphinx>=1.4.2',
@@ -60,13 +60,13 @@ extras_require = {
     ],
     'orcid': [],
     'mysql': [
-        'invenio-db[mysql]>=1.0.0b1',
+        'invenio-db[mysql]>=1.0.0b2',
     ],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.0b1',
+        'invenio-db[postgresql]>=1.0.0b2',
     ],
     'sqlite': [
-        'invenio-db>=1.0.0b1',
+        'invenio-db>=1.0.0b2',
     ],
     'tests': tests_require,
 }
@@ -85,14 +85,15 @@ setup_requires = [
 install_requires = [
     'Flask-BabelEx>=0.9.3',
     'Flask-Breadcrumbs>=0.3.0',
+    'Flask-Login>=0.3.2',
     'Flask-OAuthlib>=0.9.3',
-    'Flask-Security>=1.7.5',
+    'Flask-Security-Fork>=1.8.0',
     'Flask>=0.11.1',
     'blinker>=1.4',
     # fix issue with cryptography old version and cffi new version
     'cryptography>=1.5',  # sqlalchemy-utils dependency
-    'invenio-accounts>=1.0.0a13',
-    'invenio-mail>=1.0.0a2',
+    'invenio-accounts>=1.0.0a16',
+    'invenio-mail>=1.0.0a5',
     'six>=1.9',
     'sqlalchemy-utils>=0.31',
     'uritools>=1.0.1',

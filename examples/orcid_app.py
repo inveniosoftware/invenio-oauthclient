@@ -82,9 +82,9 @@ import os
 
 from flask import Flask, redirect, url_for
 from flask_babelex import Babel
+from flask_login import current_user
 from flask_menu import Menu as FlaskMenu
 from flask_oauthlib.client import OAuth as FlaskOAuth
-from flask_security import current_user
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_user
 from invenio_db import InvenioDB

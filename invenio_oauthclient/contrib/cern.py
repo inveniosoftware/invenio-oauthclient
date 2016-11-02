@@ -91,7 +91,7 @@ from flask import current_app, g, redirect, session, \
     url_for
 from flask_principal import AnonymousIdentity, RoleNeed, UserNeed, \
     identity_changed, identity_loaded
-from flask_security import current_user
+from flask_login import current_user
 from invenio_db import db
 
 from invenio_oauthclient.models import RemoteAccount

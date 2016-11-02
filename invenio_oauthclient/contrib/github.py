@@ -82,7 +82,7 @@ In templates you can add a sign in/up link:
 
 import github3
 from flask import current_app, redirect, url_for
-from flask_security import current_user
+from flask_login import current_user
 from invenio_db import db
 
 from invenio_oauthclient.errors import OAuthResponseError

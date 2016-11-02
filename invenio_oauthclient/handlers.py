@@ -27,7 +27,7 @@ import six
 from flask import current_app, flash, redirect, render_template, request, \
     session, url_for
 from flask_babelex import gettext as _
-from flask_security import current_user
+from flask_login import current_user
 from invenio_db import db
 from werkzeug.utils import import_string
 

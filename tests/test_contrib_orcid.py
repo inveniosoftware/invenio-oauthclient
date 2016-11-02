@@ -24,7 +24,7 @@ from __future__ import absolute_import
 import httpretty
 from flask import session, url_for
 from flask_login import current_user
-from flask_security.utils import login_user
+from flask_security import login_user
 from helpers import get_state, mock_response
 from invenio_accounts.models import User
 from six.moves.urllib_parse import parse_qs, urlparse

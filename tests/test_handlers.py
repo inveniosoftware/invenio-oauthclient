@@ -23,8 +23,9 @@ from __future__ import absolute_import, print_function
 
 import pytest
 from flask import session, url_for
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user
 from flask_oauthlib.client import OAuth as FlaskOAuth
+from flask_security import login_user, logout_user
 from flask_security.confirmable import _security
 from helpers import check_redirect_location
 from werkzeug.routing import BuildError

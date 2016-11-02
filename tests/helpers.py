@@ -22,9 +22,9 @@
 from inspect import isfunction
 
 import six
-from flask_login import _create_identifier
 from mock import MagicMock
 
+from invenio_oauthclient._compat import _create_identifier
 from invenio_oauthclient.views.client import serializer
 
 

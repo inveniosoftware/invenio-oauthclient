@@ -26,12 +26,13 @@ from collections import namedtuple
 import mock
 import pytest
 from flask import session, url_for
-from flask_login import _create_identifier, current_user
-from flask_security.utils import login_user
+from flask_login import current_user
+from flask_security import login_user
 from helpers import check_redirect_location, mock_response
 from invenio_accounts.models import User
 from six.moves.urllib_parse import parse_qs, urlparse
 
+from invenio_oauthclient._compat import _create_identifier
 from invenio_oauthclient.contrib.github import authorized
 from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken, UserIdentity
@@ -310,7 +311,6 @@ def test_not_authenticated(app):
 
 def test_authorized_handler(app, remote):
     """Test authorized callback handler."""
-
     # General error
     example_response = {'error': 'error'}
     resp = authorized(example_response, remote)

@@ -22,11 +22,11 @@
 from __future__ import absolute_import
 
 from flask import Blueprint, abort, current_app, request, url_for
-from flask_login import _create_identifier
 from invenio_db import db
 from itsdangerous import BadData, TimedJSONWebSignatureSerializer
 from werkzeug.local import LocalProxy
 
+from .._compat import _create_identifier
 from ..handlers import set_session_next_url
 from ..proxies import current_oauthclient
 from ..utils import get_safe_redirect_target
