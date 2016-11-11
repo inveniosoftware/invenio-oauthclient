@@ -32,6 +32,7 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 tests_require = [
+    'SQLAlchemy-Continuum>=1.2.1',
     'check-manifest>=0.25',
     'coverage>=4.0',
     'httpretty>=0.8.14',
@@ -43,8 +44,8 @@ tests_require = [
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
     'simplejson>=3.8',
-    'invenio-accounts>=1.0.0a15',
-    'invenio-userprofiles>=1.0.0a8',
+    'invenio-accounts>=1.0.0b1',
+    'invenio-userprofiles>=1.0.0a9',
 ]
 
 extras_require = {
@@ -60,13 +61,13 @@ extras_require = {
     ],
     'orcid': [],
     'mysql': [
-        'invenio-db[mysql]>=1.0.0b2',
+        'invenio-db[mysql]>=1.0.0b3',
     ],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.0b2',
+        'invenio-db[postgresql]>=1.0.0b3',
     ],
     'sqlite': [
-        'invenio-db>=1.0.0b2',
+        'invenio-db>=1.0.0b3',
     ],
     'tests': tests_require,
 }
@@ -92,7 +93,7 @@ install_requires = [
     'blinker>=1.4',
     # fix issue with cryptography old version and cffi new version
     'cryptography>=1.5',  # sqlalchemy-utils dependency
-    'invenio-accounts>=1.0.0a16',
+    'invenio-accounts>=1.0.0b1',
     'invenio-mail>=1.0.0a5',
     'six>=1.9',
     'sqlalchemy-utils>=0.31',
@@ -129,6 +130,9 @@ setup(
             'invenio_oauthclient = invenio_oauthclient.views.client:blueprint',
             'invenio_oauthclient_settings = '
             'invenio_oauthclient.views.settings:blueprint',
+        ],
+        'invenio_db.alembic': [
+            'invenio_oauthclient = invenio_oauthclient:alembic',
         ],
         'invenio_db.models': [
             'invenio_oauthclient = invenio_oauthclient.models',

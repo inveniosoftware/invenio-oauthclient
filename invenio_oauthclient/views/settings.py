@@ -27,8 +27,8 @@ import six
 from flask import Blueprint, current_app, render_template, request
 from flask_babelex import gettext as _
 from flask_breadcrumbs import register_breadcrumb
-from flask_menu import register_menu
 from flask_login import current_user, login_required
+from flask_menu import register_menu
 
 from ..models import RemoteAccount
 

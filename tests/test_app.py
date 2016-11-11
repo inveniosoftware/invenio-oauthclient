@@ -24,6 +24,7 @@ from __future__ import absolute_import
 import os
 from copy import deepcopy
 
+import pytest
 from flask import Flask
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from flask_oauthlib.client import OAuthRemoteApp
@@ -135,3 +136,23 @@ def test_db(request):
         tables = list(filter(lambda table: table.startswith('oauthclient'),
                              db.metadata.tables.keys()))
         assert len(tables) == 3
+
+
+def test_alembic(app):
+    """Test alembic recipes."""
+    ext = app.extensions['invenio-db']
+
+    with app.app_context():
+        if db.engine.name == 'sqlite':
+            raise pytest.skip('Upgrades are not supported on SQLite.')
+
+        assert not ext.alembic.compare_metadata()
+        db.drop_all()
+        ext.alembic.upgrade()
+
+        assert not ext.alembic.compare_metadata()
+        ext.alembic.downgrade(target='96e796392533')
+        ext.alembic.upgrade()
+
+        assert not ext.alembic.compare_metadata()
+        ext.alembic.downgrade(target='96e796392533')
