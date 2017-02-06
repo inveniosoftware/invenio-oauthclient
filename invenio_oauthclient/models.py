@@ -123,7 +123,9 @@ class RemoteToken(db.Model):
     #
     id_remote_account = db.Column(
         db.Integer,
-        db.ForeignKey(RemoteAccount.id),
+        db.ForeignKey(
+            RemoteAccount.id, name='fk_oauthclient_remote_token_remote_account'
+        ),
         nullable=False,
         primary_key=True
     )
