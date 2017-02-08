@@ -73,6 +73,7 @@ def upgrade():
         sa.Column('secret', sa.Text(), nullable=False),
         sa.ForeignKeyConstraint(
             ['id_remote_account'], [u'oauthclient_remoteaccount.id'],
+            name='fk_oauthclient_remote_token_remote_account'
         ),
         sa.PrimaryKeyConstraint('id_remote_account', 'token_type')
     )
