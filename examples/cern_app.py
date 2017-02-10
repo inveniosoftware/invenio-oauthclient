@@ -30,7 +30,7 @@ Usage:
    `https://sso-management.web.cern.ch/OAuth/RegisterOAuthClient.aspx` with
    `redirect_uri` as
    `https://localhost:5000/oauth/authorized/cern/` and filling all the other
-    fields:
+   fields:
 
 2. Ensure you have ``gunicorn`` package installed:
 
@@ -42,7 +42,6 @@ Usage:
 
 3. Ensure you have ``openssl`` installed in your system (Most of the Linux
    distributions has it by default.).
-
 
 3. Grab the *client_id* and *secret_uri* after registering the application
    and add them to your instance configuration as `consumer_key` and

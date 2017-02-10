@@ -60,3 +60,5 @@ The module contains:
   storing extra data together with a token.
 - Handlers: Customizable handlers for deciding what happens when a user
   authorizes a request.
+
+Further documentation available at https://invenio-oauthclient.readthedocs.io/

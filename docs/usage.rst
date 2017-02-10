@@ -22,9 +22,7 @@
     as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 
-How to use
+Usage
 ==========
 
 .. automodule:: invenio_oauthclient
-
-.. automodule:: invenio_oauthclient.config

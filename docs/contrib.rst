@@ -22,8 +22,8 @@
     as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 
-Contrib
-=======
+Contrib Docs
+============
 
 GitHub
 ------
