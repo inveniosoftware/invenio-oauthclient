@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -36,10 +36,11 @@ charset = utf-8
 [*.py]
 indent_size = 4
 # isort plugin configuration
-known_third_party = sqlalchemy_utils,invenio_userprofiles,mock,flask
+known_third_party = flask_security_fork, invenio_accounts, invenio_db, invenio_mail, invenio_userprofiles
 known_first_party = invenio_oauthclient
 multi_line_output = 2
 default_section = THIRDPARTY
+skip = .eggs
 
 # RST files (used by sphinx)
 [*.rst]

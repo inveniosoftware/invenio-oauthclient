@@ -25,4 +25,6 @@
 -e git+git://github.com/inveniosoftware/flask-security-fork.git#egg=flask-security-fork
 -e git+git://github.com/inveniosoftware/invenio-accounts.git#egg=invenio-accounts
 -e git+git://github.com/inveniosoftware/invenio-db.git#egg=invenio-db
+-e git+git://github.com/inveniosoftware/invenio-mail.git#egg=invenio-mail
+-e git+git://github.com/inveniosoftware/invenio-userprofiles.git#egg=invenio-userprofiles
 # -e git+git://github.com/inveniosoftware/invenio-upgrader.git#egg=invenio-upgrader

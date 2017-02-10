@@ -34,6 +34,7 @@ include babel.ini
 include docs/requirements.txt
 include pytest.ini
 include tox.ini
+prune docs/_build
 recursive-include docs *.bat
 recursive-include docs *.py
 recursive-include docs *.rst

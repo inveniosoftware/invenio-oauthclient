@@ -36,6 +36,8 @@ tests_require = [
     'check-manifest>=0.25',
     'coverage>=4.0',
     'httpretty>=0.8.14',
+    'invenio-accounts>=1.0.0b1',
+    'invenio-userprofiles>=1.0.0a9',
     'isort>=4.2.2',
     'mock>=1.3.0',
     'pydocstyle>=1.0.0',
@@ -44,8 +46,6 @@ tests_require = [
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
     'simplejson>=3.8',
-    'invenio-accounts>=1.0.0b1',
-    'invenio-userprofiles>=1.0.0a9',
 ]
 
 extras_require = {
@@ -59,10 +59,10 @@ extras_require = {
         'github3.py>=1.0.0a4',
         'uritemplate.py>=0.2.0,<2.0',
     ],
-    'orcid': [],
     'mysql': [
         'invenio-db[mysql]>=1.0.0b3',
     ],
+    'orcid': [],
     'postgresql': [
         'invenio-db[postgresql]>=1.0.0b3',
     ],
@@ -123,6 +123,12 @@ setup(
     include_package_data=True,
     platforms='any',
     entry_points={
+        'invenio_admin.views': [
+            'invenio_oauth_remote_account = '
+            'invenio_oauthclient.admin:remote_account_adminview',
+            'invenio_oauth_remote_token = '
+            'invenio_oauthclient.admin:remote_token_adminview',
+        ],
         'invenio_base.apps': [
             'invenio_oauthclient = invenio_oauthclient:InvenioOAuthClient',
         ],
@@ -140,12 +146,6 @@ setup(
         'invenio_i18n.translations': [
             'invenio_oauthclient = invenio_oauthclient',
         ],
-        'invenio_admin.views': [
-            'invenio_oauth_remote_account = '
-            'invenio_oauthclient.admin:remote_account_adminview',
-            'invenio_oauth_remote_token = '
-            'invenio_oauthclient.admin:remote_token_adminview',
-        ]
     },
     extras_require=extras_require,
     install_requires=install_requires,
@@ -164,6 +164,6 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: CPython',
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
     ],
 )
