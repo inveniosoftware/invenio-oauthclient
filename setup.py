@@ -126,6 +126,9 @@ setup(
         'invenio_base.apps': [
             'invenio_oauthclient = invenio_oauthclient:InvenioOAuthClient',
         ],
+        'invenio_base.api_apps': [
+            'invenio_oauthclient = invenio_oauthclient:InvenioOAuthClient',
+        ],
         'invenio_base.blueprints': [
             'invenio_oauthclient = invenio_oauthclient.views.client:blueprint',
             'invenio_oauthclient_settings = '
