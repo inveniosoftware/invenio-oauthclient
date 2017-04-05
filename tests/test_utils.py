@@ -21,14 +21,17 @@
 
 from __future__ import absolute_import, print_function
 
+import sys
+
 import pytest
 from flask_security.confirmable import _security
+from invenio_db import db
 
 from invenio_oauthclient.errors import AlreadyLinkedError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
 from invenio_oauthclient.utils import _get_external_id, oauth_authenticate, \
     oauth_get_user, oauth_link_external_id, oauth_unlink_external_id, \
-    obj_or_import_string
+    obj_or_import_string, rebuild_access_tokens
 
 
 def test_utilities(models_fixture):
@@ -77,3 +80,41 @@ def test_utilities(models_fixture):
     oauth_unlink_external_id(external_id)
     acc = RemoteAccount.get(user.id, 'dev')
     acc.delete()
+
+
+def test_rebuilding_access_tokens(models_fixture):
+    """Test rebuilding access tokens with random new SECRET_KEY."""
+    app = models_fixture
+    old_secret_key = app.secret_key
+
+    datastore = app.extensions['invenio-accounts'].datastore
+    existing_email = 'existing@inveniosoftware.org'
+    user = datastore.find_user(email=existing_email)
+
+    # Creating a new remote token and commiting to the db
+    test_token = 'mytoken'
+    token_type = 'testing'
+    with db.session.begin_nested():
+        rt = RemoteToken.create(user.id, 'testkey', test_token,
+                                app.secret_key, token_type)
+        db.session.add(rt)
+    db.session.commit()
+
+    # Changing application SECRET_KEY
+    app.secret_key = 'NEW_SECRET_KEY'
+    db.session.expunge_all()
+
+    # Asserting the decoding error occurs with the stale SECRET_KEY
+    if sys.version_info[0] < 3:  # python 2
+        remote_token = RemoteToken.query.first()
+        assert remote_token.access_token != test_token
+    else:  # python 3
+        with pytest.raises(UnicodeDecodeError):
+            RemoteToken.query.first()
+
+    db.session.expunge_all()
+    rebuild_access_tokens(old_secret_key)
+    remote_token = RemoteToken.query.filter_by(token_type=token_type).first()
+
+    # Asserting the access_token is not changed after rebuilding
+    assert remote_token.access_token == test_token

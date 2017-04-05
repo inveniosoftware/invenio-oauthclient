@@ -28,6 +28,7 @@ from flask_security.confirmable import requires_confirmation
 from flask_security.registerable import register_user
 from invenio_accounts.models import User
 from invenio_db import db
+from invenio_db.utils import rebuild_encrypted_properties
 from sqlalchemy.exc import IntegrityError
 from uritools import urisplit
 from werkzeug.local import LocalProxy
@@ -226,3 +227,14 @@ def disable_csrf(form):
         if isinstance(f, FormField):
             disable_csrf(f.form)
     return form
+
+
+def rebuild_access_tokens(old_key):
+    """Rebuild the access token field when the SECRET_KEY is changed.
+
+    Fixes users' login
+
+    :param old_key: the old SECRET_KEY.
+    """
+    current_app.logger.info('rebuilding RemoteToken.access_token...')
+    rebuild_encrypted_properties(old_key, RemoteToken, ['access_token'])

@@ -44,7 +44,7 @@ tests_require = [
     'pytest-cache>=1.0',
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
-    'pytest>=2.8.0',
+    'pytest>=2.8.3',
     'simplejson>=3.8',
 ]
 
@@ -60,14 +60,14 @@ extras_require = {
         'uritemplate.py>=0.2.0,<2.0',
     ],
     'mysql': [
-        'invenio-db[mysql]>=1.0.0b3',
+        'invenio-db[mysql]>=1.0.0b5',
     ],
     'orcid': [],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.0b3',
+        'invenio-db[postgresql]>=1.0.0b5',
     ],
     'sqlite': [
-        'invenio-db>=1.0.0b3',
+        'invenio-db>=1.0.0b5',
     ],
     'tests': tests_require,
 }
@@ -93,7 +93,7 @@ install_requires = [
     'blinker>=1.4',
     # fix issue with cryptography old version and cffi new version
     'cryptography>=1.5',  # sqlalchemy-utils dependency
-    'invenio-accounts>=1.0.0b1',
+    'invenio-accounts>=1.0.0b3',
     'invenio-mail>=1.0.0a5',
     'six>=1.9',
     'sqlalchemy-utils>=0.31',
@@ -142,6 +142,10 @@ setup(
         ],
         'invenio_db.models': [
             'invenio_oauthclient = invenio_oauthclient.models',
+        ],
+        'invenio_base.secret_key': [
+            'invenio_oauthclient = '
+            'invenio_oauthclient.utils:rebuild_access_tokens',
         ],
         'invenio_i18n.translations': [
             'invenio_oauthclient = invenio_oauthclient',
