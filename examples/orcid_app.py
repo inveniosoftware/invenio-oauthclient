@@ -91,7 +91,8 @@ from invenio_db import InvenioDB
 from invenio_mail import InvenioMail as Mail
 from invenio_userprofiles import InvenioUserProfiles
 from invenio_userprofiles.views import \
-    blueprint_init as blueprint_userprofile_init
+    blueprint_api_init as blueprint_userprofile_api_init,\
+    blueprint_ui_init as blueprint_userprofile_ui_init
 
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib import orcid
@@ -135,7 +136,8 @@ InvenioOAuthClient(app)
 app.register_blueprint(blueprint_user)
 app.register_blueprint(blueprint_client)
 app.register_blueprint(blueprint_settings)
-app.register_blueprint(blueprint_userprofile_init)
+app.register_blueprint(blueprint_userprofile_api_init)
+app.register_blueprint(blueprint_userprofile_ui_init)
 
 
 @app.route('/')
