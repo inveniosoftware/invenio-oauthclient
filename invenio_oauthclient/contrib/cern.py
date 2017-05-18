@@ -270,7 +270,7 @@ def account_info(remote, resp):
     resource = get_resource(remote)
 
     email = resource['EmailAddress'][0]
-    external_id = resource['PersonID'][0]
+    external_id = resource['uidNumber'][0]
     nice = resource['CommonName'][0]
     name = resource['DisplayName'][0]
 
@@ -309,7 +309,7 @@ def account_setup(remote, token, resp):
     resource = get_resource(remote)
 
     with db.session.begin_nested():
-        external_id = resource['PersonID'][0]
+        external_id = resource['uidNumber'][0]
 
         # Set CERN person ID in extra_data.
         token.remote_account.extra_data = {

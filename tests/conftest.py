@@ -283,7 +283,7 @@ def example_cern(request):
     return OAuthResponse(
         resp=None,
         content='''[
-            {"Type": "http://schemas.xmlsoap.org/claims/PersonID", "Value": "123456"},
+            {"Type": "http://schemas.xmlsoap.org/claims/uidNumber", "Value": "123456"},
             {"Type": "http://schemas.xmlsoap.org/claims/EmailAddress", "Value": "test.account@cern.ch"},
             {"Type": "http://schemas.xmlsoap.org/claims/CommonName", "Value": "taccount"},
             {"Type": "http://schemas.xmlsoap.org/claims/DisplayName", "Value": "Test Account"},
