@@ -88,7 +88,7 @@ install_requires = [
     'Flask-Breadcrumbs>=0.3.0',
     'Flask-Login>=0.3.2',
     'Flask-OAuthlib>=0.9.3',
-    'Flask-Security-Fork>=1.8.0',
+    'Flask-Security>=3.0.0',
     'Flask>=0.11.1',
     'blinker>=1.4',
     # fix issue with cryptography old version and cffi new version
