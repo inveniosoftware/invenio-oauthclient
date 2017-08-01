@@ -86,8 +86,7 @@ def oauth_get_user(client_id, account_info=None, access_token=None):
     return None
 
 
-def oauth_authenticate(client_id, user, require_existing_link=False,
-                       remember=False):
+def oauth_authenticate(client_id, user, require_existing_link=False):
     """Authenticate an oauth authorized callback.
 
     :param client_id: The client id.
@@ -99,7 +98,7 @@ def oauth_authenticate(client_id, user, require_existing_link=False,
     # Authenticate via the access token (access token used to get user_id)
     if not requires_confirmation(user):
         after_this_request(_commit)
-        if login_user(user, remember=remember):
+        if login_user(user, remember=False):
             if require_existing_link:
                 account = RemoteAccount.get(user.id, client_id)
                 if account is None:

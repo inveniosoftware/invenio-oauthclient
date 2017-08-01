@@ -59,6 +59,7 @@ def _create_example_app(app_name):
     subprocess.call(cmd, shell=True)
     # return to the original directory
     os.chdir(current_dir)
+    time.sleep(2)
 
 
 @pytest.mark.parametrize('service', ['orcid', 'github', 'cern'])
