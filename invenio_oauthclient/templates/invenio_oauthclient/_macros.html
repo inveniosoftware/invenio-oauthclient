@@ -1,7 +1,7 @@
 {# -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -50,10 +50,9 @@
 {% endmacro %}
 
 
-{% macro oauth_button(name) %}
-  {# TODO add next argument except when security.login or logout #}
+{% macro oauth_button(name, next=None) %}
   <a class="btn btn-default btn-lg btn-block"
-     href="{{url_for('invenio_oauthclient.login', remote_app=name)}}">
+     href="{{url_for('invenio_oauthclient.login', remote_app=name, next=next or request.referrer)}}">
     <i class="fa fa-{{ name|lower() }}"></i> {{
       _('Sign in with %(title)s', title=config.OAUTHCLIENT_REMOTE_APPS[name]['title'])
     }}

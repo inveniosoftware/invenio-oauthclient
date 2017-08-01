@@ -1,7 +1,7 @@
 {# -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@
 {%- block form_outer %}
   {% if config.OAUTHCLIENT_REMOTE_APPS %}
     {% for name in config.OAUTHCLIENT_REMOTE_APPS.keys() %}
-      {{ oauth_button(name) }}
+      {{ oauth_button(name, next=request.args.get('next')) }}
     {% endfor %}
     <h3 align="center">&mdash; OR &mdash;</h3>
   {% endif %}
