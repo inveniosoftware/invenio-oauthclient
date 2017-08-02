@@ -48,7 +48,9 @@ blueprint = Blueprint(
     _('%(icon)s Linked accounts', icon='<i class="fa fa-link fa-fw"></i>'),
     order=3,
     active_when=lambda: request.endpoint.startswith(
-        'invenio_oauthclient_settings.')
+        'invenio_oauthclient_settings.'),
+    visible_when=lambda: bool(current_app.config.get(
+        'OAUTHCLIENT_REMOTE_APPS')) is not False
 )
 @register_breadcrumb(
     blueprint, 'breadcrumbs.settings.oauthclient', _('Linked accounts')
