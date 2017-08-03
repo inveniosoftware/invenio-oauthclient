@@ -19,8 +19,6 @@
 
 """Pre-configured remote application for enabling sign in/up with ORCID.
 
-**Usage:**
-
 1. Edit your configuration and add:
 
    .. code-block:: python
@@ -78,6 +76,9 @@ In templates you can add a sign in/up link:
     <a href="{{url_for('invenio_oauthclient.login', remote_app='orcid')}}">
       Sign in with ORCID
     </a>
+
+
+For more details you can play with a :doc:`working example <examplesapp>`.
 
 """
 

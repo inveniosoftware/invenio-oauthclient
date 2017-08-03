@@ -19,8 +19,6 @@
 
 """Pre-configured remote application for enabling sign in/up with GitHub.
 
-**Usage:**
-
 1. Ensure you have ``github3.py`` package installed:
 
    .. code-block:: console
@@ -78,6 +76,8 @@ In templates you can add a sign in/up link:
     <a href='{{url_for('invenio_oauthclient.login', remote_app='github')}}'>
       Sign in with GitHub
     </a>
+
+For more details you can play with a :doc:`working example <examplesapp>`.
 """
 
 import github3

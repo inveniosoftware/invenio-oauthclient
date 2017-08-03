@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -24,13 +24,14 @@
 
 r"""Minimal Flask application example for development with CERN handler.
 
-Usage:
+SPHINX-START
 
 1. Register a CERN application in
    `https://sso-management.web.cern.ch/OAuth/RegisterOAuthClient.aspx` with
    `redirect_uri` as
    `https://localhost:5000/oauth/authorized/cern/` and filling all the other
-    fields:
+   fields:
+
 
 2. Ensure you have ``gunicorn`` package installed:
 
@@ -94,6 +95,9 @@ You can find the database in `examples/cern_app.db`.
    .. code-block:: console
 
        $ ./app-teardown.sh
+
+SPHINX-END
+
 """
 
 from __future__ import absolute_import, print_function
