@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015 CERN.
+    Copyright (C) 2015, 2017 CERN.
 
     Invenio is free software; you can redistribute it
     and/or modify it under the terms of the GNU General Public License as
@@ -22,17 +22,25 @@
     as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 
-Contrib
-=======
+Usage
+=====
 
 GitHub
 ------
+
 .. automodule:: invenio_oauthclient.contrib.github
 
 ORCID
 -----
+
 .. automodule:: invenio_oauthclient.contrib.orcid
 
 CERN
 ----
+
 .. automodule:: invenio_oauthclient.contrib.cern
+
+Advanced
+--------
+
+.. automodule:: invenio_oauthclient

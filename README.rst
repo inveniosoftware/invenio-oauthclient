@@ -47,10 +47,7 @@ OAuth client support is typically used to allow features such as social login
 (e.g. Sign in with Twitter) and access to resources owned by a specific user
 at a remote service. Both OAuth 1.0 and OAuth 2.0 are supported.
 
-Features
-========
-
-The module contains:
+Features:
 
 - Views: OAuth login and authorized endpoints, linked account settings and
   sign-up handling.
