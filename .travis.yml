@@ -36,6 +36,8 @@ services:
 
 language: python
 
+dist: precise
+
 matrix:
   fast_finish: true
 
