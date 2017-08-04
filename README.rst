@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015, 2016 CERN.
+    Copyright (C) 2015, 2016, 2017 CERN.
 
     Invenio is free software; you can redistribute it
     and/or modify it under the terms of the GNU General Public License as
@@ -57,3 +57,6 @@ Features:
   storing extra data together with a token.
 - Handlers: Customizable handlers for deciding what happens when a user
   authorizes a request.
+
+Further documentation is available on
+https://invenio-oauthclient.readthedocs.io/
