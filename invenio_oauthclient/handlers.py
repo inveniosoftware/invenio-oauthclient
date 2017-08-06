@@ -324,10 +324,7 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
 
         # Authenticate user
         if not oauth_authenticate(remote.consumer_key, user,
-                                  require_existing_link=False,
-                                  remember=current_app.config[
-                                      'OAUTHCLIENT_REMOTE_APPS']
-                                  [remote.name].get('remember', False)):
+                                  require_existing_link=False):
             return current_app.login_manager.unauthorized()
 
         # Link account
@@ -439,10 +436,7 @@ def signup_handler(remote, *args, **kwargs):
 
         # Authenticate the user
         if not oauth_authenticate(remote.consumer_key, user,
-                                  require_existing_link=False,
-                                  remember=current_app.config[
-                                      'OAUTHCLIENT_REMOTE_APPS']
-                                  [remote.name].get('remember', False)):
+                                  require_existing_link=False):
             # Redirect the user after registration (which doesn't include the
             # activation), waiting for user to confirm his email.
             return redirect(url_for('security.login'))
