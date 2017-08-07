@@ -1,1 +1,2 @@
 -e .[docs,tests]
+invenio-db>=1.0.0b7
