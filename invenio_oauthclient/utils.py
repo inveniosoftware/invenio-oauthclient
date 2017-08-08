@@ -200,12 +200,12 @@ def load_or_import_from_config(key, app=None, default=None):
     return obj_or_import_string(imp, default=default)
 
 
-def registrationform_cls():
+def create_registrationform(*args, **kwargs):
     """Make a registration form."""
     class RegistrationForm(_security.confirm_register_form):
         password = None
         recaptcha = None
-    return RegistrationForm
+    return RegistrationForm(*args, **kwargs)
 
 
 def fill_form(form, data):
@@ -224,12 +224,14 @@ def fill_form(form, data):
     return form
 
 
-def disable_csrf(form):
-    """Disable CSRF protection."""
-    form.csrf_enabled = False
-    for f in form:
-        if isinstance(f, FormField):
-            disable_csrf(f.form)
+def create_csrf_disabled_registrationform():
+    """Create a registration form with CSRF disabled."""
+    import flask_wtf
+    from pkg_resources import parse_version
+    if parse_version(flask_wtf.__version__) >= parse_version("0.14.0"):
+        form = create_registrationform(meta={'csrf': False})
+    else:
+        form = create_registrationform(csrf_enabled=False)
     return form
 
 
