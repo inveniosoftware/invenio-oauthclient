@@ -36,8 +36,8 @@ tests_require = [
     'check-manifest>=0.25',
     'coverage>=4.0',
     'httpretty>=0.8.14',
-    'invenio-accounts>=1.0.0b3',
-    'invenio-userprofiles>=1.0.0a9',
+    'invenio-accounts>=1.0.0b8',
+    'invenio-userprofiles>=1.0.0b1',
     'isort>=4.2.2',
     'mock>=1.3.0',
     'pydocstyle>=1.0.0',
@@ -50,7 +50,7 @@ tests_require = [
 
 extras_require = {
     'admin': [
-        'invenio-admin>=1.0.0b1',
+        'invenio-admin>=1.0.0b3',
     ],
     'docs': [
         'Sphinx>=1.5.1',
@@ -60,14 +60,14 @@ extras_require = {
         'uritemplate.py>=0.2.0,<2.0',
     ],
     'mysql': [
-        'invenio-db[mysql]>=1.0.0b5',
+        'invenio-db[mysql]>=1.0.0b8',
     ],
     'orcid': [],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.0b5',
+        'invenio-db[postgresql]>=1.0.0b8',
     ],
     'sqlite': [
-        'invenio-db>=1.0.0b5',
+        'invenio-db>=1.0.0b8',
     ],
     'tests': tests_require,
 }
