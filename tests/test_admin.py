@@ -29,7 +29,7 @@ from invenio_db import db
 
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.admin import remote_account_adminview, \
-    remote_token_adminview
+    remote_token_adminview, user_identity_adminview
 
 
 def test_admin(app):
@@ -38,11 +38,14 @@ def test_admin(app):
 
     assert isinstance(remote_account_adminview, dict)
     assert isinstance(remote_token_adminview, dict)
+    assert isinstance(user_identity_adminview, dict)
 
     assert 'model' in remote_account_adminview
     assert 'modelview' in remote_account_adminview
     assert 'model' in remote_token_adminview
     assert 'modelview' in remote_token_adminview
+    assert 'model' in user_identity_adminview
+    assert 'modelview' in user_identity_adminview
 
     admin = Admin(app, name='Test')
 

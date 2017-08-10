@@ -127,6 +127,8 @@ setup(
             'invenio_oauthclient.admin:remote_account_adminview',
             'invenio_oauth_remote_token = '
             'invenio_oauthclient.admin:remote_token_adminview',
+            'invenio_oauth_user_identity = '
+            'invenio_oauthclient.admin:user_identity_adminview',
         ],
         'invenio_base.apps': [
             'invenio_oauthclient = invenio_oauthclient:InvenioOAuthClient',

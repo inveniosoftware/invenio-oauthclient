@@ -274,4 +274,5 @@ class UserIdentity(db.Model):
         db.Index('useridentity_id_user_method', id_user, method, unique=True),
     )
 
+
 __all__ = ('RemoteAccount', 'RemoteToken', 'UserIdentity')
