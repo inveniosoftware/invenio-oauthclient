@@ -53,14 +53,8 @@ def test_account_info(app, example_orcid):
         ioc.remote_apps['orcid'], example_data) == example_account_info
 
     assert account_info(ioc.remote_apps['orcid'], {}) == \
-        dict(external_id=None,
-             external_method='orcid',
-             user=dict(
-                 profile=dict(
-                     full_name=None
-                 )
-             )
-        )
+        dict(external_id=None, external_method='orcid', user=dict(profile=dict(
+            full_name=None)))
 
 
 def test_login(app, example_orcid):
@@ -82,9 +76,9 @@ def test_login(app, example_orcid):
     assert params['state']
 
 
-def test_authorized_signup(userprofiles_app, example_orcid, orcid_bio):
+def test_authorized_signup(app_with_userprofiles, example_orcid, orcid_bio):
     """Test authorized callback with sign-up."""
-    app = userprofiles_app
+    app = app_with_userprofiles
     example_data, example_account_info = example_orcid
     example_email = 'orcidtest@inveniosoftware.org'
 

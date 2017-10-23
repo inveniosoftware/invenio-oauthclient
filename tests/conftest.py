@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -117,25 +117,58 @@ def base_app(request):
     return base_app
 
 
+def _init_app(app_):
+    """Init OAuth app."""
+    FlaskOAuth(app_)
+    InvenioOAuthClient(app_)
+    app_.register_blueprint(blueprint_client)
+    app_.register_blueprint(blueprint_settings)
+    return app_
+
+
 @pytest.fixture
 def app(base_app):
     """Flask application fixture."""
-    FlaskOAuth(base_app)
-    InvenioOAuthClient(base_app)
-    base_app.register_blueprint(blueprint_client)
-    base_app.register_blueprint(blueprint_settings)
-    return base_app
+    base_app.config.update(
+        WTF_CSRF_ENABLED=False,
+    )
+    return _init_app(base_app)
 
 
 @pytest.fixture
-def userprofiles_app(app):
-    """Configure userprofiles module."""
+def app_with_csrf(base_app):
+    """Flask application fixture with CSRF enabled."""
+    base_app.config.update(
+        WTF_CSRF_ENABLED=True,
+    )
+    return _init_app(base_app)
+
+
+def _init_userprofiles(app_):
+    """Init userprofiles module."""
+    InvenioUserProfiles(app_)
+    app_.register_blueprint(blueprint_ui_init)
+    return app_
+
+
+@pytest.fixture
+def app_with_userprofiles(app):
+    """Configure userprofiles module with CSRF disabled."""
     app.config.update(
         USERPROFILES_EXTEND_SECURITY_FORMS=True,
+        WTF_CSRF_ENABLED=False,
     )
-    InvenioUserProfiles(app)
-    app.register_blueprint(blueprint_ui_init)
-    return app
+    return _init_userprofiles(app)
+
+
+@pytest.fixture
+def app_with_userprofiles_csrf(app):
+    """Configure userprofiles module with CSRF enabled."""
+    app.config.update(
+        USERPROFILES_EXTEND_SECURITY_FORMS=True,
+        WTF_CSRF_ENABLED=True,
+    )
+    return _init_userprofiles(app)
 
 
 @pytest.fixture
@@ -260,62 +293,34 @@ def example_github(request):
 def example_orcid(request):
     """ORCID example data."""
     return {
-        'name': 'Josiah Carberry',
-        'expires_in': 3599,
-        'orcid': '0000-0002-1825-0097',
-        'access_token': 'test_access_token',
-        'refresh_token': 'test_refresh_token',
-        'scope': '/authenticate',
-        'token_type': 'bearer'
-    }, dict(external_id='0000-0002-1825-0097',
-            external_method='orcid',
-            user=dict(
-                profile=dict(
-                    full_name='Josiah Carberry'
-                )
-            )
-        )
+               'name': 'Josiah Carberry',
+               'expires_in': 3599,
+               'orcid': '0000-0002-1825-0097',
+               'access_token': 'test_access_token',
+               'refresh_token': 'test_refresh_token',
+               'scope': '/authenticate',
+               'token_type': 'bearer'
+           }, dict(external_id='0000-0002-1825-0097',
+                   external_method='orcid',
+                   user=dict(
+                       profile=dict(
+                           full_name='Josiah Carberry'
+                       )
+                   )
+                   )
 
 
 @pytest.fixture()
 def example_cern(request):
     """CERN example data."""
+    file_path = os.path.join(os.path.dirname(__file__),
+                             'data/oauth_response_content.json')
+    with open(file_path) as response_file:
+        json_data = response_file.read()
+
     return OAuthResponse(
         resp=None,
-        content='''[
-            {"Type": "http://schemas.xmlsoap.org/claims/uidNumber", "Value": "123456"},
-            {"Type": "http://schemas.xmlsoap.org/claims/EmailAddress", "Value": "test.account@cern.ch"},
-            {"Type": "http://schemas.xmlsoap.org/claims/CommonName", "Value": "taccount"},
-            {"Type": "http://schemas.xmlsoap.org/claims/DisplayName", "Value": "Test Account"},
-            {"Type": "http://schemas.xmlsoap.org/claims/Group", "Value": "Group1"},
-            {"Type": "http://schemas.xmlsoap.org/claims/Group", "Value": "Group2"},
-            {"Type": "http://schemas.xmlsoap.org/claims/Group", "Value": "Group3"},
-            {"Type": "http://schemas.xmlsoap.org/claims/Group", "Value": "Group4"},
-            {"Type": "http://schemas.xmlsoap.org/claims/Group", "Value": "Group5"},
-            {"Type": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", "Value": "test.account@cern.ch"},
-            {"Type": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn", "Value": "test.account@cern.ch"},
-            {"Type": "http://schemas.xmlsoap.org/claims/UPN", "Value": "test.account@cern.ch"},
-            {"Type": "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Value": "CERN Users"},
-            {"Type": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", "Value": "Test Account"},
-            {"Type": "http://schemas.xmlsoap.org/claims/PhoneNumber", "Value": "+41123456789"},
-            {"Type": "http://schemas.xmlsoap.org/claims/Building", "Value": "000 1-222"},
-            {"Type": "http://schemas.xmlsoap.org/claims/Firstname", "Value": "Test"},
-            {"Type": "http://schemas.xmlsoap.org/claims/Lastname", "Value": "Account"},
-            {"Type": "http://schemas.xmlsoap.org/claims/Department", "Value": "IT/CDA"},
-            {"Type": "http://schemas.xmlsoap.org/claims/HomeInstitute", "Value": "CERN"},
-            {"Type": "http://schemas.xmlsoap.org/claims/uidNumber", "Value": "54321"},
-            {"Type": "http://schemas.xmlsoap.org/claims/gidNumber", "Value": "1122"},
-            {"Type": "http://schemas.xmlsoap.org/claims/PreferredLanguage", "Value": "EN"},
-            {"Type": "http://schemas.xmlsoap.org/claims/IdentityClass", "Value": "CERN Registered"},
-            {"Type": "http://schemas.xmlsoap.org/claims/Federation", "Value": "CERN"},
-            {"Type": "http://schemas.xmlsoap.org/claims/AuthLevel", "Value": "Normal"},
-            {"Type": "http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationmethod", "Value": "http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/password"},
-            {"Type": "http://schemas.microsoft.com/ws/2008/06/identity/claims/authenticationinstant", "Value": "2016-01-20T21:44:08.554Z"},
-            {"Type": "urn:oauth:scope", "Value": "Name"},
-            {"Type": "urn:oauth:scope", "Value": "Email"},
-            {"Type": "urn:oauth:scope", "Value": "Bio"},
-            {"Type": "urn:oauth:scope", "Value": "Groups"}
-            ]''',
+        content=json_data,
         content_type='application/json'
     ), dict(
         access_token='test_access_token',
@@ -342,13 +347,25 @@ def orcid_bio():
 
 
 @pytest.fixture()
-def user(userprofiles_app):
+def user(app_with_userprofiles):
     """Create users."""
     with db.session.begin_nested():
-        datastore = userprofiles_app.extensions['security'].datastore
+        datastore = app_with_userprofiles.extensions['security'].datastore
         user1 = datastore.create_user(email='info@inveniosoftware.org',
                                       password='tester', active=True)
         profile = UserProfile(username='mynick', user=user1)
         db.session.add(profile)
     db.session.commit()
     return user1
+
+
+@pytest.fixture()
+def form_test_data():
+    """Test data to fill a registration form."""
+    return dict(
+                email='test@tester.com',
+                profile=dict(
+                    full_name='Test Tester',
+                    username='test123',
+                ),
+            )

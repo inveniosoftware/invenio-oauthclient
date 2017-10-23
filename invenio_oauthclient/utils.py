@@ -208,6 +208,11 @@ def create_registrationform(*args, **kwargs):
     return RegistrationForm(*args, **kwargs)
 
 
+def create_csrf_disabled_registrationform():
+    """Create a registration form with CSRF disabled."""
+    return create_registrationform(**_get_csrf_disabled_param())
+
+
 def fill_form(form, data):
     """Prefill form with data.
 
@@ -224,17 +229,6 @@ def fill_form(form, data):
     return form
 
 
-def create_csrf_disabled_registrationform():
-    """Create a registration form with CSRF disabled."""
-    import flask_wtf
-    from pkg_resources import parse_version
-    if parse_version(flask_wtf.__version__) >= parse_version("0.14.0"):
-        form = create_registrationform(meta={'csrf': False})
-    else:
-        form = create_registrationform(csrf_enabled=False)
-    return form
-
-
 def rebuild_access_tokens(old_key):
     """Rebuild the access token field when the SECRET_KEY is changed.
 
@@ -244,3 +238,17 @@ def rebuild_access_tokens(old_key):
     """
     current_app.logger.info('rebuilding RemoteToken.access_token...')
     rebuild_encrypted_properties(old_key, RemoteToken, ['access_token'])
+
+
+def _get_csrf_disabled_param():
+    """Return the right param to disable CSRF depending on WTF-Form version.
+
+    From Flask-WTF 0.14.0, `csrf_enabled` param has been deprecated in favor of
+    `meta={csrf: True/False}`.
+    """
+    import flask_wtf
+    from pkg_resources import parse_version
+    supports_meta = parse_version(flask_wtf.__version__) >= parse_version(
+        "0.14.0")
+    return dict(meta={'csrf': False}) if supports_meta else \
+        dict(csrf_enabled=False)

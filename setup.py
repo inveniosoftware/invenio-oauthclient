@@ -37,7 +37,7 @@ tests_require = [
     'coverage>=4.0',
     'httpretty>=0.8.14',
     'invenio-accounts>=1.0.0b8',
-    'invenio-userprofiles>=1.0.0b1',
+    'invenio-userprofiles>=1.0.0b2',
     'isort>=4.2.2',
     'mock>=1.3.0',
     'pydocstyle>=1.0.0',
@@ -94,7 +94,7 @@ install_requires = [
     'invenio-accounts>=1.0.0b7',
     'invenio-mail>=1.0.0b1',
     'six>=1.9',
-    'sqlalchemy-utils>=0.31',
+    'sqlalchemy-utils>=0.32.0',
     'uritools>=1.0.1',
 ]
 

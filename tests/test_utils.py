@@ -34,9 +34,10 @@ from invenio_db import db
 
 from invenio_oauthclient.errors import AlreadyLinkedError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
-from invenio_oauthclient.utils import _get_external_id, oauth_authenticate, \
-    oauth_get_user, oauth_link_external_id, oauth_unlink_external_id, \
-    obj_or_import_string, rebuild_access_tokens
+from invenio_oauthclient.utils import _get_external_id, \
+    create_csrf_disabled_registrationform, create_registrationform, \
+    fill_form, oauth_authenticate, oauth_get_user, oauth_link_external_id, \
+    oauth_unlink_external_id, obj_or_import_string, rebuild_access_tokens
 
 
 def test_utilities(models_fixture):
@@ -66,7 +67,11 @@ def test_utilities(models_fixture):
 
     assert oauth_get_user('dev', access_token=t.access_token) == user
     assert \
-        oauth_get_user('dev', account_info={'user': {'email': existing_email}}) == user
+        oauth_get_user('dev', account_info={
+            'user': {
+                'email': existing_email
+            }
+        }) == user
 
     # Link user to external id
     external_id = {'id': '123', 'method': 'test_method'}
@@ -114,7 +119,7 @@ def test_rebuilding_access_tokens(models_fixture):
         remote_token = RemoteToken.query.first()
         assert remote_token.access_token != test_token
     else:  # python 3
-        with pytest.raises(UnicodeDecodeError):
+        with pytest.raises(ValueError):
             RemoteToken.query.first()
 
     db.session.expunge_all()
@@ -123,3 +128,91 @@ def test_rebuilding_access_tokens(models_fixture):
 
     # Asserting the access_token is not changed after rebuilding
     assert remote_token.access_token == test_token
+
+
+def test_app_registrationform_missing_csrf(app, form_test_data):
+    """App with CSRF disabled, registration form should not have it."""
+    filled_form = _fill_form(app, create_registrationform, form_test_data)
+
+    assert 'profile' not in filled_form
+    _assert_no_csrf_token(filled_form)
+
+
+def test_app_registrationform_has_csrf(app_with_csrf, form_test_data):
+    """App with CSRF enabled, test if registration form has it."""
+    filled_form = _fill_form(app_with_csrf, create_registrationform,
+                             form_test_data)
+
+    assert 'profile' not in filled_form
+    _assert_csrf_token(filled_form)
+
+
+def test_registrationform_disable_csrf(app_with_csrf, form_test_data):
+    """App with CSRF enabled, test if registration form removes it."""
+    filled_form = _fill_form(app_with_csrf,
+                             create_csrf_disabled_registrationform,
+                             form_test_data)
+
+    assert 'profile' not in filled_form
+    _assert_no_csrf_token(filled_form)
+
+
+def test_registrationform_userprofile_missing_csrf(app_with_userprofiles,
+                                                   form_test_data):
+    """App with CSRF disabled and UserProfile, reg. form should not have it."""
+    filled_form = _fill_form(app_with_userprofiles, create_registrationform,
+                             form_test_data)
+
+    assert 'profile' in filled_form
+    assert 'csrf_token' not in filled_form.profile
+    _assert_no_csrf_token(filled_form)
+
+
+def test_app_registrationform_userprofile_has_csrf(app_with_userprofiles_csrf,
+                                                   form_test_data):
+    """App with CSRF enabled and UserProfile, test if reg. form removes it."""
+    filled_form = _fill_form(app_with_userprofiles_csrf,
+                             create_registrationform, form_test_data)
+
+    assert 'profile' in filled_form
+    assert 'csrf_token' not in filled_form.profile
+    _assert_csrf_token(filled_form)
+
+
+def test_registrationform_userprofile_disable_csrf(app_with_userprofiles_csrf,
+                                                   form_test_data):
+    """App with CSRF enabled and UserProfile, test if reg. form removes it."""
+    filled_form = _fill_form(app_with_userprofiles_csrf,
+                             create_csrf_disabled_registrationform,
+                             form_test_data)
+
+    assert 'profile' in filled_form
+    assert 'csrf_token' not in filled_form.profile
+    _assert_no_csrf_token(filled_form)
+
+
+def _assert_csrf_token(form):
+    """Assert that the field `csrf_token` exists in the form."""
+    assert 'csrf_token' in form
+    assert form.csrf_token
+
+
+def _assert_no_csrf_token(form):
+    """Assert that the field `csrf_token` does not exist in the form."""
+
+    # Flask-WTF==0.13.1 adds always `csrf_token` field, but with None value
+    # Flask-WTF>0.14.2 do not `csrf_token` field
+    assert 'csrf_token' not in form or form.csrf_token.data is None
+
+
+def _fill_form(app, form, data):
+    """Fill the input form with the provided data."""
+    with app.test_request_context():
+        filled_form = fill_form(
+            form(),
+            data
+        )
+
+        filled_form.validate()
+
+        return filled_form
