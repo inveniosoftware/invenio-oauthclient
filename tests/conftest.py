@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2018 University of Chicago.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -32,6 +33,7 @@ from sqlalchemy_utils.functions import create_database, database_exists, \
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib.cern import REMOTE_APP as CERN_REMOTE_APP
 from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
+from invenio_oauthclient.contrib.globus import REMOTE_APP as GLOBUS_REMOTE_APP
 from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
@@ -51,6 +53,7 @@ def base_app(request):
             cern=CERN_REMOTE_APP,
             orcid=ORCID_REMOTE_APP,
             github=GITHUB_REMOTE_APP,
+            globus=GLOBUS_REMOTE_APP,
         ),
         GITHUB_APP_CREDENTIALS=dict(
             consumer_key='github_key_changeme',
@@ -64,6 +67,10 @@ def base_app(request):
             consumer_key='cern_key_changeme',
             consumer_secret='cern_secret_changeme',
         ),
+        GLOBUS_APP_CREDENTIALS=dict(
+            consumer_key='globus_key_changeme',
+            consumer_secret='globus_secret_changeme',
+        ),
         # use local memory mailbox
         EMAIL_BACKEND='flask_email.backends.locmem.Mail',
         SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI',
@@ -72,6 +79,7 @@ def base_app(request):
         DEBUG=False,
         SECRET_KEY='TEST',
         SECURITY_DEPRECATED_PASSWORD_SCHEMES=[],
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SECURITY_PASSWORD_HASH='plaintext',
         SECURITY_PASSWORD_SCHEMES=['plaintext'],
     )
@@ -270,6 +278,42 @@ def example_github(request):
         'refresh_token': 'test_refresh_token',
         'scope': '/authenticate',
         'token_type': 'bearer',
+    }
+
+
+@pytest.fixture
+def example_globus(request):
+    """Globus example data."""
+    return {
+                'identity_provider_display_name': 'Globus ID',
+                'sub': '1142af3a-fea4-4df9-afe2-865ccd68bfdb',
+                'preferred_username': 'carberry@inveniosoftware.org',
+                'identity_provider': '41143743-f3c8-4d60-bbdb-eeecaba85bd9',
+                'organization': 'Globus',
+                'email': 'carberry@inveniosoftware.org',
+                'name': 'Josiah Carberry'
+            }, {
+                'expires_in': 3599,
+                'resource_server': 'auth.globus.org',
+                'state': 'test_state',
+                'access_token': 'test_access_token',
+                'id_token': 'header.test-oidc-token.pub-key',
+                'other_tokens': [],
+                'scope': 'profile openid email',
+                'token_type': 'Bearer',
+            }, {
+                'identities': [
+                    {
+                        'username': 'carberry@inveniosoftware.org',
+                        'status': 'used',
+                        'name': 'Josiah Carberry',
+                        'email': 'carberry@inveniosoftware.org',
+                        'identity_provider':
+                            '927d7238-f917-4eb2-9ace-c523fa9ba34e',
+                        'organization': 'Globus',
+                        'id': '3b843349-4d4d-4ef3-916d-2a465f9740a9'
+                    }
+                ]
     }
 
 

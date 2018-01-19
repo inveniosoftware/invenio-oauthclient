@@ -46,7 +46,7 @@ def _create_example_app(app_name):
     time.sleep(2)
 
 
-@pytest.mark.parametrize('service', ['orcid', 'github', 'cern'])
+@pytest.mark.parametrize('service', ['orcid', 'github', 'cern', 'globus'])
 def test_app(service):
     """Test example app for given service."""
     with _create_example_app('{0}_app.py'.format(service)):
