@@ -22,3 +22,12 @@ CERN
 ----
 
 .. automodule:: invenio_oauthclient.contrib.cern
+
+Globus
+------
+.. automodule:: invenio_oauthclient.contrib.globus
+
+Advanced
+--------
+
+.. automodule:: invenio_oauthclient

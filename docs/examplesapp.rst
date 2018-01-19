@@ -28,3 +28,10 @@ CERN
 .. include:: ../examples/cern_app.py
    :start-after: SPHINX-START
    :end-before: SPHINX-END
+
+Globus
+------
+
+.. include:: ../examples/globus_app.py
+   :start-after: SPHINX-START
+   :end-before: SPHINX-END
