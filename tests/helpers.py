@@ -28,6 +28,7 @@ from inspect import isfunction
 
 import six
 from mock import MagicMock
+from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient._compat import _create_identifier
 from invenio_oauthclient.views.client import serializer
@@ -60,3 +61,11 @@ def check_redirect_location(resp, loc):
         assert resp.headers['Location'] == loc
     elif isfunction(loc):
         assert loc(resp.headers['Location'])
+
+
+def check_response_redirect_url(response, expected_url):
+    """Check response redirect url."""
+    assert response.status_code == 302
+    state = serializer.loads(
+        parse_qs(urlparse(response.location).query)['state'][0])
+    assert expected_url == state['next']

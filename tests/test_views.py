@@ -32,6 +32,7 @@ import pytest
 from flask import url_for
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from flask_security import login_user
+from helpers import check_response_redirect_url
 from invenio_accounts.testutils import login_user_via_session
 from invenio_db import db
 from itsdangerous import TimedJSONWebSignatureSerializer
@@ -66,9 +67,10 @@ def test_redirect_uri(views_fixture):
     with app.test_client() as client:
         # Test redirect
         resp = client.get(
-            url_for('invenio_oauthclient.login', remote_app='test',
-                    next='http://inveniosoftware.org')
-        )
+            url_for(
+                'invenio_oauthclient.login',
+                remote_app='test',
+                next='http://inveniosoftware.org'))
         assert resp.status_code == 302
 
         # Verify parameters
@@ -88,20 +90,35 @@ def test_redirect_uri(views_fixture):
 
         # Assert that local redirects are allowed
         test_urls = [
-            '/search',
-            url_for('invenio_oauthclient.disconnect', remote_app='test',
-                    _external=True)
+            '/',
+            '/search'
         ]
         for url in test_urls:
             resp = client.get(
-                url_for('invenio_oauthclient.login', remote_app='test',
-                        next=url)
-            )
-            assert resp.status_code == 302
-            state = serializer.loads(
-                parse_qs(urlparse(resp.location).query)['state'][0]
-            )
-            assert url == state['next']
+                url_for(
+                    'invenio_oauthclient.login', remote_app='test', next=url))
+            check_response_redirect_url(resp, url)
+
+        # Assert that absolute redirects are allowed only if
+        # `APP_ALLOWED_HOSTS` is set and includes them. Otherwise, the relative
+        # path of the url is extracted and returned. Note if you need to
+        # redirect to index page you should pass '/' as next parameter.
+
+        test_url = 'http://inveniosoftware.org/test'
+
+        resp = client.get(
+            url_for(
+                'invenio_oauthclient.login', remote_app='test', next=test_url))
+
+        check_response_redirect_url(resp, urlparse(test_url).path)
+
+        app.config.update({"APP_ALLOWED_HOSTS": ["inveniosoftware.org"]})
+
+        resp = client.get(
+            url_for(
+                'invenio_oauthclient.login', remote_app='test', next=test_url))
+
+        check_response_redirect_url(resp, test_url)
 
 
 def test_login(views_fixture):
@@ -110,8 +127,7 @@ def test_login(views_fixture):
     with app.test_client() as client:
         # Test redirect
         resp = client.get(
-            url_for('invenio_oauthclient.login', remote_app='test', next='/')
-        )
+            url_for('invenio_oauthclient.login', remote_app='test', next='/'))
         assert resp.status_code == 302
 
         params = parse_qs(urlparse(resp.location).query)
@@ -164,8 +180,7 @@ def test_authorized(base_app, params):
                 params=params('fullid'),
                 title='Full',
             ),
-        )
-    )
+        ))
 
     FlaskOAuth(app)
     InvenioOAuthClient(app)

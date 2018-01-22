@@ -160,18 +160,6 @@ def oauth_unlink_external_id(external_id):
                                      method=external_id['method']).delete()
 
 
-def is_local_url(target):
-    """Determine if URL is a local.
-
-    :param target: The URL to check.
-    :returns: ``True`` if the target is a local url.
-    """
-    server_name = current_app.config['SERVER_NAME']
-    test_url = urisplit(target)
-    return not test_url.host or test_url.scheme in ('http', 'https') and \
-        server_name == test_url.host
-
-
 def get_safe_redirect_target(arg='next'):
     """Get URL to redirect to and ensure that it is local.
 
@@ -179,8 +167,13 @@ def get_safe_redirect_target(arg='next'):
     :returns: The redirect target or ``None``.
     """
     for target in request.args.get(arg), request.referrer:
-        if target and is_local_url(target):
-            return target
+        if target:
+            redirect_uri = urisplit(target)
+            allowed_hosts = current_app.config.get('APP_ALLOWED_HOSTS', [])
+            if redirect_uri.host in allowed_hosts:
+                return target
+            elif redirect_uri.path:
+                return redirect_uri.path
     return None
 
 
