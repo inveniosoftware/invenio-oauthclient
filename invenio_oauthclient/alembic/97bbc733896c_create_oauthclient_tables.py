@@ -45,7 +45,7 @@ def upgrade():
         sa.Column('client_id', sa.String(length=255), nullable=False),
         sa.Column(
             'extra_data',
-            sqlalchemy_utils.types.json.JSONType(),
+            sqlalchemy_utils.JSONType(),
             nullable=False),
         sa.ForeignKeyConstraint(['user_id'], [u'accounts_user.id'], ),
         sa.PrimaryKeyConstraint('id'),
@@ -69,7 +69,7 @@ def upgrade():
         sa.Column('token_type', sa.String(length=40), nullable=False),
         sa.Column(
             'access_token',
-            sqlalchemy_utils.types.encrypted.EncryptedType(),
+            sqlalchemy_utils.EncryptedType(),
             nullable=False),
         sa.Column('secret', sa.Text(), nullable=False),
         sa.ForeignKeyConstraint(

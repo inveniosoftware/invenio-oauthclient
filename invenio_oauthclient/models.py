@@ -29,8 +29,7 @@ from invenio_accounts.models import User
 from invenio_db import db
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import backref
-from sqlalchemy_utils import JSONType
-from sqlalchemy_utils.types.encrypted import EncryptedType
+from sqlalchemy_utils import EncryptedType, JSONType
 
 
 def _secret_key():
