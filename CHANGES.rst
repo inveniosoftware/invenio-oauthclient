@@ -24,15 +24,10 @@
 Changes
 =======
 
-Version 1.0.0b4 (released 2018-01-22)
+Version 1.0.0b5 (released 2018-02-21)
 -------------------------------------
 
 - Initial public release
-
-Version 1.0.0a13 (released 2017-05-05)
---------------------------------------
-
-- Refactoring for Invenio 3.
 
 Version 0.1.1 (released 2015-08-25)
 -----------------------------------
