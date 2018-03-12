@@ -39,8 +39,3 @@ CERN
 ----
 
 .. automodule:: invenio_oauthclient.contrib.cern
-
-Advanced
---------
-
-.. automodule:: invenio_oauthclient
