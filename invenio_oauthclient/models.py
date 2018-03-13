@@ -160,7 +160,7 @@ class RemoteToken(db.Model):
     def __repr__(self):
         """String representation for model."""
         return ('Remote Token <token_type={0.token_type} '
-                'access_token={0.access_token}>'.format(self))
+                'access_token=****{1}>'.format(self, self.access_token[-4:]))
 
     def token(self):
         """Get token as expected by Flask-OAuthlib."""
