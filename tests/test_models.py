@@ -98,11 +98,11 @@ def test_get_regression(models_fixture):
 
 
 def test_repr(models_fixture):
-    """Test representation of RemoteAccount adn RemoteToken."""
+    """Test representation of RemoteAccount and RemoteToken."""
     datastore = models_fixture.extensions['invenio-accounts'].datastore
     user = datastore.find_user(email='existing@inveniosoftware.org')
 
-    assert 'Remote Token <token_type=type access_token=mytoken>' == \
+    assert 'Remote Token <token_type=type access_token=****oken>' == \
            repr(RemoteToken.create(user.id, 'dev',
                                    'mytoken', 'mysecret',
                                    token_type='type'))
