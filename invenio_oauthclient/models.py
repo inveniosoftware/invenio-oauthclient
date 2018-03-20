@@ -13,7 +13,7 @@ from invenio_accounts.models import User
 from invenio_db import db
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import backref
-from sqlalchemy_utils import EncryptedType, JSONType
+from sqlalchemy_utils import EncryptedType, JSONType, Timestamp
 
 
 def _secret_key():
@@ -21,7 +21,7 @@ def _secret_key():
     return current_app.config.get('SECRET_KEY')
 
 
-class RemoteAccount(db.Model):
+class RemoteAccount(db.Model, Timestamp):
     """Storage for remote linked accounts."""
 
     __tablename__ = 'oauthclient_remoteaccount'
@@ -101,7 +101,7 @@ class RemoteAccount(db.Model):
         return 'Remote Account <id={0.id}, user_id={0.user.id}>'.format(self)
 
 
-class RemoteToken(db.Model):
+class RemoteToken(db.Model, Timestamp):
     """Storage for the access tokens for linked accounts."""
 
     __tablename__ = 'oauthclient_remotetoken'
@@ -241,7 +241,7 @@ class RemoteToken(db.Model):
         return token
 
 
-class UserIdentity(db.Model):
+class UserIdentity(db.Model, Timestamp):
     """Represent a UserIdentity record."""
 
     __tablename__ = 'oauthclient_useridentity'
