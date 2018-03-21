@@ -20,8 +20,8 @@ tests_require = [
     'check-manifest>=0.25',
     'coverage>=4.0',
     'httpretty>=0.8.14',
-    'invenio-accounts>=1.0.0b12',
-    'invenio-userprofiles>=1.0.0b2',
+    'invenio-accounts>=1.0.0',
+    'invenio-userprofiles>=1.0.0',
     'isort>=4.2.2',
     'mock>=1.3.0',
     'pydocstyle>=1.0.0',
@@ -33,7 +33,7 @@ tests_require = [
 
 extras_require = {
     'admin': [
-        'invenio-admin>=1.0.0b3',
+        'invenio-admin>=1.0.0',
     ],
     'docs': [
         'Sphinx>=1.5.1',
@@ -43,14 +43,14 @@ extras_require = {
         'uritemplate.py>=0.2.0,<2.0',
     ],
     'mysql': [
-        'invenio-db[mysql]>=1.0.0b8',
+        'invenio-db[mysql]>=1.0.0',
     ],
     'orcid': [],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.0b8',
+        'invenio-db[postgresql]>=1.0.0',
     ],
     'sqlite': [
-        'invenio-db>=1.0.0b8',
+        'invenio-db>=1.0.0',
     ],
     'tests': tests_require,
 }
@@ -72,8 +72,8 @@ install_requires = [
     'Flask-OAuthlib>=0.9.3',
     'Flask>=0.11.1',
     'blinker>=1.4',
-    'invenio-accounts>=1.0.0b12',
-    'invenio-mail>=1.0.0b1',
+    'invenio-accounts>=1.0.0',
+    'invenio-mail>=1.0.0',
     'six>=1.9',
     'sqlalchemy-utils>=0.32.0',
     'uritools>=1.0.1',
@@ -153,6 +153,6 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: CPython',
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
     ],
 )
