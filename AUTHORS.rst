@@ -5,27 +5,33 @@
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
-Authors
-=======
+Contributors
+============
 
-Invenio module that provides OAuth web authorization support.
-
-- Alizee Pace <alizee.pace@gmail.com>
-- Bruno Cuc <bruno.cuc@cern.ch>
-- Eirini Psallida <eirini.psallida@cern.ch>
-- Esteban J. G. Gabancho <esteban.gabancho@gmail.com>
-- Georgios Papoutsakis <georgios.papoutsakis@cern.ch>
-- Jan Aage Lavik <jan.age.lavik@cern.ch>
-- Javier Delgado <javier.delgado.fernandez@cern.ch>
-- Javier Martin Montull <javier.martin.montull@cern.ch>
-- Jiri Kuncar <jiri.kuncar@cern.ch>
-- Krzysztof Nowak <k.nowak@cern.ch>
-- Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
-- Leonardo Rossi <leonardo.r@cern.ch>
-- Ludmila Marian <ludmila.marian@gmail.com>
-- Marco Neumann <marco@crepererum.net>
-- Nicolas Harraudeau <nicolas.harraudeau@cern.ch>
-- Orestis Melkonian <melkon.or@gmail.com>
-- Pamfilos Fokianos <pamfilos.fokianos@cern.ch>
-- Sami Hiltunen <sami.mikael.hiltunen@cern.ch>
-- Tibor Simko <tibor.simko@cern.ch>
+- Alizee Pace
+- Bruno Cuc
+- Chiara Bigarella
+- Diego Rodriguez
+- Dinika Saxena
+- Dinos Kousidis
+- Harri Hirvonsalo
+- Harris Tzovanakis
+- Ioannis Tsanaktsidis
+- Jacopo Notarstefano
+- Javier Delgado
+- Javier Martin Montull
+- Jiri Kuncar
+- Krzysztof Nowak
+- Lars Holm Nielsen
+- Leonardo Rossi
+- Ludmila Marian
+- Nicola Tarocco
+- Nicolas Harraudeau
+- Nikos Filippakis
+- Orestis Melkonian
+- Pamfilos Fokianos
+- Panos Paparrigopoulos
+- Paulina Lach
+- Sami Hiltunen
+- Tibor Simko
+- Zacharias Zacharodimos
