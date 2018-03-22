@@ -32,7 +32,7 @@ env:
   - REQUIREMENTS=lowest EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio"
   - REQUIREMENTS=release EXTRAS=all,sqlite SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
   - REQUIREMENTS=release EXTRAS=all,mysql SQLALCHEMY_DATABASE_URI="mysql+pymysql://root@localhost:3306/invenio"
-  - REQUIREMENTS=release EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio"
+  - REQUIREMENTS=release EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio" DEPLOY=true
   - REQUIREMENTS=devel EXTRAS=all,sqlite SQLALCHEMY_DATABASE_URI="sqlite:///test.db"
   - REQUIREMENTS=devel EXTRAS=all,mysql SQLALCHEMY_DATABASE_URI="mysql+pymysql://root@localhost:3306/invenio"
   - REQUIREMENTS=devel EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio"
@@ -76,3 +76,4 @@ deploy:
   on:
     tags: true
     python: "2.7"
+    condition: $DEPLOY = true
