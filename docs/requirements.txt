@@ -1,2 +1,1 @@
--e .[docs,tests]
-invenio-db>=1.0.0b7
+-e .[docs,tests,sqlite,github]
