@@ -9,6 +9,9 @@
  Invenio-OAuthClient
 =====================
 
+.. image:: https://img.shields.io/github/license/inveniosoftware/invenio-oauthclient.svg
+        :target: https://github.com/inveniosoftware/invenio-oauthclient/blob/master/LICENSE
+
 .. image:: https://img.shields.io/travis/inveniosoftware/invenio-oauthclient.svg
         :target: https://travis-ci.org/inveniosoftware/invenio-oauthclient
 
