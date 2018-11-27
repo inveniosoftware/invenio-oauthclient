@@ -321,7 +321,7 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'https://docs.python.org/': None,
-    'invenio-accounts': ('https://pythonhosted.org/invenio-accounts', None),
+    'invenio-accounts': ('https://invenio-accounts.readthedocs.io/en/latest/', None),
 }
 
 # Autodoc configuraton.

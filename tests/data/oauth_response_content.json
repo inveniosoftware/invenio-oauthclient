@@ -1,5 +1,5 @@
 [
-    {"Type": "http://schemas.xmlsoap.org/claims/uidNumber", "Value": "123456"},
+    { "Type": "http://schemas.xmlsoap.org/claims/PersonID", "Value": "234567" },
     {"Type": "http://schemas.xmlsoap.org/claims/EmailAddress", "Value": "test.account@cern.ch"},
     {"Type": "http://schemas.xmlsoap.org/claims/CommonName", "Value": "taccount"},
     {"Type": "http://schemas.xmlsoap.org/claims/DisplayName", "Value": "Test Account"},
@@ -19,7 +19,7 @@
     {"Type": "http://schemas.xmlsoap.org/claims/Lastname", "Value": "Account"},
     {"Type": "http://schemas.xmlsoap.org/claims/Department", "Value": "IT/CDA"},
     {"Type": "http://schemas.xmlsoap.org/claims/HomeInstitute", "Value": "CERN"},
-    {"Type": "http://schemas.xmlsoap.org/claims/uidNumber", "Value": "54321"},
+    {"Type": "http://schemas.xmlsoap.org/claims/uidNumber", "Value": "123456"},
     {"Type": "http://schemas.xmlsoap.org/claims/gidNumber", "Value": "1122"},
     {"Type": "http://schemas.xmlsoap.org/claims/PreferredLanguage", "Value": "EN"},
     {"Type": "http://schemas.xmlsoap.org/claims/IdentityClass", "Value": "CERN Registered"},
