@@ -193,8 +193,22 @@ def fetch_groups(groups):
     return groups
 
 
-def account_groups(account, resource, refresh_timedelta=None):
-    """Fetch account groups from resource if necessary."""
+def fetch_extra_data(resource):
+    """Return a dict with extra data retrieved from cern oauth."""
+    person_id = resource.get('PersonID', [None])[0]
+    identity_class = resource.get('IdentityClass', [None])[0]
+    department = resource.get('Department', [None])[0]
+
+    return dict(
+        person_id=person_id,
+        identity_class=identity_class,
+        department=department
+    )
+
+
+def account_groups_and_extra_data(account, resource,
+                                  refresh_timedelta=None):
+    """Fetch account groups and extra data from resource if necessary."""
     updated = datetime.utcnow()
     modified_since = updated
     if refresh_timedelta is not None:
@@ -206,9 +220,15 @@ def account_groups(account, resource, refresh_timedelta=None):
         return account.extra_data.get('groups', [])
 
     groups = fetch_groups(resource['Group'])
+    extra_data = current_app.config.get(
+        'OAUTHCLIENT_CERN_EXTRA_DATA_SERIALIZER',
+        fetch_extra_data
+    )(resource)
+
     account.extra_data.update(
         groups=groups,
         updated=updated.isoformat(),
+        **extra_data
     )
     return groups
 
@@ -304,7 +324,7 @@ def account_setup(remote, token, resp):
         token.remote_account.extra_data = {
             'external_id': external_id,
         }
-        groups = account_groups(token.remote_account, resource)
+        groups = account_groups_and_extra_data(token.remote_account, resource)
         assert not isinstance(g.identity, AnonymousIdentity)
         extend_identity(g.identity, groups)
 
@@ -336,8 +356,10 @@ def on_identity_changed(sender, identity):
             'OAUTHCLIENT_CERN_REFRESH_TIMEDELTA',
             OAUTHCLIENT_CERN_REFRESH_TIMEDELTA
         )
+
         groups.extend(
-            account_groups(account, resource, refresh_timedelta=refresh)
+            account_groups_and_extra_data(account, resource,
+                                          refresh_timedelta=refresh)
         )
 
     extend_identity(identity, groups)

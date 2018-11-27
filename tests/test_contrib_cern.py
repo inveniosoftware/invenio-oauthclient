@@ -16,7 +16,8 @@ from helpers import get_state, mock_remote_get, mock_response
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.contrib.cern import account_info, \
-    disconnect_handler, fetch_groups, get_dict_from_response
+    disconnect_handler, fetch_extra_data, fetch_groups, \
+    get_dict_from_response
 
 
 def test_fetch_groups(app, example_cern):
@@ -35,6 +36,42 @@ def test_fetch_groups(app, example_cern):
     groups = fetch_groups(res['Group'])
     assert all(group in groups
                for group in ('Group{}'.format(i) for i in range(4, 6)))
+
+
+def test_fetch_extra_data(app, example_cern):
+    """Test extra data extraction."""
+    example_response, example_token, _ = example_cern
+    res = get_dict_from_response(example_response)
+
+    # Check that groups were hidden as required
+    extra_data = fetch_extra_data(res)
+
+    assert 'person_id' in extra_data
+    assert extra_data['person_id'] == "234567"
+    assert 'identity_class' in extra_data
+    assert extra_data['identity_class'] == "CERN Registered"
+    assert 'department' in extra_data
+    assert extra_data['department'] == "IT/CDA"
+
+
+def test_fetch_extra_data_fields_missing(app, example_cern):
+    """Test extra data extraction when fields are missing."""
+    example_response, example_token, _ = example_cern
+    res = get_dict_from_response(example_response)
+
+    del res['PersonID']
+    del res['IdentityClass']
+    del res['Department']
+
+    # Check that groups were hidden as required
+    extra_data = fetch_extra_data(res)
+
+    assert 'person_id' in extra_data
+    assert extra_data['person_id'] is None
+    assert 'identity_class' in extra_data
+    assert extra_data['identity_class'] is None
+    assert 'department' in extra_data
+    assert extra_data['department'] is None
 
 
 def test_account_info(app, example_cern):
