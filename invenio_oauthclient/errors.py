@@ -71,3 +71,7 @@ class OAuthClientError(OAuthResponseError):
         super(OAuthClientError, self).__init__(
             self.description or message, remote, response
         )
+
+
+class OAuthCERNRejectedAccountError(OAuthResponseError):
+    """Define exception for not allowed cern accounts."""

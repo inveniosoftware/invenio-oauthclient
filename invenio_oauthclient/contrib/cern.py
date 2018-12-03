@@ -82,6 +82,7 @@ from flask_principal import AnonymousIdentity, RoleNeed, UserNeed, \
     identity_changed, identity_loaded
 from invenio_db import db
 
+from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.proxies import current_oauthclient
 from invenio_oauthclient.utils import oauth_link_external_id, \
@@ -123,6 +124,12 @@ OAUTHCLIENT_CERN_REFRESH_TIMEDELTA = timedelta(minutes=-5)
 
 OAUTHCLIENT_CERN_SESSION_KEY = 'identity.cern_provides'
 """Name of session key where CERN roles are stored."""
+
+OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES = [
+    'CERN Registered',
+    'CERN Shared'
+]
+"""Cern oauth identityClass values that are allowed to be used."""
 
 REMOTE_APP = dict(
     title='CERN',
@@ -288,8 +295,19 @@ def account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
     resource = get_resource(remote)
 
+    valid_identities = current_app.config.get(
+        'OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES',
+        OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES
+    )
+    identity_class = resource.get('IdentityClass', [None])[0]
+    if identity_class is None or identity_class not in valid_identities:
+        raise OAuthCERNRejectedAccountError(
+            'Identity class {0} is not one of [{1}]'.format(
+                identity_class, ''.join(valid_identities)), remote, resp, )
+
     email = resource['EmailAddress'][0]
-    external_id = resource['uidNumber'][0]
+    person_id = resource.get('PersonID', [None])
+    external_id = resource.get('uidNumber', person_id)[0]
     nice = resource['CommonName'][0]
     name = resource['DisplayName'][0]
 
@@ -328,7 +346,8 @@ def account_setup(remote, token, resp):
     resource = get_resource(remote)
 
     with db.session.begin_nested():
-        external_id = resource['uidNumber'][0]
+        person_id = resource.get('PersonID', [None])
+        external_id = resource.get('uidNumber', person_id)[0]
 
         # Set CERN person ID in extra_data.
         token.remote_account.extra_data = {

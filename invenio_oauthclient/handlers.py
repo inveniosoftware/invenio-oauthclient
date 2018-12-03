@@ -20,8 +20,9 @@ from flask_login import current_user
 from invenio_db import db
 from werkzeug.utils import import_string
 
-from .errors import AlreadyLinkedError, OAuthClientError, OAuthError, \
-    OAuthRejectedRequestError, OAuthResponseError
+from .errors import AlreadyLinkedError, OAuthCERNRejectedAccountError, \
+    OAuthClientError, OAuthError, OAuthRejectedRequestError, \
+    OAuthResponseError
 from .models import RemoteAccount, RemoteToken
 from .proxies import current_oauthclient
 from .signals import account_info_received, account_setup_committed, \
@@ -227,6 +228,11 @@ def oauth_error_handler(f):
             return oauth2_handle_error(
                 e.remote, e.response, e.code, e.uri, e.description
             )
+        except OAuthCERNRejectedAccountError as e:
+            current_app.logger.warning(e.message, exc_info=True)
+            flash(_('CERN account not allowed.'),
+                  category='danger')
+            return redirect('/')
         except OAuthRejectedRequestError:
             flash(_('You rejected the authentication request.'),
                   category='info')
