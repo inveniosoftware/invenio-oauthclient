@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import
 
+import pytest
 from flask import g, session, url_for
 from flask_security import login_user
 from helpers import get_state, mock_remote_get, mock_response
@@ -18,6 +19,7 @@ from six.moves.urllib_parse import parse_qs, urlparse
 from invenio_oauthclient.contrib.cern import account_info, \
     disconnect_handler, fetch_extra_data, fetch_groups, \
     get_dict_from_response
+from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
 
 
 def test_fetch_groups(app, example_cern):
@@ -170,3 +172,23 @@ def test_authorized_reject(app):
         assert resp.location == 'http://localhost/'
         # Check message flash
         assert session['_flashes'][0][0] == 'info'
+
+
+def test_account_info_not_allowed_account(app, example_cern):
+    """Test account info extraction."""
+    client = app.test_client()
+
+    app.config['OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES'] = [
+        'another cern type'
+    ]
+    ioc = app.extensions['oauthlib.client']
+
+    # Ensure remote apps have been loaded (due to before first request)
+    client.get(url_for('invenio_oauthclient.login', remote_app='cern'))
+
+    example_response, _, example_account_info = example_cern
+
+    mock_remote_get(ioc, 'cern', example_response)
+
+    with pytest.raises(OAuthCERNRejectedAccountError):
+        account_info(ioc.remote_apps['cern'], None)
