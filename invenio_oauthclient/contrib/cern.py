@@ -76,7 +76,7 @@ import copy
 import re
 from datetime import datetime, timedelta
 
-from flask import current_app, g, redirect, session, url_for
+from flask import Blueprint, current_app, g, redirect, session, url_for
 from flask_login import current_user
 from flask_principal import AnonymousIdentity, RoleNeed, UserNeed, \
     identity_changed, identity_loaded
@@ -137,6 +137,7 @@ REMOTE_APP = dict(
         setup='invenio_oauthclient.contrib.cern:account_setup',
         view='invenio_oauthclient.handlers:signup_handler',
     ),
+    logout_url='https://login.cern.ch/adfs/ls/partiallogout.aspx',
     params=dict(
         base_url='https://oauth.web.cern.ch/',
         request_token_url=None,
@@ -162,6 +163,15 @@ REMOTE_SANDBOX_APP['params'].update(dict(
 
 REMOTE_APP_RESOURCE_API_URL = 'https://oauthresource.web.cern.ch/api/Me'
 REMOTE_APP_RESOURCE_SCHEMA = 'http://schemas.xmlsoap.org/claims/'
+
+cern_oauth_blueprint = Blueprint('cern_oauth', __name__)
+
+
+@cern_oauth_blueprint.route('/cern/logout')
+def logout():
+    """CERN logout view."""
+    return redirect(REMOTE_APP['logout_url'],
+                    code=302)
 
 
 def find_remote_by_client_id(client_id):
