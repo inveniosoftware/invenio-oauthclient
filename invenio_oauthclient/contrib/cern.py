@@ -144,7 +144,7 @@ REMOTE_APP = dict(
         setup='invenio_oauthclient.contrib.cern:account_setup',
         view='invenio_oauthclient.handlers:signup_handler',
     ),
-    logout_url='https://login.cern.ch/adfs/ls/partiallogout.aspx',
+    logout_url='https://login.cern.ch/adfs/ls/?wa=wsignout1.0',
     params=dict(
         base_url='https://oauth.web.cern.ch/',
         request_token_url=None,
@@ -177,8 +177,14 @@ cern_oauth_blueprint = Blueprint('cern_oauth', __name__)
 @cern_oauth_blueprint.route('/cern/logout')
 def logout():
     """CERN logout view."""
-    return redirect(REMOTE_APP['logout_url'],
-                    code=302)
+    logout_url = REMOTE_APP['logout_url']
+
+    apps = current_app.config.get('OAUTHCLIENT_REMOTE_APPS')
+    if apps:
+        cern_app = apps.get('cern', REMOTE_APP)
+        logout_url = cern_app['logout_url']
+
+    return redirect(logout_url, code=302)
 
 
 def find_remote_by_client_id(client_id):
