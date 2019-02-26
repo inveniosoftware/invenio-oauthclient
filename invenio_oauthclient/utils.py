@@ -19,7 +19,7 @@ from invenio_accounts.models import User
 from invenio_db import db
 from invenio_db.utils import rebuild_encrypted_properties
 from sqlalchemy.exc import IntegrityError
-from uritools import urisplit
+from uritools import uricompose, urisplit
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string
 from wtforms.fields.core import FormField
@@ -157,7 +157,11 @@ def get_safe_redirect_target(arg='next'):
             if redirect_uri.host in allowed_hosts:
                 return target
             elif redirect_uri.path:
-                return redirect_uri.path
+                return uricompose(
+                    path=redirect_uri.path,
+                    query=redirect_uri.query,
+                    fragment=redirect_uri.fragment
+                )
     return None
 
 
