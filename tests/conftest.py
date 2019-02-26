@@ -82,6 +82,7 @@ def base_app(request):
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SECURITY_PASSWORD_HASH='plaintext',
         SECURITY_PASSWORD_SCHEMES=['plaintext'],
+        APP_ALLOWED_HOSTS=['localhost']
     )
     FlaskMenu(base_app)
     Babel(base_app)

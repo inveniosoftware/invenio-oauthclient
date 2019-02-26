@@ -15,13 +15,15 @@ import sys
 import pytest
 from flask_security.confirmable import _security
 from invenio_db import db
+from six.moves.urllib.parse import quote_plus
 
 from invenio_oauthclient.errors import AlreadyLinkedError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
 from invenio_oauthclient.utils import _get_external_id, \
     create_csrf_disabled_registrationform, create_registrationform, \
-    fill_form, oauth_authenticate, oauth_get_user, oauth_link_external_id, \
-    oauth_unlink_external_id, obj_or_import_string, rebuild_access_tokens
+    fill_form, get_safe_redirect_target, oauth_authenticate, oauth_get_user, \
+    oauth_link_external_id, oauth_unlink_external_id, obj_or_import_string, \
+    rebuild_access_tokens
 
 
 def test_utilities(models_fixture):
@@ -173,6 +175,20 @@ def test_registrationform_userprofile_disable_csrf(app_with_userprofiles_csrf,
     assert 'profile' in filled_form
     assert 'csrf_token' not in filled_form.profile
     _assert_no_csrf_token(filled_form)
+
+
+@pytest.mark.parametrize("test_input,expected", [
+    ('https://invenio.org/search?page=1&q=&keywords=taxonomy&keywords=animali',
+     '/search?page=1&q=&keywords=taxonomy&keywords=animali'),
+    ('/search?page=1&size=20',
+     '/search?page=1&size=20'),
+    ('https://localhost/search?page=1',
+     'https://localhost/search?page=1'),
+])
+def test_get_safe_redirect_target(app, test_input, expected):
+    with app.test_request_context(
+            '/?next={0}'.format(quote_plus(test_input))):
+        assert get_safe_redirect_target() == expected
 
 
 def _assert_csrf_token(form):
