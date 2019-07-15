@@ -33,7 +33,7 @@ SPHINX-START
        $ pip install -e .[all]
        $ cd examples
        $ export FLASK_APP=globus_app.py
-       $ ./app-setup.py
+       $ ./app-setup.sh
 
 You can find the database in `examples/globus_app.db`.
 

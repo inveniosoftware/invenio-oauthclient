@@ -51,7 +51,7 @@
    http://localhost:4000/oauth/login/github/)
 
 6. Also, you should see GitHub listed under Linked accounts:
-   http://localhost:4000//account/settings/linkedaccounts/
+   http://localhost:4000/account/settings/linkedaccounts/
 
 By default the GitHub module will try first look if a link already exists
 between a GitHub account and a user. If no link is found, the module tries to
