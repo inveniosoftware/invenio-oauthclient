@@ -45,7 +45,7 @@ SPHINX-START
        $ pip install -e .[all]
        $ cd examples
        $ export FLASK_APP=cern_app.py
-       $ ./app-setup.py
+       $ ./app-setup.sh
 
 You can find the database in `examples/cern_app.db`.
 

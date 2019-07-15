@@ -21,7 +21,7 @@ services:
 
 language: python
 
-dist: precise
+dist: xenial
 
 cache:
   - pip

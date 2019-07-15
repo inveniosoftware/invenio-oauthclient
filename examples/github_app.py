@@ -36,7 +36,7 @@ SPHINX-START
        $ pip install -e .[all]
        $ cd examples
        $ export FLASK_APP=github_app.py
-       $ ./app-setup.py
+       $ ./app-setup.sh
 
 You can find the database in `examples/github_app.db`.
 
