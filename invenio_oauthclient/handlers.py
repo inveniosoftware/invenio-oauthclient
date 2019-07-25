@@ -504,3 +504,17 @@ def oauth2_handle_error(remote, resp, error_code, error_uri,
     """Handle errors during exchange of one-time code for an access tokens."""
     flash(_('Authorization with remote service failed.'))
     return redirect('/')
+
+
+def authorized_handler(f, authorized_response):
+        """Handles an OAuth callback.
+
+        As authorized_handler is deprecated in favor of authorized_response,
+        it's has to be wrapped with handler which will be executed
+        at the proper time.
+        """
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            data = authorized_response()
+            return f(*((data,) + args), **kwargs)
+        return decorated
