@@ -15,8 +15,9 @@ from flask_oauthlib.client import OAuth as FlaskOAuth
 from flask_oauthlib.client import OAuthRemoteApp
 
 from . import config
-from .handlers import authorized_default_handler, disconnect_handler, \
-    make_handler, make_token_getter, oauth_logout_handler
+from .handlers import authorized_default_handler, authorized_handler, \
+    disconnect_handler, make_handler, make_token_getter, \
+    oauth_logout_handler
 from .utils import load_or_import_from_config, obj_or_import_string
 
 
@@ -65,10 +66,13 @@ class _OAuthClientState(object):
             remote.tokengetter(make_token_getter(remote))
 
             # Register authorized handler
-            self.handlers[remote_app] = remote.authorized_handler(make_handler(
-                conf.get('authorized_handler', authorized_default_handler),
-                remote,
-            ))
+            self.handlers[remote_app] = authorized_handler(
+                make_handler(
+                    conf.get('authorized_handler', authorized_default_handler),
+                    remote
+                ),
+                remote.authorized_response
+            )
 
             # Register disconnect handler
             self.disconnect_handlers[remote_app] = make_handler(
