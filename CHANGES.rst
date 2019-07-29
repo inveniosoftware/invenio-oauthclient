@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 1.1.3 (released 2019-07-29)
+
+- Remove deprecated warnings from 3rd party modules
+- Fix setup file extension
+- Fix missing args from redirect target
+
 Version 1.1.2 (released 2019-02-01)
 
 - CERN OAuth: fix logout url
