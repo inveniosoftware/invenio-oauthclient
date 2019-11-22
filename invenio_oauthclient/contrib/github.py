@@ -77,6 +77,7 @@ from invenio_db import db
 from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.handlers import authorized_signup_handler, \
     oauth_error_handler
+from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.utils import oauth_link_external_id, \
     oauth_unlink_external_id
@@ -105,6 +106,39 @@ REMOTE_APP = dict(
     )
 )
 """GitHub remote application configuration."""
+
+
+REMOTE_REST_APP = dict(
+    title='GitHub',
+    description='Software collaboration platform.',
+    icon='fa fa-github',
+    authorized_handler='invenio_oauthclient.handlers.rest'
+                       ':authorized_signup_handler',
+    disconnect_handler='invenio_oauthclient.contrib.github'
+                       ':disconnect_rest_handler',
+    signup_handler=dict(
+        info='invenio_oauthclient.contrib.github:account_info',
+        setup='invenio_oauthclient.contrib.github:account_setup',
+        view='invenio_oauthclient.handlers.rest:signup_handler',
+    ),
+    response_handler=(
+        'invenio_oauthclient.handlers.rest:default_response_handler'
+    ),
+    authorized_redirect_url='/',
+    disconnect_redirect_url='/',
+    signup_redirect_url='/',
+    error_redirect_url='/',
+    params=dict(
+        request_token_params={'scope': 'user,user:email'},
+        base_url='https://api.github.com/',
+        request_token_url=None,
+        access_token_url='https://github.com/login/oauth/access_token',
+        access_token_method='POST',
+        authorize_url='https://github.com/login/oauth/authorize',
+        app_key='GITHUB_APP_CREDENTIALS',
+    )
+)
+"""GitHub remote rest application configuration."""
 
 
 def _extract_email(gh):
@@ -221,3 +255,31 @@ def disconnect_handler(remote, *args, **kwargs):
             remote_account.delete()
 
     return redirect(url_for('invenio_oauthclient_settings.index'))
+
+
+def disconnect_rest_handler(remote, *args, **kwargs):
+    """Handle unlinking of remote account.
+
+    :param remote: The remote application.
+    :returns: The HTML response.
+    """
+    if not current_user.is_authenticated:
+        return current_app.login_manager.unauthorized()
+
+    remote_account = RemoteAccount.get(user_id=current_user.get_id(),
+                                       client_id=remote.consumer_key)
+    external_method = 'github'
+    external_ids = [i.id for i in current_user.external_identifiers
+                    if i.method == external_method]
+
+    if external_ids:
+        oauth_unlink_external_id(dict(id=external_ids[0],
+                                      method=external_method))
+    if remote_account:
+        with db.session.begin_nested():
+            remote_account.delete()
+
+    redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
+        remote.name]['disconnect_redirect_url']
+
+    return response_handler(remote, redirect_url)

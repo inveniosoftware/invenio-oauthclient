@@ -53,3 +53,12 @@ def test_app(service):
         cmd = 'curl http://localhost:5000/{0}'.format(service)
         output = subprocess.check_output(cmd, shell=True).decode('utf-8')
         assert 'Redirect' in output
+
+
+@pytest.mark.parametrize('service', ['orcid', 'github', 'cern', 'globus'])
+def test_app_rest(service):
+    """Test example app for given service."""
+    with _create_example_app('{0}_app_rest.py'.format(service)):
+        cmd = 'curl http://localhost:5000/{0}'.format(service)
+        output = subprocess.check_output(cmd, shell=True).decode('utf-8')
+        assert 'Redirect' in output

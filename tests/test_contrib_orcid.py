@@ -161,11 +161,9 @@ def test_authorized_reject(app, example_orcid):
         assert session['_flashes'][0][0] == 'info'
 
 
-def test_authorized_already_authenticated(models_fixture, example_orcid,
+def test_authorized_already_authenticated(app, models_fixture, example_orcid,
                                           orcid_bio):
     """Test authorized callback with sign-up."""
-    app = models_fixture
-
     datastore = app.extensions['invenio-accounts'].datastore
     login_manager = app.login_manager
 
@@ -242,9 +240,8 @@ def test_authorized_already_authenticated(models_fixture, example_orcid,
         ).count()
 
 
-def test_not_authenticated(models_fixture):
+def test_not_authenticated(app, models_fixture):
     """Test disconnect when user is not authenticated."""
-    app = models_fixture
     with app.test_client() as client:
         assert not current_user.is_authenticated
         resp = client.get(

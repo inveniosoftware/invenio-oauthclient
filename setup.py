@@ -21,7 +21,7 @@ tests_require = [
     'coverage>=4.0',
     'httpretty>=0.8.14',
     'invenio-userprofiles>=1.0.0',
-    'isort>=4.2.2',
+    'isort>=4.3.0',
     'mock>=1.3.0',
     'pydocstyle>=1.0.0',
     'pytest-cov>=1.8.0',
@@ -117,12 +117,15 @@ setup(
             'invenio_oauthclient = invenio_oauthclient:InvenioOAuthClient',
         ],
         'invenio_base.api_apps': [
-            'invenio_oauthclient = invenio_oauthclient:InvenioOAuthClient',
+            'invenio_oauthclient = invenio_oauthclient:InvenioOAuthClientREST',
         ],
         'invenio_base.blueprints': [
             'invenio_oauthclient = invenio_oauthclient.views.client:blueprint',
             'invenio_oauthclient_settings = '
             'invenio_oauthclient.views.settings:blueprint',
+        ],
+        'invenio_base.api_blueprints': [
+            'invenio_oauthclient_rest = invenio_oauthclient.views.rest:blueprint',
         ],
         'invenio_db.alembic': [
             'invenio_oauthclient = invenio_oauthclient:alembic',

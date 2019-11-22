@@ -50,10 +50,10 @@ from flask_login import current_user
 from invenio_db import db
 
 from invenio_oauthclient.errors import OAuthResponseError
+from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.utils import oauth_link_external_id, \
     oauth_unlink_external_id
-
 
 REMOTE_APP = dict(
     title='Globus',
@@ -79,6 +79,40 @@ REMOTE_APP = dict(
     )
 )
 """Globus remote application configuration."""
+
+
+REMOTE_REST_APP = dict(
+    title='Globus',
+    description='Research data management simplified.',
+    icon='',
+    authorized_handler='invenio_oauthclient.handlers.rest'
+                       ':authorized_signup_handler',
+    disconnect_handler='invenio_oauthclient.contrib.globus'
+                       ':disconnect_rest_handler',
+    signup_handler=dict(
+        info='invenio_oauthclient.contrib.globus:account_info',
+        setup='invenio_oauthclient.contrib.globus:account_setup',
+        view='invenio_oauthclient.handlers.rest:signup_handler',
+    ),
+    response_handler=(
+        'invenio_oauthclient.handlers.rest:default_response_handler'
+    ),
+    authorized_redirect_url='/',
+    disconnect_redirect_url='/',
+    signup_redirect_url='/',
+    error_redirect_url='/',
+    params=dict(
+        request_token_params={'scope': 'openid email profile'},
+        base_url='https://auth.globus.org/',
+        request_token_url=None,
+        access_token_url='https://auth.globus.org/v2/oauth2/token',
+        access_token_method='POST',
+        authorize_url='https://auth.globus.org/v2/oauth2/authorize',
+        app_key='GLOBUS_APP_CREDENTIALS',
+    )
+)
+"""Globus remote rest application configuration."""
+
 
 GLOBUS_USER_INFO_URL = 'https://auth.globus.org/v2/oauth2/userinfo'
 GLOBUS_USER_ID_URL = 'https://auth.globus.org/v2/api/identities'
@@ -215,3 +249,31 @@ def disconnect_handler(remote, *args, **kwargs):
             remote_account.delete()
 
     return redirect(url_for('invenio_oauthclient_settings.index'))
+
+
+def disconnect_rest_handler(remote, *args, **kwargs):
+    """Handle unlinking of remote account.
+
+    :param remote: The remote application.
+    :returns: The HTML response.
+    """
+    if not current_user.is_authenticated:
+        return current_app.login_manager.unauthorized()
+
+    remote_account = RemoteAccount.get(user_id=current_user.get_id(),
+                                       client_id=remote.consumer_key)
+    external_ids = [i.id for i in current_user.external_identifiers
+                    if i.method == GLOBUS_EXTERNAL_METHOD]
+
+    if external_ids:
+        oauth_unlink_external_id(dict(id=external_ids[0],
+                                      method=GLOBUS_EXTERNAL_METHOD))
+
+    if remote_account:
+        with db.session.begin_nested():
+            remote_account.delete()
+
+    redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
+        remote.name]['disconnect_redirect_url']
+
+    return response_handler(remote, redirect_url)

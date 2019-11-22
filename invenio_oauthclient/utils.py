@@ -14,10 +14,11 @@ import six
 from flask import after_this_request, current_app, request
 from flask_security import login_user, logout_user
 from flask_security.confirmable import requires_confirmation
-from flask_security.registerable import register_user
 from invenio_accounts.models import User
+from invenio_accounts.utils import register_user
 from invenio_db import db
 from invenio_db.utils import rebuild_encrypted_properties
+from itsdangerous import BadData, TimedJSONWebSignatureSerializer
 from sqlalchemy.exc import IntegrityError
 from uritools import uricompose, urisplit
 from werkzeug.local import LocalProxy
@@ -31,6 +32,13 @@ _security = LocalProxy(lambda: current_app.extensions['security'])
 
 _datastore = LocalProxy(lambda: _security.datastore)
 
+
+serializer = LocalProxy(
+    lambda: TimedJSONWebSignatureSerializer(
+        current_app.config['SECRET_KEY'],
+        expires_in=current_app.config['OAUTHCLIENT_STATE_EXPIRES'],
+    )
+)
 
 def _commit(response=None):
     _datastore.commit()
@@ -95,6 +103,22 @@ def oauth_authenticate(client_id, user, require_existing_link=False):
                     return False
             return True
     return False
+
+
+def rest_oauth_register(data):
+    """Register user if possible.
+
+    :param data: A data instance.
+    :returns: A :class:`invenio_accounts.models.User` instance.
+    """
+    if data.get('email'):
+        if not data.get('password'):
+            data['password'] = ''
+        user = register_user(**data)
+        if not data['password']:
+            user.password = None
+        _datastore.commit()
+        return user
 
 
 def oauth_register(form):

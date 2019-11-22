@@ -220,10 +220,8 @@ def test_authorized_reject(app):
         assert session['_flashes'][0][0] == 'info'
 
 
-def test_authorized_already_authenticated(models_fixture, example_github):
+def test_authorized_already_authenticated(app, models_fixture, example_github):
     """Test authorized callback with sign-up."""
-    app = models_fixture
-
     datastore = app.extensions['invenio-accounts'].datastore
     login_manager = app.login_manager
 
