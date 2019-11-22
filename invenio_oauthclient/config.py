@@ -211,3 +211,6 @@ OAUTHCLIENT_STATE_ENABLED = True
 
 OAUTHCLIENT_SIGNUP_TEMPLATE = 'invenio_oauthclient/signup.html'
 """Template for the signup page."""
+
+OAUTHCLIENT_REST_REMOTE_APPS = {}
+"""Configuration of remote rest applications."""

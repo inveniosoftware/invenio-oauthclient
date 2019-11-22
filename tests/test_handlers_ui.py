@@ -22,56 +22,17 @@ from werkzeug.routing import BuildError
 from invenio_oauthclient import InvenioOAuthClient, current_oauthclient
 from invenio_oauthclient.errors import AlreadyLinkedError, OAuthResponseError
 from invenio_oauthclient.handlers import authorized_signup_handler, \
-    disconnect_handler, oauth_error_handler, response_token_setter, \
-    signup_handler, token_getter, token_session_key, token_setter
+    disconnect_handler, oauth_error_handler, signup_handler, \
+    token_session_key, token_setter
 from invenio_oauthclient.models import RemoteToken
 from invenio_oauthclient.utils import oauth_authenticate
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 
 
-def test_token_setter(app, remote):
-    """Test token setter on response from OAuth server."""
-
-    # OAuth1
-    resp_oauth1 = {
-        'name': 'Josiah Carberry',
-        'expires_in': 3599,
-        'oauth_token': 'test_access_token',
-        'oauth_token_secret': 'test_refresh_token',
-        'scope': '/authenticate',
-        'token_type': 'bearer',
-    }
-    assert not response_token_setter(remote, resp_oauth1)
-
-    # Bad request
-    resp_bad = {
-        'invalid': 'invalid',
-    }
-    with pytest.raises(OAuthResponseError):
-        response_token_setter(remote, resp_bad)
-
-
-def test_token_getter(remote, models_fixture):
-    """Test token getter on response from OAuth server."""
-    app = models_fixture
-    datastore = app.extensions['invenio-accounts'].datastore
-    existing_email = 'existing@inveniosoftware.org'
-    user = datastore.find_user(email=existing_email)
-
-    # Missing RemoteToken
-    oauth_authenticate('dev', user)
-    assert not token_getter(remote)
-
-    # Populated RemoteToken
-    RemoteToken.create(user.id, 'testkey', 'mytoken', 'mysecret')
-    oauth_authenticate('dev', user)
-    assert token_getter(remote) == ('mytoken', 'mysecret')
-
-
-def test_authorized_signup_handler(remote, models_fixture):
+def test_authorized_signup_handler(remote, app, models_fixture):
     """Test authorized signup handler."""
-    datastore = models_fixture.extensions['invenio-accounts'].datastore
+    datastore = app.extensions['invenio-accounts'].datastore
     user = datastore.find_user(email='existing@inveniosoftware.org')
 
     example_response = {'access_token': 'test_access_token'}
@@ -93,9 +54,8 @@ def test_authorized_signup_handler(remote, models_fixture):
     check_redirect_location(resp, next_url)
 
 
-def test_unauthorized_signup(remote, models_fixture):
+def test_unauthorized_signup(remote, app, models_fixture):
     """Test unauthorized redirect on signup callback handler."""
-    app = models_fixture
     datastore = app.extensions['invenio-accounts'].datastore
     existing_email = 'existing@inveniosoftware.org'
     user = datastore.find_user(email=existing_email)
@@ -121,9 +81,8 @@ def test_unauthorized_signup(remote, models_fixture):
     check_redirect_location(resp, lambda x: x.startswith('/login/'))
 
 
-def test_signup_handler(remote, models_fixture):
+def test_signup_handler(remote, app, models_fixture):
     """Test signup handler."""
-    app = models_fixture
     datastore = app.extensions['invenio-accounts'].datastore
     existing_email = 'existing@inveniosoftware.org'
     user = datastore.find_user(email=existing_email)

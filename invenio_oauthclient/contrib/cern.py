@@ -83,6 +83,7 @@ from flask_principal import AnonymousIdentity, RoleNeed, UserNeed, \
 from invenio_db import db
 
 from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
+from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.proxies import current_oauthclient
 from invenio_oauthclient.utils import oauth_link_external_id, \
@@ -158,6 +159,43 @@ REMOTE_APP = dict(
     )
 )
 """CERN Remote Application."""
+
+
+REMOTE_REST_APP = dict(
+    title='CERN',
+    description='Connecting to CERN Organization.',
+    icon='',
+    authorized_handler='invenio_oauthclient.handlers.rest'
+                       ':authorized_signup_handler',
+    disconnect_handler='invenio_oauthclient.contrib.cern'
+                       ':disconnect_rest_handler',
+    signup_handler=dict(
+        info='invenio_oauthclient.contrib.cern:account_info',
+        setup='invenio_oauthclient.contrib.cern:account_setup',
+        view='invenio_oauthclient.handlers.rest:signup_handler',
+    ),
+    response_handler=(
+        'invenio_oauthclient.handlers.rest:default_response_handler'
+    ),
+    logout_url='https://login.cern.ch/adfs/ls/?wa=wsignout1.0',
+    authorized_redirect_url='/',
+    disconnect_redirect_url='/',
+    signup_redirect_url='/',
+    error_redirect_url='/',
+    params=dict(
+        base_url='https://oauth.web.cern.ch/',
+        request_token_url=None,
+        access_token_url='https://oauth.web.cern.ch/OAuth/Token',
+        access_token_method='POST',
+        authorize_url='https://oauth.web.cern.ch/OAuth/Authorize',
+        app_key='CERN_APP_CREDENTIALS',
+        content_type='application/json',
+        request_token_params={'scope': 'Name Email Bio Groups',
+                              'show_login': 'true'}
+    ),
+)
+"""CERN Remote REST Application."""
+
 
 REMOTE_SANDBOX_APP = copy.deepcopy(REMOTE_APP)
 """CERN Sandbox Remote Application."""
@@ -345,6 +383,29 @@ def disconnect_handler(remote, *args, **kwargs):
     disconnect_identity(g.identity)
 
     return redirect(url_for('invenio_oauthclient_settings.index'))
+
+
+def disconnect_rest_handler(remote, *args, **kwargs):
+    """Handle unlinking of remote account."""
+    if not current_user.is_authenticated:
+        return current_app.login_manager.unauthorized()
+
+    account = RemoteAccount.get(user_id=current_user.get_id(),
+                                client_id=remote.consumer_key)
+    external_id = account.extra_data.get('external_id')
+
+    if external_id:
+        oauth_unlink_external_id(dict(id=external_id, method='cern'))
+    if account:
+        with db.session.begin_nested():
+            account.delete()
+
+    disconnect_identity(g.identity)
+
+    redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
+        remote.name]['disconnect_redirect_url']
+
+    return response_handler(remote, redirect_url)
 
 
 def account_setup(remote, token, resp):

@@ -66,3 +66,6 @@ target/
 examples/*.db
 examples/*.key
 examples/*.crt
+
+# Vscode
+.vscode/
