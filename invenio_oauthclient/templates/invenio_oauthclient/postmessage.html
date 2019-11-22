@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <noscript>
+      You need to enable JavaScript to be able to login!
+    </noscript>
+    <script>
+      document.body.onload = function() {
+        var payload = JSON.parse('{{ (payload or {}) | tojson }}');
+        window.opener.postMessage(
+          payload,
+          window.opener.location
+        );
+      };
+    </script>
+  </body>
+</html>

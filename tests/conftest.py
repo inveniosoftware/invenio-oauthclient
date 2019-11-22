@@ -22,19 +22,28 @@ from flask import Flask
 from flask_babelex import Babel
 from flask_mail import Mail
 from flask_menu import Menu as FlaskMenu
-from invenio_accounts import InvenioAccounts
+from invenio_accounts import InvenioAccounts, InvenioAccountsREST
 from invenio_db import InvenioDB, db
 from invenio_userprofiles import InvenioUserProfiles, UserProfile
 from invenio_userprofiles.views import blueprint_ui_init
 from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
 
-from invenio_oauthclient import InvenioOAuthClient
+from invenio_oauthclient import InvenioOAuthClient, InvenioOAuthClientREST
 from invenio_oauthclient.contrib.cern import REMOTE_APP as CERN_REMOTE_APP
+from invenio_oauthclient.contrib.cern import \
+    REMOTE_REST_APP as CERN_REMOTE_REST_APP
 from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
+from invenio_oauthclient.contrib.github import \
+    REMOTE_REST_APP as GITHUB_REMOTE_REST_APP
 from invenio_oauthclient.contrib.globus import REMOTE_APP as GLOBUS_REMOTE_APP
+from invenio_oauthclient.contrib.globus import \
+    REMOTE_REST_APP as GLOBUS_REMOTE_REST_APP
 from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
+from invenio_oauthclient.contrib.orcid import \
+    REMOTE_REST_APP as ORCID_REMOTE_REST_APP
 from invenio_oauthclient.views.client import blueprint as blueprint_client
+from invenio_oauthclient.views.client import rest_blueprint
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 
 from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
@@ -64,6 +73,13 @@ def base_app(request):
             github=GITHUB_REMOTE_APP,
             globus=GLOBUS_REMOTE_APP,
         ),
+        OAUTHCLIENT_REST_REMOTE_APPS=dict(
+            cern=CERN_REMOTE_REST_APP,
+            orcid=ORCID_REMOTE_REST_APP,
+            github=GITHUB_REMOTE_REST_APP,
+            globus=GLOBUS_REMOTE_REST_APP,
+        ),
+        OAUTHCLIENT_STATE_EXPIRES=300,
         GITHUB_APP_CREDENTIALS=dict(
             consumer_key='github_key_changeme',
             consumer_secret='github_secret_changeme',
@@ -102,7 +118,7 @@ def base_app(request):
     with base_app.app_context():
         if str(db.engine.url) != 'sqlite://' and \
            not database_exists(str(db.engine.url)):
-                create_database(str(db.engine.url))
+            create_database(str(db.engine.url))
         db.create_all()
 
     def teardown():
@@ -121,6 +137,9 @@ def base_app(request):
 
 def _init_app(app_):
     """Init OAuth app."""
+    app_.config.update(
+        WTF_CSRF_ENABLED=False,
+    )
     FlaskOAuth(app_)
     InvenioOAuthClient(app_)
     app_.register_blueprint(blueprint_client)
@@ -128,22 +147,44 @@ def _init_app(app_):
     return app_
 
 
+def _init_app_rest(app_):
+    """Init OAuth rest app."""
+    FlaskOAuth(app_)
+    InvenioOAuthClientREST(app_)
+    app_.register_blueprint(rest_blueprint)
+    return app_
+
+
 @pytest.fixture
 def app(base_app):
     """Flask application fixture."""
-    base_app.config.update(
-        WTF_CSRF_ENABLED=False,
-    )
     return _init_app(base_app)
+
+
+@pytest.fixture
+def app_rest(base_app, views_fixture_rest):
+    """Flask application fixture."""
+    return _init_app_rest(base_app)
 
 
 @pytest.fixture
 def app_with_csrf(base_app):
     """Flask application fixture with CSRF enabled."""
-    base_app.config.update(
+    app_ = _init_app(base_app)
+    app_.config.update(
         WTF_CSRF_ENABLED=True,
     )
-    return _init_app(base_app)
+    return app_
+
+
+@pytest.fixture
+def app_rest_with_userprofiles(app_rest):
+    """Configure userprofiles module with CSRF disabled."""
+    app_rest.config.update(
+        USERPROFILES_EXTEND_SECURITY_FORMS=True,
+        WTF_CSRF_ENABLED=False,
+    )
+    return _init_userprofiles(app_rest)
 
 
 def _init_userprofiles(app_):
@@ -174,10 +215,10 @@ def app_with_userprofiles_csrf(app):
 
 
 @pytest.fixture
-def models_fixture(app):
+def models_fixture(base_app):
     """Flask app with example data used to test models."""
-    with app.app_context():
-        datastore = app.extensions['security'].datastore
+    with base_app.app_context():
+        datastore = base_app.extensions['security'].datastore
         datastore.create_user(
             email='existing@inveniosoftware.org',
             password='tester',
@@ -194,7 +235,6 @@ def models_fixture(app):
             active=True
         )
         datastore.commit()
-    return app
 
 
 @pytest.fixture
@@ -230,27 +270,8 @@ def remote():
 
 
 @pytest.fixture
-def views_fixture(base_app, params):
+def views_fixture(base_app, params, models_fixture):
     """Flask application with example data used to test views."""
-    with base_app.app_context():
-        datastore = base_app.extensions['security'].datastore
-        datastore.create_user(
-            email='existing@inveniosoftware.org',
-            password='tester',
-            active=True
-        )
-        datastore.create_user(
-            email='test2@inveniosoftware.org',
-            password='tester',
-            active=True
-        )
-        datastore.create_user(
-            email='test3@inveniosoftware.org',
-            password='tester',
-            active=True
-        )
-        datastore.commit()
-
     base_app.config['OAUTHCLIENT_REMOTE_APPS'].update(
         dict(
             test=dict(
@@ -270,12 +291,42 @@ def views_fixture(base_app, params):
         )
     )
 
-    FlaskOAuth(base_app)
-    InvenioOAuthClient(base_app)
-    base_app.register_blueprint(blueprint_client)
-    base_app.register_blueprint(blueprint_settings)
+    return _init_app(base_app)
 
-    return base_app
+
+@pytest.fixture
+def views_fixture_rest(base_app, params, models_fixture):
+    """Flask application with example data used to test views."""
+    base_app.config['OAUTHCLIENT_REST_REMOTE_APPS'].update(
+        dict(
+            test=dict(
+                authorized_handler=lambda *args, **kwargs: 'TEST',
+                authorized_redirect_url='/',
+                disconnect_redirect_url='/',
+                signup_redirect_url='/',
+                error_redirect_url='/',
+                params=params('testid'),
+                title='MyLinkedTestAccount',
+            ),
+            test_invalid=dict(
+                authorized_handler=lambda *args, **kwargs: 'TEST',
+                authorized_redirect_url='/',
+                disconnect_redirect_url='/',
+                signup_redirect_url='/',
+                error_redirect_url='/',
+                params=params('test_invalidid'),
+                title='Test Invalid',
+            ),
+            full=dict(
+                params=params('fullid'),
+                authorized_redirect_url='/',
+                disconnect_redirect_url='/',
+                signup_redirect_url='/',
+                error_redirect_url='/',
+                title='Full',
+            ),
+        )
+    )
 
 
 @pytest.fixture
@@ -389,6 +440,19 @@ def user(app_with_userprofiles):
     """Create users."""
     with db.session.begin_nested():
         datastore = app_with_userprofiles.extensions['security'].datastore
+        user1 = datastore.create_user(email='info@inveniosoftware.org',
+                                      password='tester', active=True)
+        profile = UserProfile(username='mynick', user=user1)
+        db.session.add(profile)
+    db.session.commit()
+    return user1
+
+
+@pytest.fixture()
+def user_rest(app_rest_with_userprofiles):
+    """Create users."""
+    with db.session.begin_nested():
+        datastore = app_rest_with_userprofiles.extensions['security'].datastore
         user1 = datastore.create_user(email='info@inveniosoftware.org',
                                       password='tester', active=True)
         profile = UserProfile(username='mynick', user=user1)

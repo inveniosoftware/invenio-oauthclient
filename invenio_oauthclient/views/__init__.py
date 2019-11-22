@@ -9,6 +9,7 @@
 """Blueprints for oauthclient."""
 
 from __future__ import absolute_import
+
 from .client import blueprint as client_blueprint
 from .settings import blueprint as settings_blueprint
 

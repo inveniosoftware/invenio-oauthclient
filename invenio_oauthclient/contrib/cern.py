@@ -6,7 +6,10 @@
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Pre-configured remote application for enabling sign in/up with CERN.
+r"""Pre-configured remote application for enabling sign in/up with CERN.
+
+CERN (remote app).
+^^^^^^^^^^^^^^^^^^
 
 1. Edit your configuration and add:
 
@@ -70,19 +73,79 @@ In templates you can add a sign in/up link:
     </a>
 
 For more details you can play with a :doc:`working example <examplesapp>`.
+
+
+CERN (remote REST app)
+^^^^^^^^^^^^^^^^^^^^^^
+
+This configuration is appropriate for e.g. a SPA application which communicates
+with Invenio via REST calls.
+
+1. Edit your configuration and add:
+
+   .. code-block:: python
+
+        import copy
+        from invenio_oauthclient.contrib import cern
+
+        OAUTH_REMOTE_APP = copy.deepcopy(cern.REMOTE_REST_APP)
+
+        # Path where you want your SPA to be redirected after a
+        # successful login.
+        OAUTH_REMOTE_APP["authorized_redirect_url"] = \
+            'https://<my_SPA_site>/login'
+        # Path where you want your SPA to be redirected after a
+        # login error.
+        OAUTH_REMOTE_APP["error_redirect_url"] = 'https://<my_SPA_site>/error'
+        OAUTHCLIENT_REST_REMOTE_APPS = dict(
+            cern=OAUTH_REMOTE_APP,
+        )
+
+2. Register a new application with CERN. When registering the
+   application ensure that the *Redirect URI* points to:
+   ``https://<my_invenio_site>:5000/oauth/authorized/cern/`` (note, CERN does
+   not allow localhost to be used, thus testing on development machines is
+   somewhat complicated by this).
+
+
+3. Grab the *Client ID* and *Client Secret* after registering the application
+   and add them to your instance configuration (``config.py``):
+
+   .. code-block:: python
+
+        CERN_APP_CREDENTIALS = dict(
+            consumer_key='<client_id>',
+            consumer_secret='<secret>',
+        )
+
+4. Now access the login page from your SPA using CERN OAuth:
+
+.. code-block:: javascript
+
+    window.location =
+    "https://<my_invenio_site>:5000/api/oauth/login/cern?next=<my_next_page>";
+
+
+By default the CERN module will try first look if a link already exists
+between a CERN account and a user. If no link is found, the user is asked
+to provide an email address to sign-up.
+
+For more details you can play with a :doc:`working example <examplesapp>`.
 """
 
 import copy
 import re
 from datetime import datetime, timedelta
 
-from flask import Blueprint, current_app, g, redirect, session, url_for
+from flask import Blueprint, current_app, flash, g, redirect, session, url_for
+from flask_babelex import gettext as _
 from flask_login import current_user
 from flask_principal import AnonymousIdentity, RoleNeed, UserNeed, \
     identity_changed, identity_loaded
 from invenio_db import db
 
 from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
+from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.proxies import current_oauthclient
 from invenio_oauthclient.utils import oauth_link_external_id, \
@@ -131,19 +194,10 @@ OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES = [
 ]
 """Cern oauth identityClass values that are allowed to be used."""
 
-REMOTE_APP = dict(
+BASE_APP = dict(
     title='CERN',
     description='Connecting to CERN Organization.',
     icon='',
-    authorized_handler='invenio_oauthclient.handlers'
-                       ':authorized_signup_handler',
-    disconnect_handler='invenio_oauthclient.contrib.cern'
-                       ':disconnect_handler',
-    signup_handler=dict(
-        info='invenio_oauthclient.contrib.cern:account_info',
-        setup='invenio_oauthclient.contrib.cern:account_setup',
-        view='invenio_oauthclient.handlers:signup_handler',
-    ),
     logout_url='https://login.cern.ch/adfs/ls/?wa=wsignout1.0',
     params=dict(
         base_url='https://oauth.web.cern.ch/',
@@ -157,7 +211,42 @@ REMOTE_APP = dict(
                               'show_login': 'true'}
     )
 )
+
+REMOTE_APP = dict(BASE_APP)
+REMOTE_APP.update(dict(
+    authorized_handler='invenio_oauthclient.handlers'
+                       ':authorized_signup_handler',
+    disconnect_handler='invenio_oauthclient.contrib.cern'
+                       ':disconnect_handler',
+    signup_handler=dict(
+        info='invenio_oauthclient.contrib.cern:account_info',
+        setup='invenio_oauthclient.contrib.cern:account_setup',
+        view='invenio_oauthclient.handlers:signup_handler',
+    )
+))
 """CERN Remote Application."""
+
+REMOTE_REST_APP = dict(BASE_APP)
+REMOTE_REST_APP.update(dict(
+    authorized_handler='invenio_oauthclient.handlers.rest'
+                       ':authorized_signup_handler',
+    disconnect_handler='invenio_oauthclient.contrib.cern'
+                       ':disconnect_rest_handler',
+    signup_handler=dict(
+        info='invenio_oauthclient.contrib.cern:account_info_rest',
+        setup='invenio_oauthclient.contrib.cern:account_setup',
+        view='invenio_oauthclient.handlers.rest:signup_handler',
+    ),
+    response_handler=(
+        'invenio_oauthclient.handlers.rest:default_remote_response_handler'
+    ),
+    authorized_redirect_url='/',
+    disconnect_redirect_url='/',
+    signup_redirect_url='/',
+    error_redirect_url='/'
+))
+"""CERN Remote REST Application."""
+
 
 REMOTE_SANDBOX_APP = copy.deepcopy(REMOTE_APP)
 """CERN Sandbox Remote Application."""
@@ -297,7 +386,7 @@ def get_resource(remote):
     return dict_response
 
 
-def account_info(remote, resp):
+def _account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
     resource = get_resource(remote)
 
@@ -327,7 +416,34 @@ def account_info(remote, resp):
     )
 
 
-def disconnect_handler(remote, *args, **kwargs):
+def account_info(remote, resp):
+    """Retrieve remote account information used to find local user."""
+    try:
+        return _account_info(remote, resp)
+    except OAuthCERNRejectedAccountError as e:
+        current_app.logger.warning(e.message, exc_info=True)
+        flash(_('CERN account not allowed.'), category='danger')
+        return redirect('/')
+
+
+def account_info_rest(remote, resp):
+    """Retrieve remote account information used to find local user."""
+    try:
+        return _account_info(remote, resp)
+    except OAuthCERNRejectedAccountError as e:
+        current_app.logger.warning(e.message, exc_info=True)
+        remote_app_config = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
+            remote.name]
+        return response_handler(
+            remote,
+            remote_app_config['error_redirect_url'],
+            payload=dict(
+                message='CERN account not allowed.',
+                code=400)
+        )
+
+
+def _disconnect(remote, *args, **kwargs):
     """Handle unlinking of remote account."""
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
@@ -344,7 +460,19 @@ def disconnect_handler(remote, *args, **kwargs):
 
     disconnect_identity(g.identity)
 
+
+def disconnect_handler(remote, *args, **kwargs):
+    """Handle unlinking of remote account."""
+    _disconnect(remote, *args, **kwargs)
     return redirect(url_for('invenio_oauthclient_settings.index'))
+
+
+def disconnect_rest_handler(remote, *args, **kwargs):
+    """Handle unlinking of remote account."""
+    _disconnect(remote, *args, **kwargs)
+    redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
+        remote.name]['disconnect_redirect_url']
+    return response_handler(remote, redirect_url)
 
 
 def account_setup(remote, token, resp):

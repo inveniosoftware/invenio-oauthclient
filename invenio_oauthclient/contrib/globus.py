@@ -50,24 +50,15 @@ from flask_login import current_user
 from invenio_db import db
 
 from invenio_oauthclient.errors import OAuthResponseError
+from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.utils import oauth_link_external_id, \
     oauth_unlink_external_id
 
-
-REMOTE_APP = dict(
+BASE_APP = dict(
     title='Globus',
     description='Research data management simplified.',
     icon='',
-    authorized_handler='invenio_oauthclient.handlers'
-                       ':authorized_signup_handler',
-    disconnect_handler='invenio_oauthclient.contrib.globus'
-                       ':disconnect_handler',
-    signup_handler=dict(
-        info='invenio_oauthclient.contrib.globus:account_info',
-        setup='invenio_oauthclient.contrib.globus:account_setup',
-        view='invenio_oauthclient.handlers:signup_handler',
-    ),
     params=dict(
         request_token_params={'scope': 'openid email profile'},
         base_url='https://auth.globus.org/',
@@ -78,7 +69,42 @@ REMOTE_APP = dict(
         app_key='GLOBUS_APP_CREDENTIALS',
     )
 )
+
+REMOTE_APP = dict(BASE_APP)
+REMOTE_APP.update(dict(
+    authorized_handler='invenio_oauthclient.handlers'
+                       ':authorized_signup_handler',
+    disconnect_handler='invenio_oauthclient.contrib.globus'
+                       ':disconnect_handler',
+    signup_handler=dict(
+        info='invenio_oauthclient.contrib.globus:account_info',
+        setup='invenio_oauthclient.contrib.globus:account_setup',
+        view='invenio_oauthclient.handlers:signup_handler',
+    )
+))
 """Globus remote application configuration."""
+
+REMOTE_REST_APP = dict(BASE_APP)
+REMOTE_REST_APP.update(dict(
+    authorized_handler='invenio_oauthclient.handlers.rest'
+                       ':authorized_signup_handler',
+    disconnect_handler='invenio_oauthclient.contrib.globus'
+                       ':disconnect_rest_handler',
+    signup_handler=dict(
+        info='invenio_oauthclient.contrib.globus:account_info',
+        setup='invenio_oauthclient.contrib.globus:account_setup',
+        view='invenio_oauthclient.handlers.rest:signup_handler',
+    ),
+    response_handler=(
+        'invenio_oauthclient.handlers.rest:default_remote_response_handler'
+    ),
+    authorized_redirect_url='/',
+    disconnect_redirect_url='/',
+    signup_redirect_url='/',
+    error_redirect_url='/'
+))
+"""Globus remote rest application configuration."""
+
 
 GLOBUS_USER_INFO_URL = 'https://auth.globus.org/v2/oauth2/userinfo'
 GLOBUS_USER_ID_URL = 'https://auth.globus.org/v2/api/identities'
@@ -192,7 +218,7 @@ def account_setup(remote, token, resp):
         )
 
 
-def disconnect_handler(remote, *args, **kwargs):
+def _disconnect(remote, *args, **kwargs):
     """Handle unlinking of remote account.
 
     :param remote: The remote application.
@@ -214,4 +240,24 @@ def disconnect_handler(remote, *args, **kwargs):
         with db.session.begin_nested():
             remote_account.delete()
 
+
+def disconnect_handler(remote, *args, **kwargs):
+    """Handle unlinking of remote account.
+
+    :param remote: The remote application.
+    :returns: The HTML response.
+    """
+    _disconnect(remote, *args, **kwargs)
     return redirect(url_for('invenio_oauthclient_settings.index'))
+
+
+def disconnect_rest_handler(remote, *args, **kwargs):
+    """Handle unlinking of remote account.
+
+    :param remote: The remote application.
+    :returns: The HTML response.
+    """
+    _disconnect(remote, *args, **kwargs)
+    redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
+        remote.name]['disconnect_redirect_url']
+    return response_handler(remote, redirect_url)

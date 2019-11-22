@@ -15,9 +15,8 @@ from invenio_db import db
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
 
 
-def test_get_create_remote_account(models_fixture):
+def test_get_create_remote_account(app, models_fixture):
     """Test create remote account."""
-    app = models_fixture
     created_acc = RemoteAccount.create(1, 'dev', dict(somekey='somevalue'))
     assert created_acc
 
@@ -29,9 +28,8 @@ def test_get_create_remote_account(models_fixture):
     assert RemoteAccount.get(1, 'dev') is None
 
 
-def test_get_create_remote_token(models_fixture):
+def test_get_create_remote_token(app, models_fixture):
     """Test create remote token."""
-    app = models_fixture
     existing_email = 'existing@inveniosoftware.org'
     datastore = app.extensions['invenio-accounts'].datastore
     user = datastore.find_user(email=existing_email)
@@ -61,9 +59,8 @@ def test_get_create_remote_token(models_fixture):
     assert RemoteToken.query.count() == 0
 
 
-def test_get_regression(models_fixture):
+def test_get_regression(app, models_fixture):
     """Test regression."""
-    app = models_fixture
     datastore = app.extensions['invenio-accounts'].datastore
 
     email2 = 'test2@inveniosoftware.org'
@@ -81,9 +78,9 @@ def test_get_regression(models_fixture):
         t4.remote_account.user_id
 
 
-def test_repr(models_fixture):
+def test_repr(app, models_fixture):
     """Test representation of RemoteAccount and RemoteToken."""
-    datastore = models_fixture.extensions['invenio-accounts'].datastore
+    datastore = app.extensions['invenio-accounts'].datastore
     user = datastore.find_user(email='existing@inveniosoftware.org')
 
     assert 'Remote Token <token_type=type access_token=****oken>' == \

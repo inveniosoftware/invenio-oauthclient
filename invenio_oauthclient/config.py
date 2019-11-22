@@ -74,6 +74,44 @@ keys:
         )
     )
 
+Remote REST application
+^^^^^^^^^^^^^^^^^^^^^^^
+Configuration of a single remote REST application is a dictionary with the
+same keys as Remote application in addition to:
+
+- ``response_handler`` - Import path to response callback handler.
+- ``authorized_redirect_url`` - URL path to redirect your SPA when login was
+  successfull.
+- ``disconnect_redirect_url`` - URL path to redirect your SPA after logging
+  out.
+- ``signup_redirect_url`` - URL path to redirect your SPA to sign up a user.
+- ``error_redirect_url`` - URL path to redirect your SPA when an error ocurred.
+
+
+.. code-block:: python
+
+    OAUTHCLIENT_REMOTE_APPS = dict(
+        myapp=dict(
+            title='...',
+            description='...',
+            icon='...',
+            authorized_handler="...",
+            disconnect_handler="...",
+            signup_handler=dict(
+                info="...",
+                setup="...",
+                view="...",
+            ),
+            response_handler=("..."),
+            authorized_redirect_url="...",
+            disconnect_redirect_url="...",
+            signup_redirect_url="...",
+            error_redirect_url="...",
+            params=dict(...),
+            )
+        )
+    )
+
 
 Flask-OAuthlib parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -211,3 +249,12 @@ OAUTHCLIENT_STATE_ENABLED = True
 
 OAUTHCLIENT_SIGNUP_TEMPLATE = 'invenio_oauthclient/signup.html'
 """Template for the signup page."""
+
+OAUTHCLIENT_REST_REMOTE_APPS = {}
+"""Configuration of remote rest applications."""
+
+OAUTHCLIENT_REST_DEFAULT_ERROR_REDIRECT_URL = '/'
+"""Configuration of default error redirect URL."""
+
+OAUTHCLIENT_REST_DEFAULT_RESPONSE_HANDLER = None
+"""Default REST response handler."""
