@@ -6,31 +6,32 @@
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Test case for CERN oauth remote app."""
+"""Test case for CERN oauth remote app_rest."""
 
 from __future__ import absolute_import
 
 import pytest
 from flask import g, session, url_for
 from flask_security import login_user
-from helpers import get_state, mock_remote_get, mock_response
+from helpers import check_response_redirect_url_args, get_state, \
+    mock_remote_get, mock_response
 from six.moves.urllib_parse import parse_qs, urlparse
 
-from invenio_oauthclient.contrib.cern import account_info, \
-    disconnect_handler, fetch_extra_data, fetch_groups, \
+from invenio_oauthclient.contrib.cern import account_info_rest, \
+    disconnect_rest_handler, fetch_extra_data, fetch_groups, \
     get_dict_from_response
 from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
 
 
-def test_fetch_groups(app, example_cern):
+def test_fetch_groups(app_rest, example_cern):
     """Test group extraction."""
     example_response, example_token, _ = example_cern
     res = get_dict_from_response(example_response)
 
     # Override hidden group configuration
     import re
-    app.config['OAUTHCLIENT_CERN_HIDDEN_GROUPS'] = ('hidden_group',)
-    app.config['OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE'] = (
+    app_rest.config['OAUTHCLIENT_CERN_HIDDEN_GROUPS'] = ('hidden_group',)
+    app_rest.config['OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE'] = (
         re.compile(r'Group[1-3]'),
     )
 
@@ -40,7 +41,7 @@ def test_fetch_groups(app, example_cern):
                for group in ('Group{}'.format(i) for i in range(4, 6)))
 
 
-def test_fetch_extra_data(app, example_cern):
+def test_fetch_extra_data(app_rest, example_cern):
     """Test extra data extraction."""
     example_response, example_token, _ = example_cern
     res = get_dict_from_response(example_response)
@@ -56,7 +57,7 @@ def test_fetch_extra_data(app, example_cern):
     assert extra_data['department'] == "IT/CDA"
 
 
-def test_fetch_extra_data_fields_missing(app, example_cern):
+def test_fetch_extra_data_fields_missing(app_rest, example_cern):
     """Test extra data extraction when fields are missing."""
     example_response, example_token, _ = example_cern
     res = get_dict_from_response(example_response)
@@ -76,22 +77,22 @@ def test_fetch_extra_data_fields_missing(app, example_cern):
     assert extra_data['department'] is None
 
 
-def test_account_info(app, example_cern):
+def test_account_info(app_rest, example_cern):
     """Test account info extraction."""
-    client = app.test_client()
-    ioc = app.extensions['oauthlib.client']
+    client = app_rest.test_client()
+    ioc = app_rest.extensions['oauthlib.client']
 
     # Ensure remote apps have been loaded (due to before first request)
-    client.get(url_for('invenio_oauthclient.login', remote_app='cern'))
+    client.get(url_for('invenio_oauthclient.rest_login', remote_app='cern'))
 
     example_response, _, example_account_info = example_cern
 
     mock_remote_get(ioc, 'cern', example_response)
 
-    assert account_info(
+    assert account_info_rest(
         ioc.remote_apps['cern'], None) == example_account_info
 
-    assert account_info(ioc.remote_apps['cern'], {}) == \
+    assert account_info_rest(ioc.remote_apps['cern'], {}) == \
         dict(
             user=dict(
                 email='test.account@cern.ch',
@@ -104,49 +105,53 @@ def test_account_info(app, example_cern):
         )
 
 
-def test_account_setup(app, example_cern, models_fixture):
+def test_account_setup(app_rest, example_cern, models_fixture):
     """Test account setup after login."""
-    with app.test_client() as c:
-        ioc = app.extensions['oauthlib.client']
+    with app_rest.test_client() as c:
+        ioc = app_rest.extensions['oauthlib.client']
 
         # Ensure remote apps have been loaded (due to before first request)
-        resp = c.get(url_for('invenio_oauthclient.login', remote_app='cern'))
+        resp = c.get(url_for(
+            'invenio_oauthclient.rest_login', remote_app='cern'))
         assert resp.status_code == 302
 
         example_response, example_token, example_account_info = example_cern
 
-        mock_response(app.extensions['oauthlib.client'], 'cern',
+        mock_response(app_rest.extensions['oauthlib.client'], 'cern',
                       example_token)
         mock_remote_get(ioc, 'cern', example_response)
 
         resp = c.get(url_for(
-            'invenio_oauthclient.authorized',
+            'invenio_oauthclient.rest_authorized',
             remote_app='cern', code='test',
             state=get_state('cern')))
         assert resp.status_code == 302
-        assert resp.location == ('http://localhost/account/settings/'
-                                 'linkedaccounts/')
+        expected_url_args = {
+            "message": "Successfully authorized.",
+            "code": 200,
+        }
+        check_response_redirect_url_args(resp, expected_url_args)
         assert len(g.identity.provides) == 7
 
-    datastore = app.extensions['invenio-accounts'].datastore
+    datastore = app_rest.extensions['invenio-accounts'].datastore
     user = datastore.find_user(email='test.account@cern.ch')
     assert user
 
-    with app.test_request_context():
-        resp = disconnect_handler(ioc.remote_apps['cern'])
+    with app_rest.test_request_context():
+        resp = disconnect_rest_handler(ioc.remote_apps['cern'])
         assert resp.status_code >= 300
 
         login_user(user)
         assert len(g.identity.provides) == 7
-        disconnect_handler(ioc.remote_apps['cern'])
+        disconnect_rest_handler(ioc.remote_apps['cern'])
 
 
-def test_login(app):
+def test_login(app_rest):
     """Test CERN login."""
-    client = app.test_client()
+    client = app_rest.test_client()
 
     resp = client.get(
-        url_for('invenio_oauthclient.login', remote_app='cern',
+        url_for('invenio_oauthclient.rest_login', remote_app='cern',
                 next='/someurl/')
     )
     assert resp.status_code == 302
@@ -159,38 +164,43 @@ def test_login(app):
     assert params['state']
 
 
-def test_authorized_reject(app):
+def test_authorized_reject(app_rest):
     """Test a rejected request."""
-    with app.test_client() as c:
-        c.get(url_for('invenio_oauthclient.login', remote_app='cern'))
+    with app_rest.test_client() as c:
+        c.get(url_for('invenio_oauthclient.rest_login', remote_app='cern'))
         resp = c.get(
-            url_for('invenio_oauthclient.authorized',
+            url_for('invenio_oauthclient.rest_authorized',
                     remote_app='cern', error='access_denied',
                     error_description='User denied access',
                     state=get_state('cern')))
         assert resp.status_code in (301, 302)
-        assert resp.location == 'http://localhost/'
-        # Check message flash
-        assert session['_flashes'][0][0] == 'info'
+        expected_url_args = {
+            "message": "You rejected the authentication request.",
+            "code": 400,
+        }
+        check_response_redirect_url_args(resp, expected_url_args)
 
 
-def test_account_info_not_allowed_account(app, example_cern):
+def test_account_info_not_allowed_account(app_rest, example_cern):
     """Test account info extraction."""
-    client = app.test_client()
+    client = app_rest.test_client()
 
-    app.config['OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES'] = [
+    app_rest.config['OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES'] = [
         'another cern type'
     ]
-    ioc = app.extensions['oauthlib.client']
+    ioc = app_rest.extensions['oauthlib.client']
 
     # Ensure remote apps have been loaded (due to before first request)
-    client.get(url_for('invenio_oauthclient.login', remote_app='cern'))
+    client.get(url_for('invenio_oauthclient.rest_login', remote_app='cern'))
 
     example_response, _, example_account_info = example_cern
 
     mock_remote_get(ioc, 'cern', example_response)
 
-    resp = account_info(ioc.remote_apps['cern'], None)
+    resp = account_info_rest(ioc.remote_apps['cern'], None)
     assert resp.status_code == 302
-    assert session['_flashes'][0][0] == 'danger'
-    assert session['_flashes'][0][1] == 'CERN account not allowed.'
+    expected_url_args = {
+        "message": "CERN account not allowed.",
+        "code": 400,
+    }
+    check_response_redirect_url_args(resp, expected_url_args)

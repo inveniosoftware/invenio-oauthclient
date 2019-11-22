@@ -26,9 +26,8 @@ from invenio_oauthclient.utils import _get_external_id, \
     rebuild_access_tokens
 
 
-def test_utilities(models_fixture):
+def test_utilities(app, models_fixture):
     """Test utilities."""
-    app = models_fixture
     datastore = app.extensions['invenio-accounts'].datastore
     assert obj_or_import_string('invenio_oauthclient.errors')
 
@@ -78,9 +77,8 @@ def test_utilities(models_fixture):
     acc.delete()
 
 
-def test_rebuilding_access_tokens(models_fixture):
+def test_rebuilding_access_tokens(app, models_fixture):
     """Test rebuilding access tokens with random new SECRET_KEY."""
-    app = models_fixture
     old_secret_key = app.secret_key
 
     datastore = app.extensions['invenio-accounts'].datastore
@@ -128,7 +126,6 @@ def test_app_registrationform_has_csrf(app_with_csrf, form_test_data):
     """App with CSRF enabled, test if registration form has it."""
     filled_form = _fill_form(app_with_csrf, create_registrationform,
                              form_test_data)
-
     assert 'profile' not in filled_form
     _assert_csrf_token(filled_form)
 

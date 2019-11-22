@@ -8,9 +8,10 @@
 
 """Add Timestamp to oauthclient tables."""
 
-from alembic import op
 from datetime import datetime
+
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.sql import text
 
 # revision identifiers, used by Alembic.

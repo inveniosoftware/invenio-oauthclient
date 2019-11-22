@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import, print_function
 
-from .ext import InvenioOAuthClient
+from .ext import InvenioOAuthClient, InvenioOAuthClientREST
 from .proxies import current_oauthclient
 from .version import __version__
 
@@ -18,4 +18,5 @@ __all__ = (
     '__version__',
     'current_oauthclient',
     'InvenioOAuthClient',
+    'InvenioOAuthClientREST'
 )

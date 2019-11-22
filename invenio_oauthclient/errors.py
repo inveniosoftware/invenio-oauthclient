@@ -75,3 +75,35 @@ class OAuthClientError(OAuthResponseError):
 
 class OAuthCERNRejectedAccountError(OAuthResponseError):
     """Define exception for not allowed cern accounts."""
+
+
+class OAuthClientUnAuthorized(Exception):
+    """Define exception for unauthorized user."""
+
+
+class OAuthClientAlreadyAuthorized(Exception):
+    """Define exception for user already authorized."""
+
+
+class OAuthClientTokenNotFound(Exception):
+    """Define exception for oauth token not found."""
+
+
+class OAuthClientUserNotRegistered(Exception):
+    """Define exception of user not registered."""
+
+
+class OAuthClientTokenNotSet(Exception):
+    """Define exception for oauth token not set."""
+
+
+class OAuthClientMustRedirectSignup(Exception):
+    """Define exception for forcing redirection to signup view."""
+
+
+class OAuthClientMustRedirectLogin(Exception):
+    """Define exception for forcing redirection to login view."""
+
+
+class OAuthRemoteNotFound(Exception):
+    """Define exception for remote app not found."""

@@ -14,10 +14,11 @@ import six
 from flask import after_this_request, current_app, request
 from flask_security import login_user, logout_user
 from flask_security.confirmable import requires_confirmation
-from flask_security.registerable import register_user
 from invenio_accounts.models import User
+from invenio_accounts.utils import register_user
 from invenio_db import db
 from invenio_db.utils import rebuild_encrypted_properties
+from itsdangerous import BadData, TimedJSONWebSignatureSerializer
 from sqlalchemy.exc import IntegrityError
 from uritools import uricompose, urisplit
 from werkzeug.local import LocalProxy
@@ -30,6 +31,14 @@ from .models import RemoteAccount, RemoteToken, UserIdentity
 _security = LocalProxy(lambda: current_app.extensions['security'])
 
 _datastore = LocalProxy(lambda: _security.datastore)
+
+
+serializer = LocalProxy(
+    lambda: TimedJSONWebSignatureSerializer(
+        current_app.config['SECRET_KEY'],
+        expires_in=current_app.config['OAUTHCLIENT_STATE_EXPIRES'],
+    )
+)
 
 
 def _commit(response=None):
@@ -105,11 +114,7 @@ def oauth_register(form):
     """
     if form.validate():
         data = form.to_dict()
-        if not data.get('password'):
-            data['password'] = ''
         user = register_user(**data)
-        if not data['password']:
-            user.password = None
         _datastore.commit()
         return user
 
@@ -150,10 +155,10 @@ def get_safe_redirect_target(arg='next'):
     :param arg: URL argument.
     :returns: The redirect target or ``None``.
     """
+    allowed_hosts = current_app.config.get('APP_ALLOWED_HOSTS') or []
     for target in request.args.get(arg), request.referrer:
         if target:
             redirect_uri = urisplit(target)
-            allowed_hosts = current_app.config.get('APP_ALLOWED_HOSTS', [])
             if redirect_uri.host in allowed_hosts:
                 return target
             elif redirect_uri.path:
