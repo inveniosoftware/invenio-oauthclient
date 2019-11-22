@@ -17,10 +17,13 @@ from invenio_db import db
 from itsdangerous import BadData
 from werkzeug.local import LocalProxy
 
-from .._compat import _create_identifier
-from ..handlers import set_session_next_url
-from ..proxies import current_oauthclient
-from ..utils import get_safe_redirect_target, serializer
+from invenio_oauthclient._compat import _create_identifier
+from invenio_oauthclient.handlers import set_session_next_url
+from invenio_oauthclient.handlers.rest import response_handler
+from invenio_oauthclient.proxies import current_oauthclient
+from invenio_oauthclient.utils import get_safe_redirect_target
+
+from ..utils import serializer
 
 blueprint = Blueprint(
     'invenio_oauthclient',
@@ -31,35 +34,21 @@ blueprint = Blueprint(
 )
 
 
-@blueprint.record_once
-def post_ext_init(state):
-    """Setup blueprint."""
-    app = state.app
-
-    app.config.setdefault(
-        'OAUTHCLIENT_SITENAME',
-        app.config.get('THEME_SITENAME', 'Invenio'))
-    app.config.setdefault(
-        'OAUTHCLIENT_BASE_TEMPLATE',
-        app.config.get('BASE_TEMPLATE',
-                       'invenio_oauthclient/base.html'))
-    app.config.setdefault(
-        'OAUTHCLIENT_COVER_TEMPLATE',
-        app.config.get('COVER_TEMPLATE',
-                       'invenio_oauthclient/base_cover.html'))
-    app.config.setdefault(
-        'OAUTHCLIENT_SETTINGS_TEMPLATE',
-        app.config.get('SETTINGS_TEMPLATE',
-                       'invenio_oauthclient/settings/base.html'))
-
-
 @blueprint.route('/login/<remote_app>/')
 def login(remote_app):
     """Send user to remote application for authentication."""
     oauth = current_app.extensions['oauthlib.client']
+    remote_app_config = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
+        remote_app]
 
     if remote_app not in oauth.remote_apps:
-        return abort(404)
+        return response_handler(
+            remote_app,
+            remote_app_config['error_redirect_url'],
+            payload=dict(
+                message="Remote {} not found.".format(remote_app),
+                code=404
+            ))
 
     # Get redirect target in safe manner.
     next_param = get_safe_redirect_target(arg='next')
@@ -88,8 +77,17 @@ def login(remote_app):
 @blueprint.route('/authorized/<remote_app>/')
 def authorized(remote_app=None):
     """Authorized handler callback."""
+    remote_app_config = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
+        remote_app]
     if remote_app not in current_oauthclient.handlers:
-        return abort(404)
+        return response_handler(
+            remote_app,
+            remote_app_config['error_redirect_url'],
+            payload=dict(
+                message="Handler for remote {} not found.".format(remote_app),
+                code=404
+            )
+        )
 
     state_token = request.args.get('state')
 
@@ -107,26 +105,44 @@ def authorized(remote_app=None):
     except (AssertionError, BadData):
         if current_app.config.get('OAUTHCLIENT_STATE_ENABLED', True) or (
            not(current_app.debug or current_app.testing)):
-            abort(403)
+            return response_handler(
+                remote_app,
+                remote_app_config['error_redirect_url'],
+                payload=dict(
+                    message="Invalid state.",
+                    code=403
+                )
+            )
 
     try:
         handler = current_oauthclient.handlers[remote_app]()
     except OAuthException as e:
-        if e.type == 'invalid_response':
-            abort(500)
-        else:
-            raise
-
+        return response_handler(
+            remote_app,
+            remote_app_config['error_redirect_url'],
+            payload=dict(
+                message="Invalid response.",
+                code=500
+            )
+        )
     return handler
 
 
 @blueprint.route('/signup/<remote_app>/', methods=['GET', 'POST'])
 def signup(remote_app):
     """Extra signup step."""
+    remote_app_config = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
+        remote_app]
     if remote_app not in current_oauthclient.signup_handlers:
-        return abort(404)
-    res = current_oauthclient.signup_handlers[remote_app]['view']()
-    return abort(404) if res is None else res
+        return response_handler(
+            remote_app,
+            remote_app_config['error_redirect_url'],
+            payload=dict(
+                message="Remote {} not found.".format(remote_app),
+                code=404
+            )
+        )
+    return current_oauthclient.signup_handlers[remote_app]['view']()
 
 
 @blueprint.route('/disconnect/<remote_app>/')
@@ -135,8 +151,17 @@ def disconnect(remote_app):
 
     Removes application as well as associated information.
     """
+    remote_app_config = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
+        remote_app]
     if remote_app not in current_oauthclient.disconnect_handlers:
-        return abort(404)
+        return response_handler(
+            remote_app,
+            remote_app_config['error_redirect_url'],
+            payload=dict(
+                message="Handler for remote {} not found.".format(remote_app),
+                code=404
+            )
+        )
 
     ret = current_oauthclient.disconnect_handlers[remote_app]()
     db.session.commit()
