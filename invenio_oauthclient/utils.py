@@ -174,10 +174,17 @@ def get_safe_redirect_target(arg='next'):
     :param arg: URL argument.
     :returns: The redirect target or ``None``.
     """
+    allowed_hosts = current_app.config.get('APP_ALLOWED_HOSTS')
+    # don't do the check if APP_ALLOWED_HOSTS is ``None``` to be aligned with
+    # invenio-app default.
+    # https://github.com/inveniosoftware/invenio-app/blob/9003a5942c5e2f80485de4dcedd7f589d44e8827/invenio_app/config.py#L156
+    if allowed_hosts is None:
+        return
     for target in request.args.get(arg), request.referrer:
         if target:
             redirect_uri = urisplit(target)
-            allowed_hosts = current_app.config.get('APP_ALLOWED_HOSTS', [])
+            if allowed_hosts is None:
+                return
             if redirect_uri.host in allowed_hosts:
                 return target
             elif redirect_uri.path:
