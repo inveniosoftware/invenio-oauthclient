@@ -168,7 +168,7 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
 
         if user is None:
             # Auto sign-up if user not found
-            current_app.logger.error(account_info['user'])
+            current_app.logger.info(account_info['user'])
             user = rest_oauth_register(account_info['user'])
             # if registration fails ...
             if user is None:
