@@ -10,7 +10,21 @@
 
 from __future__ import absolute_import, print_function
 
+import werkzeug
+
 try:
     from flask_login.utils import _create_identifier
 except ImportError:
     from flask_login import _create_identifier
+
+
+def monkey_patch_werkzeug():
+    """Patch top level removed modules."""
+    try:
+        from werkzeug import cached_property
+    except ImportError:
+        werkzeug.cached_property = werkzeug.utils.cached_property
+        werkzeug.parse_options_header = werkzeug.http.parse_options_header
+        werkzeug.url_quote = werkzeug.urls.url_quote
+        werkzeug.url_decode = werkzeug.urls.url_decode
+        werkzeug.url_encode = werkzeug.urls.url_encode

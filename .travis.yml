@@ -12,16 +12,12 @@ addons:
 notifications:
   email: false
 
-sudo: false
-
 services:
   - mysql
   - postgresql
   - redis
 
 language: python
-
-dist: xenial
 
 cache:
   - pip
@@ -38,8 +34,8 @@ env:
   - REQUIREMENTS=devel EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio"
 
 python:
-  - "2.7"
-  - "3.5"
+  - "3.6"
+  - "3.7"
 
 matrix:
   fast_finish: true
@@ -49,6 +45,7 @@ matrix:
     - env: REQUIREMENTS=devel EXTRAS=all,postgresql SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/invenio"
 
 before_install:
+  - "pip uninstall -y six"
   - "travis_retry pip install --upgrade pip setuptools py"
   - "travis_retry pip install twine wheel coveralls requirements-builder"
   - "requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt"
@@ -60,6 +57,7 @@ before_install:
 install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
   - "travis_retry pip install -e .[${EXTRAS}]"
+  - "pip freeze"
 
 script:
   - "./run-tests.sh"
@@ -73,7 +71,8 @@ deploy:
   password:
     secure: "Fbqa+pT8riuZhDCOzZ79SBz/YFFIcFUmgAdfbZLfIxbYnf59UuF+21dMMsUlbwUiUbY2qm9EgQQDwVGRGVyFNuEebCvXjbhUH0fN41AQR+k/Voh9dp9QDh4qkmq9P3V7yI3rnerEJnxq91xRisZAXvfTyaLF0bn3AHoDp91SpjdTD1jO1WDZuVr8zOUH5l2PNY2uVbVwwHzi0hh1OEvkUxhR61nhgrn61qDNzzaGPkE3tz9O3v/hfOoKxGaT8HUUOkLEYMa9iHTL3LnmKfz5fUSJ/wMIEhHmLQasyolDwOnseL9Jb8ST0mVVA5JPzEfL/D/kaDKmuAhsvtbKKTBNC6LKoi0Acv1xviC7gGVl9HGqUtqrKurcUe0mgPfNLJdRDO6v+tofC1ielEazRwfs7qJOf4IVYY+LgU7GcT+2LZcW0ClwklSFmYyjH1NUIeoYNbw/FGZ/UjKItY59wdr9PJ3q18+GY0GlyNASI9tEXS3jQFfJkr65Xp6YBnVFpLRsq2RtxnRJP37hksm4QbFviLvHBp4DtQ0Pf56f2ubD8Z3nIfdejmU4ipy3i6nNXsIZ3ivTo1RvAWkhIxPQorAcY6aweurKXjDJBGJLSr8GIPykDLi/zCkFjMIIWyL4gg7kYAGfBtu0d3dbbbK+Vb/HKNC84uj5yV2KLRSkVSgFW2E="
   distributions: "compile_catalog sdist bdist_wheel"
+  skip_existing: true
   on:
     tags: true
-    python: "2.7"
+    python: "3.6"
     condition: $DEPLOY = true
