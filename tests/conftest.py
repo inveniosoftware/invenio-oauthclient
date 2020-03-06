@@ -17,12 +17,11 @@ import shutil
 import tempfile
 
 import pytest
+import werkzeug
 from flask import Flask
 from flask_babelex import Babel
 from flask_mail import Mail
 from flask_menu import Menu as FlaskMenu
-from flask_oauthlib.client import OAuth as FlaskOAuth
-from flask_oauthlib.client import OAuthResponse
 from invenio_accounts import InvenioAccounts
 from invenio_db import InvenioDB, db
 from invenio_userprofiles import InvenioUserProfiles, UserProfile
@@ -37,6 +36,16 @@ from invenio_oauthclient.contrib.globus import REMOTE_APP as GLOBUS_REMOTE_APP
 from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
+
+from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
+
+try:
+    from werkzeug.middleware.dispatcher import DispatcherMiddleware
+except ImportError:
+    from werkzeug.wsgi import DispatcherMiddleware
+
+from flask_oauthlib.client import OAuth as FlaskOAuth  # noqa isort:skip
+from flask_oauthlib.client import OAuthResponse  # noqa isort:skip
 
 
 @pytest.fixture

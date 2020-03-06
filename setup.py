@@ -20,7 +20,6 @@ tests_require = [
     'check-manifest>=0.25',
     'coverage>=4.0',
     'httpretty>=0.8.14',
-    'invenio-accounts>=1.0.0',
     'invenio-userprofiles>=1.0.0',
     'isort>=4.2.2',
     'mock>=1.3.0',
@@ -67,16 +66,17 @@ setup_requires = [
 ]
 
 install_requires = [
-    'Flask-BabelEx>=0.9.3',
     'Flask-Breadcrumbs>=0.3.0',
     'requests-oauthlib>=0.5.0,<1.2.0',
     'oauthlib>=1.1.2,<3.0.0',
     'Flask-OAuthlib>=0.9.3',
-    'Flask>=0.11.1',
     'blinker>=1.4',
     'invenio-accounts>=1.0.0',
+    'invenio-base>=1.2.2',
+    'invenio-i18n>=1.2.0',
     'invenio-mail>=1.0.0',
-    'six>=1.9',
+    # pinned due to flask-aout
+    'requests-oauthlib>=0.6.2,<1.2.0',
     'sqlalchemy-utils>=0.32.0',
     'uritools>=1.0.1',
 ]

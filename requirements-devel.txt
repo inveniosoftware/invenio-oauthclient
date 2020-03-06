@@ -10,4 +10,5 @@
 -e git+git://github.com/inveniosoftware/invenio-db.git#egg=invenio-db
 -e git+git://github.com/inveniosoftware/invenio-mail.git#egg=invenio-mail
 -e git+git://github.com/inveniosoftware/invenio-userprofiles.git#egg=invenio-userprofiles
+-e git+https://github.com/inveniosoftware/invenio-base.git#egg=invenio-base
 # -e git+git://github.com/inveniosoftware/invenio-upgrader.git#egg=invenio-upgrader

@@ -78,7 +78,6 @@ from flask import Flask, redirect, url_for
 from flask_babelex import Babel
 from flask_login import current_user
 from flask_menu import Menu as FlaskMenu
-from flask_oauthlib.client import OAuth as FlaskOAuth
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_user
 from invenio_db import InvenioDB
@@ -91,6 +90,11 @@ from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib import github
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
+
+from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
+monkey_patch_werkzeug()  # noqa isort:skip
+
+from flask_oauthlib.client import OAuth as FlaskOAuth  # noqa isort:skip
 
 # [ Configure application credentials ]
 GITHUB_APP_CREDENTIALS = dict(
@@ -116,6 +120,7 @@ app.config.update(
     MAIL_SUPPRESS_SEND=True,
     TESTING=True,
     USERPROFILES_EXTEND_SECURITY_FORMS=True,
+    SQLALCHEMY_TRACK_MODIFICATIONS=False,
 )
 
 Babel(app)

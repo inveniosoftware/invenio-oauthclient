@@ -39,7 +39,6 @@ import os
 from flask import Flask
 from flask_babelex import Babel
 from flask_menu import Menu
-from flask_oauthlib.client import OAuth as FlaskOAuth
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_accounts
 from invenio_admin import InvenioAdmin
@@ -48,6 +47,11 @@ from invenio_db import InvenioDB
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
+
+from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
+monkey_patch_werkzeug()  # noqa isort:skip
+
+from flask_oauthlib.client import OAuth as FlaskOAuth  # noqa isort:skip
 
 # Create Flask application
 app = Flask(__name__)
@@ -65,6 +69,7 @@ app.config.update(
     MAIL_SUPPRESS_SEND=True,
     SECRET_KEY='CHANGE_ME',
     SECURITY_PASSWORD_SALT='CHANGE_ME_ALSO',
+    SQLALCHEMY_TRACK_MODIFICATIONS=False,
 )
 
 Babel(app)

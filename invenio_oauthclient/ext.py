@@ -11,14 +11,18 @@
 from __future__ import absolute_import, print_function
 
 from flask_login import user_logged_out
-from flask_oauthlib.client import OAuth as FlaskOAuth
-from flask_oauthlib.client import OAuthRemoteApp
 
 from . import config
 from .handlers import authorized_default_handler, authorized_handler, \
     disconnect_handler, make_handler, make_token_getter, \
     oauth_logout_handler
 from .utils import load_or_import_from_config, obj_or_import_string
+
+from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
+monkey_patch_werkzeug()  # noqa isort:skip
+
+from flask_oauthlib.client import OAuth as FlaskOAuth  # noqa isort:skip
+from flask_oauthlib.client import OAuthRemoteApp  # noqa isort:skip
 
 
 class _OAuthClientState(object):
