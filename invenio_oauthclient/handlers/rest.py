@@ -53,6 +53,8 @@ def default_response_handler(remote, url, payload=dict()):
 
 def response_handler(remote, url, payload=dict()):
     """Handle oauthclient rest response."""
+    if remote is None:
+        return default_response_handler(remote, url, payload)
     return current_oauthclient.response_handler[remote.name](
         url, payload)
 

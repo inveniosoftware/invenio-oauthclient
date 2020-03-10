@@ -116,7 +116,7 @@ def base_app(request):
     with base_app.app_context():
         if str(db.engine.url) != 'sqlite://' and \
            not database_exists(str(db.engine.url)):
-                create_database(str(db.engine.url))
+            create_database(str(db.engine.url))
         db.create_all()
 
     def teardown():
@@ -148,7 +148,6 @@ def _init_app(app_):
 def _init_app_rest(app_):
     """Init OAuth rest app."""
     FlaskOAuth(app_)
-    InvenioAccountsRest(app_)
     InvenioOAuthClientREST(app_)
     app_.register_blueprint(blueprint_client)
     return app_

@@ -36,15 +36,15 @@ blueprint = Blueprint(
 
 @blueprint.route('/login/<remote_app>/')
 def login(remote_app):
+    oauth = current_oauthclient.oauth
     """Send user to remote application for authentication."""
-    oauth = current_app.extensions['oauthlib.client']
     remote_app_config = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
         remote_app]
 
     if remote_app not in oauth.remote_apps:
         return response_handler(
-            remote_app,
-            remote_app_config['error_redirect_url'],
+            None,
+            current_app.config['OAUTHCLIENT_REST_DEFAULT_ERROR_REDIRECT_URL'],
             payload=dict(
                 message="Remote {} not found.".format(remote_app),
                 code=404
@@ -81,8 +81,8 @@ def authorized(remote_app=None):
         remote_app]
     if remote_app not in current_oauthclient.handlers:
         return response_handler(
-            remote_app,
-            remote_app_config['error_redirect_url'],
+            None,
+            current_app.config['OAUTHCLIENT_REST_DEFAULT_ERROR_REDIRECT_URL'],
             payload=dict(
                 message="Handler for remote {} not found.".format(remote_app),
                 code=404
@@ -106,8 +106,9 @@ def authorized(remote_app=None):
         if current_app.config.get('OAUTHCLIENT_STATE_ENABLED', True) or (
            not(current_app.debug or current_app.testing)):
             return response_handler(
-                remote_app,
-                remote_app_config['error_redirect_url'],
+                None,
+                current_app.config[
+                    'OAUTHCLIENT_REST_DEFAULT_ERROR_REDIRECT_URL'],
                 payload=dict(
                     message="Invalid state.",
                     code=403
@@ -118,7 +119,7 @@ def authorized(remote_app=None):
         handler = current_oauthclient.handlers[remote_app]()
     except OAuthException as e:
         return response_handler(
-            remote_app,
+            None,
             remote_app_config['error_redirect_url'],
             payload=dict(
                 message="Invalid response.",
@@ -135,8 +136,8 @@ def signup(remote_app):
         remote_app]
     if remote_app not in current_oauthclient.signup_handlers:
         return response_handler(
-            remote_app,
-            remote_app_config['error_redirect_url'],
+            None,
+            current_app.config['OAUTHCLIENT_REST_DEFAULT_ERROR_REDIRECT_URL'],
             payload=dict(
                 message="Remote {} not found.".format(remote_app),
                 code=404
@@ -155,8 +156,8 @@ def disconnect(remote_app):
         remote_app]
     if remote_app not in current_oauthclient.disconnect_handlers:
         return response_handler(
-            remote_app,
-            remote_app_config['error_redirect_url'],
+            None,
+            current_app.config['OAUTHCLIENT_REST_DEFAULT_ERROR_REDIRECT_URL'],
             payload=dict(
                 message="Handler for remote {} not found.".format(remote_app),
                 code=404

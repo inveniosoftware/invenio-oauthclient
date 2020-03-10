@@ -40,6 +40,7 @@ serializer = LocalProxy(
     )
 )
 
+
 def _commit(response=None):
     _datastore.commit()
     return response

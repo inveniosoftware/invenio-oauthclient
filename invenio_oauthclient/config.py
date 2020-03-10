@@ -214,3 +214,5 @@ OAUTHCLIENT_SIGNUP_TEMPLATE = 'invenio_oauthclient/signup.html'
 
 OAUTHCLIENT_REST_REMOTE_APPS = {}
 """Configuration of remote rest applications."""
+
+OAUTHCLIENT_REST_DEFAULT_ERROR_REDIRECT_URL = '/'
