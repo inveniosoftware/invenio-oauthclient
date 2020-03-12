@@ -6,7 +6,10 @@
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Pre-configured remote application for enabling sign in/up with CERN.
+r"""Pre-configured remote application for enabling sign in/up with CERN.
+
+CERN (remote app).
+^^^^^^^^^^^^^^^^^^
 
 1. Edit your configuration and add:
 
@@ -68,6 +71,62 @@ In templates you can add a sign in/up link:
     <a href="{{ url_for("invenio_oauthclient.login", remote_app="cern") }}">
       Sign in with CERN
     </a>
+
+For more details you can play with a :doc:`working example <examplesapp>`.
+
+
+CERN (remote REST app)
+^^^^^^^^^^^^^^^^^^^^^^
+
+This configuration is appropriate for e.g. a SPA application which communicates
+with Invenio via REST calls.
+
+1. Edit your configuration and add:
+
+   .. code-block:: python
+
+        from invenio_oauthclient.contrib import cern
+
+        OAUTH_REMOTE_APP = cern.REMOTE_REST_APP
+        # Path where you want your SPA to be redirected after a
+        # successful login.
+        OAUTH_REMOTE_APP["authorized_redirect_url"] = \
+            'https://<my_SPA_site>/login'
+        # Path where you want your SPA to be redirected after a
+        # login error.
+        OAUTH_REMOTE_APP["error_redirect_url"] = 'https://<my_SPA_site>/error'
+        OAUTHCLIENT_REST_REMOTE_APPS = dict(
+            cern=OAUTH_REMOTE_APP,
+        )
+
+2. Register a new application with CERN. When registering the
+   application ensure that the *Redirect URI* points to:
+   ``https://<my_invenio_site>:5000/oauth/authorized/cern/`` (note, CERN does
+   not allow localhost to be used, thus testing on development machines is
+   somewhat complicated by this).
+
+
+3. Grab the *Client ID* and *Client Secret* after registering the application
+   and add them to your instance configuration (``config.py``):
+
+   .. code-block:: python
+
+        CERN_APP_CREDENTIALS = dict(
+            consumer_key='<client_id>',
+            consumer_secret='<secret>',
+        )
+
+4. Now access the login page from your SPA using CERN OAuth:
+
+.. code-block:: javascript
+
+    window.location =
+    "https://<my_invenio_site>:5000/api/oauth/login/cern?next=<my_next_page>";
+
+
+By default the CERN module will try first look if a link already exists
+between a CERN account and a user. If no link is found, the user is asked
+to provide an email address to sign-up.
 
 For more details you can play with a :doc:`working example <examplesapp>`.
 """
