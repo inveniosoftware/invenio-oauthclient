@@ -20,6 +20,7 @@ from flask_login import current_user, login_required
 from flask_menu import register_menu
 
 from ..models import RemoteAccount
+from ..proxies import current_oauthclient
 
 blueprint = Blueprint(
     'invenio_oauthclient_settings',
@@ -46,7 +47,7 @@ blueprint = Blueprint(
 )
 def index():
     """List linked accounts."""
-    oauth = current_app.extensions['oauthlib.client']
+    oauth = current_oauthclient.oauth
 
     services = []
     service_map = {}

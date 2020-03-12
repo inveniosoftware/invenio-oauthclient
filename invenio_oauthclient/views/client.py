@@ -56,7 +56,7 @@ def post_ext_init(state):
 @blueprint.route('/login/<remote_app>/')
 def login(remote_app):
     """Send user to remote application for authentication."""
-    oauth = current_app.extensions['oauthlib.client']
+    oauth = current_oauthclient.oauth
 
     if remote_app not in oauth.remote_apps:
         return abort(404)

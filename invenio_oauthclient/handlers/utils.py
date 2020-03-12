@@ -214,7 +214,7 @@ def token_delete(remote, token=''):
 
 def oauth_logout_handler(sender_app, user=None):
     """Remove all access tokens from session on logout."""
-    oauth = current_app.extensions['oauthlib.client']
+    oauth = current_oauthclient.oauth
     for remote in oauth.remote_apps.values():
         token_delete(remote)
     db.session.commit()

@@ -35,7 +35,7 @@ REMOTE_APPS = ["cern", "github", "orcid", "globus"]
 @pytest.fixture(scope="function")
 def remote(request, app_rest):
     """."""
-    oauth = current_app.extensions['oauthlib.client']
+    oauth = current_oauthclient.oauth
     return oauth.remote_apps[request.param]
 
 
