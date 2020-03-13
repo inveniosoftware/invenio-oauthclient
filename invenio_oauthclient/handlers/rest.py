@@ -13,8 +13,8 @@ from __future__ import absolute_import, print_function
 from functools import partial, wraps
 
 import six
-from flask import current_app, flash, jsonify, redirect, render_template, \
-    request, session, url_for
+from flask import abort, current_app, flash, jsonify, make_response, \
+redirect, render_template, request, session, url_for
 from flask_babelex import gettext as _
 from flask_login import current_user
 from invenio_db import db
@@ -274,6 +274,19 @@ def disconnect_handler(remote, *args, **kwargs):
     )
 
 
+def signup_form_handler(remote, *args, **kwargs):
+    """Handle signup form information.
+
+    :param remote: The remote application.
+    :returns: User if succesfully registered otherwise aborts.
+    """
+    # Register user
+    user = rest_oauth_register(request.json)
+    if user is None:
+        abort(make_response(jsonify(message='Form validation error.'), 400))
+    return user
+
+
 def signup_handler(remote, *args, **kwargs):
     """Handle extra signup information.
 
@@ -313,12 +326,9 @@ def signup_handler(remote, *args, **kwargs):
     if request.method == 'POST':
         account_info = session.get(session_prefix + '_account_info')
         response = session.get(session_prefix + '_response')
+        handlers = current_oauthclient.signup_handlers[remote.name]
 
-        # Register user
-        user = rest_oauth_register(request.json)
-
-        if user is None:
-            raise OAuthError('Could not create user.', remote)
+        user = handlers['form'](remote)
 
         # Remove session key
         session.pop(session_prefix + '_autoregister', None)
@@ -326,8 +336,6 @@ def signup_handler(remote, *args, **kwargs):
         # Link account and set session data
         token = token_setter(remote, oauth_token[0], secret=oauth_token[1],
                              user=user)
-        handlers = current_oauthclient.signup_handlers[remote.name]
-
         if token is None:
             raise OAuthError('Could not create token for user.', remote)
 
@@ -347,13 +355,7 @@ def signup_handler(remote, *args, **kwargs):
         # Authenticate the user
         if not oauth_authenticate(remote.consumer_key, user,
                                   require_existing_link=False):
-            return response_handler(
-                remote,
-                remote_app_config['error_redirect_url'],
-                payload=dict(
-                    message="Unauthorized.",
-                    code=401
-                ))
+            abort(401)
 
         # Remove account info from session
         session.pop(session_prefix + '_account_info', None)
@@ -365,11 +367,7 @@ def signup_handler(remote, *args, **kwargs):
         if next_url:
             response_payload["next_url"] = next_url
 
-        return response_handler(
-            remote,
-            remote_app_config['authorized_redirect_url'],
-            payload=response_payload
-        )
+        return jsonify(response_payload)
 
     account_info = session.get(session_prefix + '_account_info')
     return response_handler(

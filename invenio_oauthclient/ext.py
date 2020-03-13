@@ -120,11 +120,17 @@ class _OAuthClientState(object):
                 remote,
                 with_response=False
             )
+            account_form_handler = make_handler(
+                signup_handler.get('form', dummy_handler),
+                remote,
+                with_response=False
+            )
 
             self.signup_handlers[remote_app] = dict(
                 info=account_info_handler,
                 setup=account_setup_handler,
                 view=account_view_handler,
+                form=account_form_handler,
             )
 
 

@@ -232,6 +232,7 @@ REMOTE_REST_APP = dict(
         info='invenio_oauthclient.contrib.cern:account_info',
         setup='invenio_oauthclient.contrib.cern:account_setup',
         view='invenio_oauthclient.handlers.rest:signup_handler',
+        form='invenio_oauthclient.handlers.rest:signup_form_handler',
     ),
     response_handler=(
         'invenio_oauthclient.handlers.rest:default_response_handler'

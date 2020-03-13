@@ -113,11 +113,7 @@ def rest_oauth_register(data):
     :returns: A :class:`invenio_accounts.models.User` instance.
     """
     if data.get('email'):
-        if not data.get('password'):
-            data['password'] = ''
         user = register_user(**data)
-        if not data['password']:
-            user.password = None
         _datastore.commit()
         return user
 
@@ -130,11 +126,7 @@ def oauth_register(form):
     """
     if form.validate():
         data = form.to_dict()
-        if not data.get('password'):
-            data['password'] = ''
         user = register_user(**data)
-        if not data['password']:
-            user.password = None
         _datastore.commit()
         return user
 
