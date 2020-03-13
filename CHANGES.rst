@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.2.0 (released 2020-03-13)
+
+- Centrally manage Flask dependency by invenio-base
+- Drop support for Python 2.7
+
 Version 1.1.3 (released 2019-07-29)
 
 - Remove deprecated warnings from 3rd party modules
