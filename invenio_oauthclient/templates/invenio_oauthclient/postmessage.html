@@ -6,7 +6,7 @@
     </noscript>
     <script>
       document.body.onload = function() {
-        var payload = JSON.parse('{{ payload | tojson }}');
+        var payload = JSON.parse('{{ (payload or {}) | tojson }}');
         window.opener.postMessage(
           payload,
           window.opener.location

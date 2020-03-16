@@ -10,32 +10,26 @@
 
 from __future__ import absolute_import, print_function
 
-from functools import partial, wraps
+from functools import wraps
 
-import six
-from flask import abort, current_app, flash, jsonify, make_response, \
-redirect, render_template, request, session, url_for
-from flask_babelex import gettext as _
+from flask import abort, current_app, jsonify, make_response, \
+    redirect, render_template, request, session, url_for
 from flask_login import current_user
 from invenio_db import db
 from six.moves.urllib_parse import urlencode
-from werkzeug.utils import import_string
 
 from ..errors import AlreadyLinkedError, OAuthCERNRejectedAccountError, \
-    OAuthClientError, OAuthError, OAuthRejectedRequestError, \
-    OAuthResponseError
-from ..models import RemoteAccount, RemoteToken
+    OAuthClientError, OAuthError, OAuthRejectedRequestError
+from ..models import RemoteAccount
 from ..proxies import current_oauthclient
 from ..signals import account_info_received, account_setup_committed, \
     account_setup_received
-from ..utils import create_csrf_disabled_registrationform, \
-    create_registrationform, fill_form, oauth_authenticate, oauth_get_user, \
-    oauth_register, rest_oauth_register
+from ..utils import oauth_authenticate, oauth_get_user, rest_oauth_register
 from .utils import get_session_next_url, response_token_setter, token_getter, \
     token_session_key, token_setter
 
 
-def response_handler_postmessage(remote, url, payload=dict()):
+def response_handler_postmessage(remote, url, payload=None):
     """Postmessage response handler."""
     return render_template(
         'invenio_oauthclient/postmessage.html',
@@ -43,15 +37,16 @@ def response_handler_postmessage(remote, url, payload=dict()):
     )
 
 
-def default_response_handler(remote, url, payload=dict()):
+def default_response_handler(remote, url, payload=None):
     """Default response handler."""
     if payload:
+        # XXX: Use something similar to invenio_accounts.utils._generate_token_url
         return redirect(
             "{url}?{payload}".format(url=url, payload=urlencode(payload)))
     return redirect(url)
 
 
-def response_handler(remote, url, payload=dict()):
+def response_handler(remote, url, payload=None):
     """Handle oauthclient rest response."""
     if not remote:
         return default_response_handler(remote, url, payload)
@@ -128,7 +123,6 @@ def authorized_default_handler(resp, remote, *args, **kwargs):
     return response_handler(
         remote,
         remote_app_config['authorized_redirect_url'],
-        payload=dict()
     )
 
 
