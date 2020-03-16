@@ -16,7 +16,7 @@ from flask import abort, current_app, jsonify, make_response, \
     redirect, render_template, request, session, url_for
 from flask_login import current_user
 from invenio_db import db
-from six.moves.urllib_parse import urlencode
+from six.moves.urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from ..errors import AlreadyLinkedError, OAuthCERNRejectedAccountError, \
     OAuthClientError, OAuthError, OAuthRejectedRequestError
@@ -39,10 +39,12 @@ def response_handler_postmessage(remote, url, payload=None):
 
 def default_response_handler(remote, url, payload=None):
     """Default response handler."""
+    scheme, netloc, path, query, fragment = urlsplit(url)
+    qs = parse_qs(query)
     if payload:
-        # XXX: Use something similar to invenio_accounts.utils._generate_token_url
-        return redirect(
-            "{url}?{payload}".format(url=url, payload=urlencode(payload)))
+        qs.update(payload)
+    query = urlencode(qs)
+    url = urlunsplit((scheme, netloc, path, query, fragment))
     return redirect(url)
 
 

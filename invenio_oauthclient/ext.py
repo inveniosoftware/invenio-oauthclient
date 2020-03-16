@@ -12,8 +12,7 @@ from __future__ import absolute_import, print_function
 
 from flask_login import user_logged_out
 
-from . import config
-from . import handlers
+from . import config, handlers
 from .utils import load_or_import_from_config, obj_or_import_string
 
 from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
@@ -139,7 +138,7 @@ class InvenioOAuthClient(object):
         self.init_config(app)
         state = _OAuthClientState(
             app, 'OAUTHCLIENT_REMOTE_APPS',
-            handlers.disconnect_default_handler,
+            handlers.disconnect_handler,
             handlers.authorized_default_handler)
         app.extensions['invenio-oauthclient'] = state
         return state
@@ -179,7 +178,7 @@ class InvenioOAuthClientREST(object):
         self.init_config(app)
         state = _OAuthClientState(
             app, 'OAUTHCLIENT_REST_REMOTE_APPS',
-            handlers.rest.disconnect_default_handler,
+            handlers.rest.disconnect_handler,
             handlers.rest.authorized_default_handler,
             handlers.rest.default_response_handler,
         )
