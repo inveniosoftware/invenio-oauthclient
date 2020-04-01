@@ -255,3 +255,9 @@ OAUTHCLIENT_REST_REMOTE_APPS = {}
 
 OAUTHCLIENT_REST_DEFAULT_ERROR_REDIRECT_URL = '/'
 """Configuration of default error redirect URL."""
+
+OAUTHCLIENT_REST_DEFAULT_RESPONSE_HANDLER = None
+"""Default REST response handler"""
+
+OAUTHCLIENT_REST_DEFAULT_ERROR_HANDLER = None
+"""Default REST error handler"""

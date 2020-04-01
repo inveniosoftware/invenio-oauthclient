@@ -12,7 +12,7 @@ from __future__ import absolute_import, print_function
 
 import mock
 import pytest
-from flask import current_app, session, url_for
+from flask import session, url_for
 from flask_login import current_user
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from flask_security import login_user, logout_user
@@ -21,11 +21,11 @@ from helpers import check_redirect_location, check_response_redirect_url_args
 from werkzeug.routing import BuildError
 
 from invenio_oauthclient import InvenioOAuthClientREST, current_oauthclient
-from invenio_oauthclient.errors import AlreadyLinkedError, OAuthResponseError
+from invenio_oauthclient.errors import AlreadyLinkedError
 from invenio_oauthclient.handlers import token_session_key, token_setter
 from invenio_oauthclient.handlers.rest import authorized_signup_handler, \
-    disconnect_handler, oauth_error_handler, response_handler_postmessage, \
-    signup_handler, response_handler
+    default_response_handler, disconnect_handler, oauth_error_handler, \
+    response_handler_postmessage, signup_handler, oauth2_handle_error
 from invenio_oauthclient.models import RemoteToken
 from invenio_oauthclient.utils import oauth_authenticate
 from invenio_oauthclient.views.client import blueprint as blueprint_client
@@ -245,7 +245,23 @@ def test_response_handler_with_postmessage(remote, app_rest, models_fixture):
 
 
 @mock.patch('invenio_oauthclient.handlers.rest.default_response_handler')
-def test_response_handler_with_string_in_remote_regresion(default_response_handler_mock, app_rest):
+def test_error_handler_with_string_in_remote_regresion(
+    default_response_handler_mock,
+    app_rest
+):
     remote = 'orcid'
-    response_handler(remote, None)
-    default_response_handler_mock.called_once()
+    oauth2_handle_error(remote, None, None, None, None)
+    default_response_handler_mock.assert_called_once()
+
+
+@mock.patch('invenio_oauthclient.handlers.rest.response_handler_postmessage')
+def test_default_response_handler_from_config(response_handler_mock, app_rest):
+    default_handler = 'invenio_oauthclient.handlers.' \
+                      'rest.response_handler_postmessage'
+    with mock.patch.dict(
+        app_rest.config, {
+            "OAUTHCLIENT_REST_DEFAULT_RESPONSE_HANDLER": default_handler
+        }
+    ):
+        default_response_handler(None, None, None)
+    response_handler_mock.assert_called_once()
