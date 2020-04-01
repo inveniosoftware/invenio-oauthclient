@@ -50,7 +50,7 @@ def default_response_handler(remote, url, payload=None):
 
 def response_handler(remote, url, payload=None):
     """Handle oauthclient rest response."""
-    if not remote:
+    if not remote or not hasattr(remote, 'name'):
         return default_response_handler(remote, url, payload)
     return current_oauthclient.response_handler[remote.name](
         url, payload)

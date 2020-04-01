@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, print_function
 
+import mock
 import pytest
 from flask import current_app, session, url_for
 from flask_login import current_user
@@ -24,7 +25,7 @@ from invenio_oauthclient.errors import AlreadyLinkedError, OAuthResponseError
 from invenio_oauthclient.handlers import token_session_key, token_setter
 from invenio_oauthclient.handlers.rest import authorized_signup_handler, \
     disconnect_handler, oauth_error_handler, response_handler_postmessage, \
-    signup_handler
+    signup_handler, response_handler
 from invenio_oauthclient.models import RemoteToken
 from invenio_oauthclient.utils import oauth_authenticate
 from invenio_oauthclient.views.client import blueprint as blueprint_client
@@ -241,3 +242,10 @@ def test_response_handler_with_postmessage(remote, app_rest, models_fixture):
     assert expected_message in response
     assert expected_status in response
     assert 'window.opener.postMessage' in response
+
+
+@mock.patch('invenio_oauthclient.handlers.rest.default_response_handler')
+def test_response_handler_with_string_in_remote_regresion(default_response_handler_mock, app_rest):
+    remote = 'orcid'
+    response_handler(remote, None)
+    default_response_handler_mock.called_once()
