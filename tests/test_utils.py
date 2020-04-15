@@ -184,6 +184,9 @@ def test_registrationform_userprofile_disable_csrf(app_with_userprofiles_csrf,
      '/search?page=1&size=20'),
     ('https://localhost/search?page=1',
      'https://localhost/search?page=1'),
+    # previously encoded parameter
+    ('/oauth/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A5100%2Fauthorize',
+     '/oauth/authorize?redirect_uri=http://127.0.0.1:5100/authorize'),
 ])
 def test_get_safe_redirect_target(app, test_input, expected):
     with app.test_request_context(

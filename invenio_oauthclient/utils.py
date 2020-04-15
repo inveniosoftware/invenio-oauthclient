@@ -158,9 +158,9 @@ def get_safe_redirect_target(arg='next'):
                 return target
             elif redirect_uri.path:
                 return uricompose(
-                    path=redirect_uri.path,
-                    query=redirect_uri.query,
-                    fragment=redirect_uri.fragment
+                    path=redirect_uri.getpath(),
+                    query=redirect_uri.getquery(),
+                    fragment=redirect_uri.getfragment()
                 )
     return None
 
