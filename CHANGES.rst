@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.2.1 (released 2020-04-17)
+
+- Fix args from redirect target' encoding
+
 Version 1.2.0 (released 2020-03-13)
 
 - Centrally manage Flask dependency by invenio-base
