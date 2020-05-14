@@ -1,0 +1,44 @@
+{# -*- coding: utf-8 -*-
+
+  This file is part of Invenio.
+  Copyright (C) 2015-2018 CERN.
+
+  Invenio is free software; you can redistribute it and/or modify it
+  under the terms of the MIT License; see LICENSE file for more details.
+#}
+
+{%- extends config.OAUTHCLIENT_SETTINGS_TEMPLATE %}
+
+{% from "invenio_oauthclient/_macros.html" import render_field, form_errors %}
+
+{% set panel_title = _("Linked accounts") %}
+{% set panel_icon = "linkify icon" %}
+
+{% block settings_body %}
+<div class="ui segment">
+    {% block oauth_body_text %}
+    <p>{{ _('Tired of entering password for %(sitename)s every time you sign in? Set up single sign-on with one or more of the services below:',
+            sitename=config.THEME_SITENAME) }}</p>
+    {% endblock oauth_body_text %}
+</div>
+<div class="ui celled list">
+  {%- for s in services %}
+  <div class="item">
+    <div class="ui basic segment">
+      {% block oauth_controls scoped %}
+      <div class="right floated content">
+          {%- if s.account -%}
+          <a href="{{url_for('invenio_oauthclient.disconnect', remote_app=s.appid)}}" class="ui compact basic button mini"><i class="times circle outline icon"></i> {{ _('Disconnect') }}</a>
+          {%- else -%}
+          <a href="{{url_for('invenio_oauthclient.login', remote_app=s.appid)}}" class="ui compact basic button mini"><i class="linkify icon"></i> {{ _('Connect') }}</a>
+          {%- endif -%}
+      </div>
+      {% endblock oauth_controls %}
+      <div>{% if s.icon %}<i class="{{s.icon}}"></i>{% endif %} {{s.title}} {% if s.account %}<i class="check icon green"></i>{% endif %}</div>
+      <small>{{s.description}}</small>
+      
+    </div>  
+  </div>
+  {%- endfor %}
+</div>
+{% endblock %}
