@@ -8,6 +8,15 @@
 Changes
 =======
 
+Version 1.3.0 (released 2020-05-15)
+
+- Introduce `InvenioOAuthClientREST` extension.
+- The module can be used as a full REST OAuth service. For example, from
+  an SPA application. All responses are being handled by redirecting to
+  user's configured endpoints.
+- The new configuration variable `OAUTHCLIENT_REST_REMOTE_APPS` defines the
+  registered applications that are using the REST OAuth workflow.
+
 Version 1.2.1 (released 2020-04-17)
 
 - Fix args from redirect target' encoding
