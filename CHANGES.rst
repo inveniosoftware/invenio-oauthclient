@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.3.1 (released 2020-06-03)
+
+- Exports rest handlers.
+
 Version 1.3.0 (released 2020-05-15)
 
 - Introduce `InvenioOAuthClientREST` extension.
