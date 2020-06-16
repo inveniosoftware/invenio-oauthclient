@@ -99,7 +99,7 @@ REMOTE_APP = dict(
                               'show_login': 'true'},
         base_url='https://pub.orcid.org/v1.2/',
         request_token_url=None,
-        access_token_url='https://pub.orcid.org/oauth/token',
+        access_token_url="https://pub.orcid.org/oauth/token",
         access_token_method='POST',
         authorize_url='https://orcid.org/oauth/authorize',
         app_key='ORCID_APP_CREDENTIALS',

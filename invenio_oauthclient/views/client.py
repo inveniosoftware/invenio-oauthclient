@@ -116,6 +116,17 @@ def authorized(remote_app=None):
         if current_app.config.get('OAUTHCLIENT_STATE_ENABLED', True) or (
            not(current_app.debug or current_app.testing)):
             abort(403)
+    except OAuthException as e:
+        if e.type == 'invalid_response':
+            current_app.logger.warning(
+                '{message} ({data})'.format(
+                    message=e.message,
+                    data=e.data
+                )
+            )
+            abort(500)
+        else:
+            raise
 
     try:
         handler = current_oauthclient.handlers[remote_app]()
