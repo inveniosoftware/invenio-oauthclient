@@ -148,6 +148,12 @@ def authorized(remote_app=None):
             abort(403)
     except OAuthException as e:
         if e.type == 'invalid_response':
+            current_app.logger.warning(
+                '{message} ({data})'.format(
+                    message=e.message,
+                    data=e.data
+                )
+            )
             abort(500)
         else:
             raise
