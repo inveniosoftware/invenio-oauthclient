@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.4.0a1 (released 2020-06-22)
+
+- Integrates Semantic-UI templates.
+
 Version 1.3.1 (released 2020-06-03)
 
 - Exports rest handlers.
