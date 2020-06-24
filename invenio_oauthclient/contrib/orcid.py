@@ -99,7 +99,7 @@ REMOTE_APP = dict(
                               'show_login': 'true'},
         base_url='https://pub.orcid.org/v1.2/',
         request_token_url=None,
-        access_token_url="https://pub.orcid.org/oauth/token",
+        access_token_url='https://orcid.org/oauth/token',
         access_token_method='POST',
         authorize_url='https://orcid.org/oauth/authorize',
         app_key='ORCID_APP_CREDENTIALS',
@@ -113,7 +113,7 @@ REMOTE_MEMBER_APP = copy.deepcopy(REMOTE_APP)
 
 REMOTE_MEMBER_APP['params'].update(dict(
     base_url='https://api.orcid.org/',
-    access_token_url='https://api.orcid.org/oauth/token',
+    access_token_url='https://orcid.org/oauth/token',
 ))
 """ORCID sandbox member API."""
 
@@ -122,7 +122,7 @@ REMOTE_SANDBOX_MEMBER_APP = copy.deepcopy(REMOTE_APP)
 
 REMOTE_SANDBOX_MEMBER_APP['params'].update(dict(
     base_url='https://api.sandbox.orcid.org/',
-    access_token_url='https://api.sandbox.orcid.org/oauth/token',
+    access_token_url='https://sandbox.orcid.org/oauth/token',
     authorize_url='https://sandbox.orcid.org/oauth/authorize#show_login',
 ))
 """ORCID sandbox member API."""
@@ -132,7 +132,7 @@ REMOTE_SANDBOX_APP = copy.deepcopy(REMOTE_APP)
 
 REMOTE_SANDBOX_APP['params'].update(dict(
     base_url='https://pub.sandbox.orcid.org/',
-    access_token_url='https://pub.sandbox.orcid.org/oauth/token',
+    access_token_url='https://sandbox.orcid.org/oauth/token',
     authorize_url='https://sandbox.orcid.org/oauth/authorize#show_login',
 ))
 """ORCID sandbox public API."""
