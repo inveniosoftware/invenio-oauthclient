@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.2.2 (released 2020-06-25)
+
+- Fixes orcid access token url
+
 Version 1.2.1 (released 2020-04-17)
 
 - Fix args from redirect target' encoding
