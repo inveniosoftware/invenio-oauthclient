@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.1.4 (released 2020-06-25)
+
+- Fixes orcid access token url
+
 Version 1.1.3 (released 2019-07-29)
 
 - Remove deprecated warnings from 3rd party modules
