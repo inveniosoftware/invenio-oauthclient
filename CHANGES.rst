@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.3.2 (released 2020-06-25)
+
+- Fixes orcid access token url.
+
 Version 1.3.1 (released 2020-06-03)
 
 - Exports rest handlers.
