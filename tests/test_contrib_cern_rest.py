@@ -92,18 +92,6 @@ def test_account_info(app_rest, example_cern):
     assert account_info_rest(
         ioc.remote_apps['cern'], None) == example_account_info
 
-    assert account_info_rest(ioc.remote_apps['cern'], {}) == \
-        dict(
-            user=dict(
-                email='test.account@cern.ch',
-                profile={
-                    'full_name': u'Test Account', 'username': u'taccount'
-                },
-            ),
-            external_id='123456', external_method='cern',
-            active=True
-        )
-
 
 def test_account_setup(app_rest, example_cern, models_fixture):
     """Test account setup after login."""
