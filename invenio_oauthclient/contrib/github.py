@@ -78,7 +78,8 @@ from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.handlers import authorized_signup_handler, \
     oauth_error_handler
 from invenio_oauthclient.handlers.rest import \
-    authorized_signup_handler as authorized_signup_rest_handler, \
+    authorized_signup_handler as authorized_signup_rest_handler
+from invenio_oauthclient.handlers.rest import \
     oauth_resp_remote_error_handler, response_handler
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.utils import oauth_link_external_id, \
