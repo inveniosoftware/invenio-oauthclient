@@ -20,27 +20,22 @@ from flask_login import current_user
 from invenio_db import db
 from werkzeug.utils import import_string
 
-from ..errors import AlreadyLinkedError, OAuthClientError, OAuthError, \
-    OAuthRejectedRequestError, OAuthResponseError, \
-    OAuthClientAlreadyAuthorized, OAuthClientUnAuthorized, \
-    OAuthClientTokenNotSet, OAuthClientUserNotRegistered, \
-    OAuthClientTokenNotFound, OAuthClientMustRedirectLogin, \
-    OAuthClientMustRedirectSignup
+from ..errors import AlreadyLinkedError, OAuthClientAlreadyAuthorized, \
+    OAuthClientError, OAuthClientMustRedirectLogin, \
+    OAuthClientMustRedirectSignup, OAuthClientTokenNotFound, \
+    OAuthClientTokenNotSet, OAuthClientUnAuthorized, \
+    OAuthClientUserNotRegistered, OAuthError, OAuthRejectedRequestError, \
+    OAuthResponseError
 from ..models import RemoteAccount, RemoteToken
 from ..proxies import current_oauthclient
 from ..signals import account_info_received, account_setup_committed, \
     account_setup_received
 from ..utils import create_csrf_disabled_registrationform, \
-    create_registrationform, fill_form, oauth_authenticate, oauth_get_user, \
-    oauth_register
+    create_registrationform, fill_form, oauth_authenticate, oauth_register
+from .base import base_authorized_signup_handler, base_disconnect_handler, \
+    base_signup_handler
 from .utils import get_session_next_url, response_token_setter, token_getter, \
     token_session_key, token_setter
-
-from .base import (
-    base_authorized_signup_handler,
-    base_disconnect_handler,
-    base_signup_handler
-)
 
 
 def _oauth_error_handler(remote, f, *args, **kwargs):

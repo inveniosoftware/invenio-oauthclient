@@ -21,11 +21,11 @@ from invenio_db import db
 from werkzeug.utils import import_string
 
 from ..errors import AlreadyLinkedError, OAuthCERNRejectedAccountError, \
-    OAuthClientError, OAuthError, OAuthRejectedRequestError, \
-    OAuthResponseError, OAuthClientAlreadyAuthorized, \
-    OAuthClientUnAuthorized, OAuthClientTokenNotSet, \
-    OAuthClientUserNotRegistered, OAuthClientTokenNotFound, \
-    OAuthClientMustRedirectLogin, OAuthClientMustRedirectSignup
+    OAuthClientAlreadyAuthorized, OAuthClientError, \
+    OAuthClientMustRedirectLogin, OAuthClientMustRedirectSignup, \
+    OAuthClientTokenNotFound, OAuthClientTokenNotSet, \
+    OAuthClientUnAuthorized, OAuthClientUserNotRegistered, OAuthError, \
+    OAuthRejectedRequestError, OAuthResponseError
 from ..models import RemoteAccount, RemoteToken
 from ..proxies import current_oauthclient
 from ..signals import account_info_received, account_setup_committed, \

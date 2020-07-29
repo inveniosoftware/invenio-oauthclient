@@ -1,0 +1,8 @@
+{
+    "email": "john.doe@cern.ch",
+    "cern_person_id": "234567",
+    "cern_upn": "222222",
+    "preferred_username": "jdoe",
+    "name": "John Doe",
+    "cern_roles": ["cern_user"]
+}
