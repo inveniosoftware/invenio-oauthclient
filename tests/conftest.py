@@ -92,6 +92,10 @@ def base_app(request):
             consumer_key='cern_key_changeme',
             consumer_secret='cern_secret_changeme',
         ),
+        CERN_APP_OPENID_CREDENTIALS=dict(
+            consumer_key='cern_key_changeme',
+            consumer_secret='cern_secret_changeme',
+        ),
         GLOBUS_APP_CREDENTIALS=dict(
             consumer_key='globus_key_changeme',
             consumer_secret='globus_secret_changeme',
