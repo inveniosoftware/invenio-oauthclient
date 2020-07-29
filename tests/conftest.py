@@ -33,6 +33,10 @@ from invenio_oauthclient import InvenioOAuthClient, InvenioOAuthClientREST
 from invenio_oauthclient.contrib.cern import REMOTE_APP as CERN_REMOTE_APP
 from invenio_oauthclient.contrib.cern import \
     REMOTE_REST_APP as CERN_REMOTE_REST_APP
+from invenio_oauthclient.contrib.cern_openid import \
+    REMOTE_APP as CERN_OPENID_REMOTE_APP
+from invenio_oauthclient.contrib.cern_openid import \
+    REMOTE_REST_APP as CERN_OPENID_REMOTE_REST_APP
 from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
 from invenio_oauthclient.contrib.github import \
     REMOTE_REST_APP as GITHUB_REMOTE_REST_APP
@@ -69,12 +73,14 @@ def base_app(request):
         CACHE_TYPE='simple',
         OAUTHCLIENT_REMOTE_APPS=dict(
             cern=CERN_REMOTE_APP,
+            cern_openid=CERN_OPENID_REMOTE_APP,
             orcid=ORCID_REMOTE_APP,
             github=GITHUB_REMOTE_APP,
             globus=GLOBUS_REMOTE_APP,
         ),
         OAUTHCLIENT_REST_REMOTE_APPS=dict(
             cern=CERN_REMOTE_REST_APP,
+            cern_openid=CERN_OPENID_REMOTE_REST_APP,
             orcid=ORCID_REMOTE_REST_APP,
             github=GITHUB_REMOTE_REST_APP,
             globus=GLOBUS_REMOTE_REST_APP,
@@ -89,6 +95,10 @@ def base_app(request):
             consumer_secret='orcid_secret_changeme',
         ),
         CERN_APP_CREDENTIALS=dict(
+            consumer_key='cern_key_changeme',
+            consumer_secret='cern_secret_changeme',
+        ),
+        CERN_APP_OPENID_CREDENTIALS=dict(
             consumer_key='cern_key_changeme',
             consumer_secret='cern_secret_changeme',
         ),
