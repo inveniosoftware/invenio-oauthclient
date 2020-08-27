@@ -8,8 +8,10 @@
 
 """OAuth client test utility functions."""
 
+import json
 from inspect import isfunction
 
+import httpretty
 import six
 from mock import MagicMock
 from six.moves.urllib_parse import parse_qs, urlencode, urlparse
@@ -59,3 +61,29 @@ def check_response_redirect_url_args(response, expected_args):
     """Check response redirect url."""
     assert response.status_code == 302
     assert urlencode(expected_args) == urlparse(response.location).query
+
+
+def mock_keycloak(app_config, token_dict, user_info_dict, realm_info):
+    """Mock a running Keycloak instance."""
+    keycloak_settings = app_config["OAUTHCLIENT_REMOTE_APPS"]["keycloak"]
+
+    httpretty.register_uri(
+        httpretty.POST,
+        keycloak_settings["params"]["access_token_url"],
+        body=json.dumps(token_dict),
+        content_type="application/json",
+    )
+
+    httpretty.register_uri(
+        httpretty.GET,
+        app_config["OAUTHCLIENT_KEYCLOAK_USER_INFO_URL"],
+        body=json.dumps(user_info_dict),
+        content_type="application/json",
+    )
+
+    httpretty.register_uri(
+        httpretty.GET,
+        app_config["OAUTHCLIENT_KEYCLOAK_REALM_URL"],
+        body=json.dumps(realm_info),
+        content_type="application/json",
+    )
