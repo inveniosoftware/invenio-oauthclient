@@ -1,0 +1,7 @@
+{
+  "realm": "invenio",
+  "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyZ5aoSIieF5vWOg4O8xTRlwWgs032Fuv7kvSXVLbE1XW+wlagD2asZ27U18A290RE3aK8zW4Bhtj8Zad/Xy1gAXYuuHNriNELBTm+WuJyA67bYvBB0QAKSIlDmbjc6btcgFJAyq0vNd0riwvsQJw5soRNT1eyrz12Z+yzCnSB5kO16ur2tzCxts+hkiUmznKcaPXDcbaJIUfyGMmSZLDk924GDFwOhLG01wcegmxUf48WqCQSfjzwudhubhJTSnNyhx8ndKUXKa3eGsV6Lub/u2diFZ+3rJGEbEKFUbFNPTJfslXh+mnH89/ZM8mZDb4V8YNX1lafSeJdvC7nnvvyQIDAQAB",
+  "token-service": "http://localhost:8080/auth/realms/invenio/protocol/openid-connect",
+  "account-service": "http://localhost:8080/auth/realms/invenio/account",
+  "tokens-not-before": 0
+}

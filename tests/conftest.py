@@ -42,6 +42,7 @@ from invenio_oauthclient.contrib.github import \
 from invenio_oauthclient.contrib.globus import REMOTE_APP as GLOBUS_REMOTE_APP
 from invenio_oauthclient.contrib.globus import \
     REMOTE_REST_APP as GLOBUS_REMOTE_REST_APP
+from invenio_oauthclient.contrib.keycloak import KeycloakSettingsHelper
 from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_oauthclient.contrib.orcid import \
     REMOTE_REST_APP as ORCID_REMOTE_REST_APP
@@ -63,6 +64,12 @@ from flask_oauthlib.client import OAuthResponse  # noqa isort:skip
 @pytest.fixture
 def base_app(request):
     """Flask application fixture without OAuthClient initialized."""
+    # allow HTTP for keycloak tests, and create the KEYCLOAK_REMOTE_APP
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+    base_url, realm = "http://localhost:8080", "test"
+    helper = KeycloakSettingsHelper(base_url=base_url, realm=realm)
+    KEYCLOAK_REMOTE_APP = helper.remote_app()
+
     instance_path = tempfile.mkdtemp()
     base_app = Flask('testapp')
     base_app.config.update(
@@ -76,6 +83,7 @@ def base_app(request):
             orcid=ORCID_REMOTE_APP,
             github=GITHUB_REMOTE_APP,
             globus=GLOBUS_REMOTE_APP,
+            keycloak=KEYCLOAK_REMOTE_APP,
         ),
         OAUTHCLIENT_REST_REMOTE_APPS=dict(
             cern=CERN_REMOTE_REST_APP,
@@ -104,6 +112,14 @@ def base_app(request):
         GLOBUS_APP_CREDENTIALS=dict(
             consumer_key='globus_key_changeme',
             consumer_secret='globus_secret_changeme',
+        ),
+        OAUTHCLIENT_KEYCLOAK_USER_INFO_URL=helper.user_info_url,
+        OAUTHCLIENT_KEYCLOAK_REALM_URL=helper.realm_url,
+        OAUTHCLIENT_KEYCLOAK_VERIFY_AUD=True,
+        OAUTHCLIENT_KEYCLOAK_AUD="invenio",
+        KEYCLOAK_APP_CREDENTIALS=dict(
+            consumer_key="keycloak_key_changeme",
+            consumer_secret="keycloak_secret_changeme",
         ),
         # use local memory mailbox
         EMAIL_BACKEND='flask_email.backends.locmem.Mail',
@@ -486,3 +502,61 @@ def form_test_data():
                     username='test123',
                 ),
             )
+
+
+@pytest.fixture()
+def example_keycloak_token():
+    """Keycloak example data."""
+    file_path = os.path.join(
+        os.path.dirname(__file__),
+        'data/keycloak_token_response.json'
+    )
+
+    with open(file_path) as token_file:
+        token = json.load(token_file)
+
+    return token
+
+
+@pytest.fixture()
+def example_keycloak_userinfo():
+    """Keycloak example user info response."""
+    file_path = os.path.join(
+        os.path.dirname(__file__),
+        'data/keycloak_userinfo_response.json'
+    )
+
+    with open(file_path) as response_file:
+        response = json.load(response_file)
+
+    return OAuthResponse(
+        resp=None,
+        content=json.dumps(response),
+        content_type="application/json",
+    )
+
+
+@pytest.fixture()
+def example_keycloak_realm_info():
+    """Keycloak example realm info."""
+    file_path = os.path.join(
+        os.path.dirname(__file__),
+        'data/keycloak_realm_info.json'
+    )
+
+    with open(file_path) as info_file:
+        realm_info = json.load(info_file)
+
+    return realm_info
+
+
+@pytest.fixture()
+def example_keycloak_public_key():
+    """Keycloak example public key."""
+    return ("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyZ5aoSIieF5vWOg4O8xTR"
+            "lwWgs032Fuv7kvSXVLbE1XW+wlagD2asZ27U18A290RE3aK8zW4Bhtj8Zad/Xy1gA"
+            "XYuuHNriNELBTm+WuJyA67bYvBB0QAKSIlDmbjc6btcgFJAyq0vNd0riwvsQJw5so"
+            "RNT1eyrz12Z+yzCnSB5kO16ur2tzCxts+hkiUmznKcaPXDcbaJIUfyGMmSZLDk924"
+            "GDFwOhLG01wcegmxUf48WqCQSfjzwudhubhJTSnNyhx8ndKUXKa3eGsV6Lub/u2di"
+            "FZ+3rJGEbEKFUbFNPTJfslXh+mnH89/ZM8mZDb4V8YNX1lafSeJdvC7nnvvyQIDAQ"
+            "AB")
