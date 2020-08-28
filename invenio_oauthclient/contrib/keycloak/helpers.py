@@ -12,8 +12,7 @@ from flask import current_app
 
 
 def _get_config_item(item):
-    return current_app.config.get(item) or \
-        current_app.config.get("OAUTHCLIENT_" + item)
+    return current_app.config.get("OAUTHCLIENT_" + item)
 
 
 def _get_user_info_url():
