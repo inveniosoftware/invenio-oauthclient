@@ -25,7 +25,13 @@ CERN
 
 Globus
 ------
+
 .. automodule:: invenio_oauthclient.contrib.globus
+
+Keycloak
+--------
+
+.. automodule:: invenio_oauthclient.contrib.keycloak
 
 Advanced
 --------
