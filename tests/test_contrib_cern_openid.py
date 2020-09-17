@@ -14,13 +14,13 @@ import os
 
 import pytest
 from flask import g, session, url_for
-from flask_security import login_user
+from flask_security import login_user, logout_user
 from helpers import get_state, mock_remote_get, mock_response
 from six.moves.urllib_parse import parse_qs, urlparse
 
-from invenio_oauthclient.contrib.cern_openid import account_info, \
-    disconnect_handler, fetch_extra_data, get_dict_from_response
-from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
+from invenio_oauthclient.contrib.cern_openid import \
+    OAUTHCLIENT_CERN_OPENID_SESSION_KEY, account_info, disconnect_handler, \
+    fetch_extra_data, get_dict_from_response
 
 from flask_oauthlib.client import OAuthResponse  # noqa isort:skip
 
@@ -118,6 +118,16 @@ def test_account_setup(app, example_cern_openid, models_fixture):
 
         login_user(user)
         assert len(g.identity.provides) == 3
+
+        logout_user()
+        assert len(g.identity.provides) == 1
+        assert "cern_resource" not in session
+        assert OAUTHCLIENT_CERN_OPENID_SESSION_KEY not in session
+
+        # Login again to test the disconnect handler
+        login_user(user)
+        assert len(g.identity.provides) == 3
+
         disconnect_handler(ioc.remote_apps['cern_openid'])
 
 
