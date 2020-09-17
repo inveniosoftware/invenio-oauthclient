@@ -10,17 +10,16 @@
 
 from __future__ import absolute_import
 
-import pytest
 from flask import g, session, url_for
-from flask_security import login_user
+from flask_principal import AnonymousIdentity, Identity, RoleNeed, UserNeed
+from flask_security import login_user, logout_user
 from helpers import check_response_redirect_url_args, get_state, \
     mock_remote_get, mock_response
 from six.moves.urllib_parse import parse_qs, urlparse
 
-from invenio_oauthclient.contrib.cern import account_info_rest, \
-    disconnect_rest_handler, fetch_extra_data, fetch_groups, \
-    get_dict_from_response
-from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
+from invenio_oauthclient.contrib.cern import OAUTHCLIENT_CERN_SESSION_KEY, \
+    account_info_rest, disconnect_rest_handler, fetch_extra_data, \
+    fetch_groups, get_dict_from_response
 
 
 def test_fetch_groups(app_rest, example_cern):
@@ -130,7 +129,31 @@ def test_account_setup(app_rest, example_cern, models_fixture):
         assert resp.status_code >= 300
 
         login_user(user)
+        assert isinstance(g.identity, Identity)
+        assert g.identity.provides == set([
+            UserNeed(4),
+            UserNeed('test.account@cern.ch'),
+            RoleNeed('Group1@cern.ch'),
+            RoleNeed('Group2@cern.ch'),
+            RoleNeed('Group3@cern.ch'),
+            RoleNeed('Group4@cern.ch'),
+            RoleNeed('Group5@cern.ch'),
+        ])
+
+        logout_user()
+        assert isinstance(g.identity, AnonymousIdentity)
+        # NOTE: Wrong role, g.identity.provides = {Need(['id', 4])} read more
+        # https://github.com/inveniosoftware/invenio-access/blob/e28e76d5361a29202b94d498f1968454c24c5c80/tests/test_loaders.py#L47
+        assert len(g.identity.provides) == 1
+
+        assert "cern_resource" not in session
+        assert OAUTHCLIENT_CERN_SESSION_KEY not in session
+
+        # Login again to test the disconnect handler
+        login_user(user)
+        assert isinstance(g.identity, Identity)
         assert len(g.identity.provides) == 7
+
         disconnect_rest_handler(ioc.remote_apps['cern'])
 
 

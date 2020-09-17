@@ -356,7 +356,8 @@ def extend_identity(identity, groups):
 
 def disconnect_identity(identity):
     """Disconnect identity from CERN groups."""
-    provides = session.pop(OAUTHCLIENT_CERN_SESSION_KEY, {})
+    session.pop("cern_resource", None)
+    provides = session.pop(OAUTHCLIENT_CERN_SESSION_KEY, set())
     identity.provides -= provides
 
 
@@ -504,6 +505,7 @@ def on_identity_changed(sender, identity):
     :param identity: The user identity where information are stored.
     """
     if isinstance(identity, AnonymousIdentity):
+        disconnect_identity(identity)
         return
 
     client_id = current_app.config['CERN_APP_CREDENTIALS']['consumer_key']

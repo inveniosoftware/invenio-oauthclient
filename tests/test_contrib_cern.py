@@ -10,16 +10,14 @@
 
 from __future__ import absolute_import
 
-import pytest
 from flask import g, session, url_for
-from flask_security import login_user
+from flask_security import login_user, logout_user
 from helpers import get_state, mock_remote_get, mock_response
 from six.moves.urllib_parse import parse_qs, urlparse
 
-from invenio_oauthclient.contrib.cern import account_info, \
-    disconnect_handler, fetch_extra_data, fetch_groups, \
+from invenio_oauthclient.contrib.cern import OAUTHCLIENT_CERN_SESSION_KEY, \
+    account_info, disconnect_handler, fetch_extra_data, fetch_groups, \
     get_dict_from_response
-from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
 
 
 def test_fetch_groups(app, example_cern):
@@ -138,6 +136,16 @@ def test_account_setup(app, example_cern, models_fixture):
 
         login_user(user)
         assert len(g.identity.provides) == 7
+
+        logout_user()
+        assert len(g.identity.provides) == 1
+        assert "cern_resource" not in session
+        assert OAUTHCLIENT_CERN_SESSION_KEY not in session
+
+        # Login again to test the disconnect handler
+        login_user(user)
+        assert len(g.identity.provides) == 7
+
         disconnect_handler(ioc.remote_apps['cern'])
 
 
