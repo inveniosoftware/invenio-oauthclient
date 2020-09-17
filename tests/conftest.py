@@ -17,12 +17,11 @@ import shutil
 import tempfile
 
 import pytest
-import werkzeug
 from flask import Flask
 from flask_babelex import Babel
 from flask_mail import Mail
 from flask_menu import Menu as FlaskMenu
-from invenio_accounts import InvenioAccounts, InvenioAccountsREST
+from invenio_accounts import InvenioAccounts
 from invenio_db import InvenioDB, db
 from invenio_userprofiles import InvenioUserProfiles, UserProfile
 from invenio_userprofiles.views import blueprint_ui_init
