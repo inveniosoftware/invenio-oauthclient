@@ -203,8 +203,8 @@ def token_delete(remote, token=''):
     """Remove OAuth access tokens from session.
 
     :param remote: The remote application.
-    :param token: Type of token to get. Data passed from ``oauth.request()`` to
-        identify which token to retrieve. (Default: ``''``)
+    :param token: Type of token to get. Data passed from ``oauth.request()``
+        to identify which token to retrieve. (Default: ``''``)
     :returns: The token.
     """
     session_key = token_session_key(remote.name)
@@ -245,14 +245,14 @@ def make_token_getter(remote):
 
 
 def authorized_handler(f, authorized_response):
-        """Handles an OAuth callback.
+    """Handles an OAuth callback.
 
-        As authorized_handler is deprecated in favor of authorized_response,
-        it's has to be wrapped with handler which will be executed
-        at the proper time.
-        """
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            data = authorized_response()
-            return f(*((data,) + args), **kwargs)
-        return decorated
+    As authorized_handler is deprecated in favor of authorized_response,
+    it's has to be wrapped with handler which will be executed
+    at the proper time.
+    """
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        data = authorized_response()
+        return f(*((data,) + args), **kwargs)
+    return decorated
