@@ -16,7 +16,7 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 tests_require = [
-    'pytest-invenio>=1.3.2',
+    'pytest-invenio>=1.4.0',
     'SQLAlchemy-Continuum>=1.2.1',
     'httpretty>=0.8.14',
     'invenio-userprofiles>=1.0.0',
@@ -31,7 +31,7 @@ extras_require = {
         'invenio-admin>=1.0.0',
     ],
     'docs': [
-        'Sphinx>=1.5.1',
+        'Sphinx>=3.0.0',
     ],
     'github': [
         'github3.py>=1.0.0a4',
@@ -58,7 +58,6 @@ for name, reqs in extras_require.items():
 
 setup_requires = [
     'Babel>=1.3',
-    'pytest-runner>=2.6.2',
 ]
 
 install_requires = [
