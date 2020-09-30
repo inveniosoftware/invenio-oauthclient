@@ -12,36 +12,26 @@ from __future__ import absolute_import, print_function
 
 from functools import partial, wraps
 
-import six
 from flask import current_app, flash, redirect, render_template, request, \
-    session, url_for
+    url_for
 from flask_babelex import gettext as _
-from flask_login import current_user
 from invenio_db import db
-from werkzeug.utils import import_string
 
 from ..errors import AlreadyLinkedError, OAuthClientAlreadyAuthorized, \
     OAuthClientError, OAuthClientMustRedirectLogin, \
     OAuthClientMustRedirectSignup, OAuthClientTokenNotFound, \
     OAuthClientTokenNotSet, OAuthClientUnAuthorized, \
-    OAuthClientUserNotRegistered, OAuthError, OAuthRejectedRequestError, \
-    OAuthResponseError
-from ..models import RemoteAccount, RemoteToken
-from ..proxies import current_oauthclient
-from ..signals import account_info_received, account_setup_committed, \
-    account_setup_received
-from ..utils import create_csrf_disabled_registrationform, \
-    create_registrationform, fill_form, oauth_authenticate, oauth_register
+    OAuthClientUserNotRegistered, OAuthError, OAuthRejectedRequestError
+from ..utils import create_registrationform
 from .base import base_authorized_signup_handler, base_disconnect_handler, \
     base_signup_handler
-from .utils import get_session_next_url, response_token_setter, token_getter, \
-    token_session_key, token_setter
+from .utils import response_token_setter
 
 
 def _oauth_error_handler(remote, f, *args, **kwargs):
     """Function to handle exceptions."""
     try:
-            return f(remote, *args, **kwargs)
+        return f(remote, *args, **kwargs)
     except OAuthClientError as e:
         current_app.logger.warning(e.message, exc_info=True)
         return oauth2_handle_error(
