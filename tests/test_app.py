@@ -118,9 +118,10 @@ def test_db(request):
     request.addfinalizer(teardown)
 
     with app.app_context():
-        if str(db.engine.url) != 'sqlite://' and \
-           not database_exists(str(db.engine.url)):
-                create_database(str(db.engine.url))
+        is_sqllite = str(db.engine.url) == 'sqlite://'
+        db_exists = database_exists(str(db.engine.url))
+        if not is_sqllite and not db_exists:
+            create_database(str(db.engine.url))
         db.create_all()
         tables = list(filter(lambda table: table.startswith('oauthclient'),
                              db.metadata.tables.keys()))

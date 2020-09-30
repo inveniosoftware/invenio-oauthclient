@@ -12,8 +12,6 @@ from __future__ import print_function
 
 import os
 
-import sphinx.environment
-
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -321,7 +319,9 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'https://docs.python.org/': None,
-    'invenio-accounts': ('https://invenio-accounts.readthedocs.io/en/latest/', None),
+    'invenio-accounts': (
+        'https://invenio-accounts.readthedocs.io/en/latest/', None
+    ),
 }
 
 # Autodoc configuraton.

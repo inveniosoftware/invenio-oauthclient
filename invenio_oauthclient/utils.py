@@ -18,12 +18,11 @@ from invenio_accounts.models import User
 from invenio_accounts.utils import register_user
 from invenio_db import db
 from invenio_db.utils import rebuild_encrypted_properties
-from itsdangerous import BadData, TimedJSONWebSignatureSerializer
+from itsdangerous import TimedJSONWebSignatureSerializer
 from sqlalchemy.exc import IntegrityError
 from uritools import uricompose, urisplit
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string
-from wtforms.fields.core import FormField
 
 from .errors import AlreadyLinkedError
 from .models import RemoteAccount, RemoteToken, UserIdentity
