@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.3.4 (released 2020-10-04)
+
+- CERN providers: clear user roles on logout
+
 Version 1.3.3 (released 2020-08-31)
 
 - Add CERN OpenID OAuth provider.
