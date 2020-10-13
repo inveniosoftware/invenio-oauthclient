@@ -82,7 +82,10 @@ from invenio_oauthclient.utils import oauth_link_external_id, \
     oauth_unlink_external_id
 
 OAUTHCLIENT_CERN_OPENID_REFRESH_TIMEDELTA = timedelta(minutes=-5)
-"""Default interval for refreshing CERN extra data (e.g. groups)."""
+"""Default interval for refreshing CERN extra data (e.g. groups).
+
+False value disabled the refresh.
+"""
 
 OAUTHCLIENT_CERN_OPENID_SESSION_KEY = "identity.cern_openid_provides"
 """Name of session key where CERN roles are stored."""
@@ -95,15 +98,15 @@ BASE_APP = dict(
     description="Connecting to CERN Organization.",
     icon="",
     logout_url="https://auth.cern.ch/auth/realms/cern/protocol/"
-    "openid-connect/logout",
+               "openid-connect/logout",
     params=dict(
         base_url="https://auth.cern.ch/auth/realms/cern",
         request_token_url=None,
         access_token_url="https://auth.cern.ch/auth/realms/cern/protocol/"
-        "openid-connect/token",
+                         "openid-connect/token",
         access_token_method="POST",
         authorize_url="https://auth.cern.ch/auth/realms/cern/protocol/"
-        "openid-connect/auth",
+                      "openid-connect/auth",
         app_key="CERN_APP_OPENID_CREDENTIALS",
         content_type="application/json",
     ),
@@ -113,9 +116,9 @@ REMOTE_APP = dict(BASE_APP)
 REMOTE_APP.update(
     dict(
         authorized_handler="invenio_oauthclient.handlers"
-        ":authorized_signup_handler",
+                           ":authorized_signup_handler",
         disconnect_handler="invenio_oauthclient.contrib.cern_openid"
-        ":disconnect_handler",
+                           ":disconnect_handler",
         signup_handler=dict(
             info="invenio_oauthclient.contrib.cern_openid:account_info",
             setup="invenio_oauthclient.contrib.cern_openid:account_setup",
@@ -129,9 +132,9 @@ REMOTE_REST_APP = dict(BASE_APP)
 REMOTE_REST_APP.update(
     dict(
         authorized_handler="invenio_oauthclient.handlers.rest"
-        ":authorized_signup_handler",
+                           ":authorized_signup_handler",
         disconnect_handler="invenio_oauthclient.contrib.cern_openid"
-        ":disconnect_rest_handler",
+                           ":disconnect_rest_handler",
         signup_handler=dict(
             info="invenio_oauthclient.contrib.cern_openid:account_info_rest",
             setup="invenio_oauthclient.contrib.cern_openid:account_setup",
@@ -147,7 +150,6 @@ REMOTE_REST_APP.update(
     )
 )
 """CERN Openid Remote REST Application."""
-
 
 REMOTE_APP_RESOURCE_API_URL = (
     "https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/userinfo"
@@ -370,26 +372,34 @@ def on_identity_changed(sender, identity):
         disconnect_identity(identity)
         return
 
+    logged_in_via_token = hasattr(current_user, 'login_via_oauth2') \
+        and getattr(current_user, 'login_via_oauth2')
+
     client_id = current_app.config["CERN_APP_OPENID_CREDENTIALS"][
         "consumer_key"
     ]
-    account = RemoteAccount.get(
+    remote_account = RemoteAccount.get(
         user_id=current_user.get_id(), client_id=client_id
     )
     roles = []
-    if account:
-        remote = find_remote_by_client_id(client_id)
-        resource = get_resource(remote)
+
+    if remote_account and not logged_in_via_token:
         refresh = current_app.config.get(
             "OAUTHCLIENT_CERN_OPENID_REFRESH_TIMEDELTA",
             OAUTHCLIENT_CERN_OPENID_REFRESH_TIMEDELTA,
         )
-
-        roles.extend(
-            account_roles_and_extra_data(
-                account, resource, refresh_timedelta=refresh
+        if refresh:
+            remote = find_remote_by_client_id(client_id)
+            resource = get_resource(remote)
+            roles.extend(
+                account_roles_and_extra_data(
+                    remote_account, resource, refresh_timedelta=refresh
+                )
             )
-        )
+        else:
+            roles.extend(remote_account.extra_data["roles"])
+    elif remote_account and logged_in_via_token:
+        roles.extend(remote_account.extra_data["roles"])
 
     extend_identity(identity, roles)
 

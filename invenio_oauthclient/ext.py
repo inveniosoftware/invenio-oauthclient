@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, print_function
 
+import warnings
+
 from flask_login import user_logged_out
 
 from . import config, handlers
@@ -124,6 +126,12 @@ class _OAuthClientState(object):
                 info=account_info_handler,
                 setup=account_setup_handler,
                 view=account_view_handler,
+            )
+
+        if 'cern' in self.oauth.remote_apps:
+            warnings.warn(
+                "CERN Remote app is deprecated, use CERN OpenID instead.",
+                DeprecationWarning
             )
 
     def init_config(self, app):
