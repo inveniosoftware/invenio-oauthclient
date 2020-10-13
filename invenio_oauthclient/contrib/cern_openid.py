@@ -71,6 +71,10 @@ from flask_babelex import gettext as _
 from flask_login import current_user
 from flask_principal import AnonymousIdentity, RoleNeed, UserNeed, \
     identity_changed, identity_loaded
+from flask_security.views import logout
+from invenio_accounts.config import \
+    ACCOUNTS_REST_AUTH_VIEWS as _ACCOUNTS_REST_AUTH_VIEWS
+from invenio_accounts.views.rest import LogoutView
 from invenio_db import db
 from jwt import decode
 
@@ -90,20 +94,24 @@ OAUTHCLIENT_CERN_OPENID_SESSION_KEY = "identity.cern_openid_provides"
 OAUTHCLIENT_CERN_OPENID_ALLOWED_ROLES = ["cern_user"]
 """CERN OAuth application role values that are allowed to be used."""
 
+_ACCOUNTS_REST_AUTH_VIEWS.update(
+    logout="invenio_oauthclient.contrib.cern_openid:CERNOpenIDLogoutView")
+ACCOUNTS_REST_AUTH_VIEWS = _ACCOUNTS_REST_AUTH_VIEWS
+
 BASE_APP = dict(
     title="CERN",
     description="Connecting to CERN Organization.",
     icon="",
     logout_url="https://auth.cern.ch/auth/realms/cern/protocol/"
-    "openid-connect/logout",
+               "openid-connect/logout",
     params=dict(
         base_url="https://auth.cern.ch/auth/realms/cern",
         request_token_url=None,
         access_token_url="https://auth.cern.ch/auth/realms/cern/protocol/"
-        "openid-connect/token",
+                         "openid-connect/token",
         access_token_method="POST",
         authorize_url="https://auth.cern.ch/auth/realms/cern/protocol/"
-        "openid-connect/auth",
+                      "openid-connect/auth",
         app_key="CERN_APP_OPENID_CREDENTIALS",
         content_type="application/json",
     ),
@@ -113,9 +121,9 @@ REMOTE_APP = dict(BASE_APP)
 REMOTE_APP.update(
     dict(
         authorized_handler="invenio_oauthclient.handlers"
-        ":authorized_signup_handler",
+                           ":authorized_signup_handler",
         disconnect_handler="invenio_oauthclient.contrib.cern_openid"
-        ":disconnect_handler",
+                           ":disconnect_handler",
         signup_handler=dict(
             info="invenio_oauthclient.contrib.cern_openid:account_info",
             setup="invenio_oauthclient.contrib.cern_openid:account_setup",
@@ -129,9 +137,9 @@ REMOTE_REST_APP = dict(BASE_APP)
 REMOTE_REST_APP.update(
     dict(
         authorized_handler="invenio_oauthclient.handlers.rest"
-        ":authorized_signup_handler",
+                           ":authorized_signup_handler",
         disconnect_handler="invenio_oauthclient.contrib.cern_openid"
-        ":disconnect_rest_handler",
+                           ":disconnect_rest_handler",
         signup_handler=dict(
             info="invenio_oauthclient.contrib.cern_openid:account_info_rest",
             setup="invenio_oauthclient.contrib.cern_openid:account_setup",
@@ -147,7 +155,6 @@ REMOTE_REST_APP.update(
     )
 )
 """CERN Openid Remote REST Application."""
-
 
 REMOTE_APP_RESOURCE_API_URL = (
     "https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/userinfo"
@@ -402,3 +409,21 @@ def on_identity_loaded(sender, identity):
         OAUTHCLIENT_CERN_OPENID_SESSION_KEY,
     )
     identity.provides.update(session.get(key, []))
+
+
+class CERNOpenIDLogoutView(LogoutView):
+    """Logout with redirect to logout page of the CERN OPENID provider."""
+
+    def logout_user(self):
+        """Return the logout response of flask-security."""
+        return logout()
+
+    def get(self):
+        """Logout a user."""
+        return self.logout_user()
+
+
+@cern_oauth_blueprint.route('/cern_openid/logout/')
+def logout_redirect():
+    """Redirect to the CERN OpenID logout."""
+    return redirect(current_app.config['OAUTH_REMOTE_REST_APP']['logout_url'])
