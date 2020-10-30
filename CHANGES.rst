@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.3.5 (released 2020-10-30)
+
+- CERN Open ID: handle login via User Token
+
 Version 1.3.4 (released 2020-10-04)
 
 - CERN providers: clear user roles on logout
