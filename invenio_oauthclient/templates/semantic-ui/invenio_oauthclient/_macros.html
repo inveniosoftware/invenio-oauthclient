@@ -15,6 +15,13 @@
     <i class="{{icon}}" aria-hidden="true" ></i>
     {%- endif%}
   </div>
+  {%- if field.errors %}
+      <div class="ui pointing red basic label">
+        {%- for error in field.errors %}
+        <p>{{error}}</p>
+        {%- endfor %}
+      </div>
+    {%- endif %}
 {% endmacro %}
 
 

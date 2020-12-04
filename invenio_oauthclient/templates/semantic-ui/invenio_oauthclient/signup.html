@@ -9,7 +9,7 @@
 
 {%- extends config.OAUTHCLIENT_SETTINGS_TEMPLATE %}
 
-{% from "invenio_oauthclient/_macros.html" import render_field, form_errors %}
+{% from "invenio_oauthclient/_macros.html" import render_field %}
 
 {% block page_body %}
 <div class="ui centered grid">
@@ -18,7 +18,7 @@
   <div>
     {%- block signup_header %}
       <div class="ui center aligned header">
-        <div class="content"> 
+        <div class="content">
           {%- block signup_app_icon %}
           {% if app_icon -%}
           <i class="{{app_icon}}"></i>
@@ -33,7 +33,7 @@
     </div>
     {% endblock %}
     {%- block signup_form %}
-    <form name="edit" method="post" role="form">
+    <form class="ui form" name="edit" method="post" role="form">
       {%- for field in form %}
         {{ render_field(field) }}
       {%- endfor %}
