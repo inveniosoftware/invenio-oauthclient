@@ -8,6 +8,13 @@
 Changes
 =======
 
+Version 1.4.0a2 (released 2020-12-07)
+
+- Use centrally managed test dependencies.
+- Add CERN OpenID contrib.
+- Migrate CI to GitHub Actions.
+- Several UI styling fixes.
+
 Version 1.4.0a1 (released 2020-06-22)
 
 - Integrates Semantic-UI templates.
