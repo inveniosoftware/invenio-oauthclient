@@ -8,7 +8,7 @@
 Changes
 =======
 
-Version 1.4.0a2 (released 2020-12-07)
+Version 1.4.0 (released 2020-12-09)
 
 - Use centrally managed test dependencies.
 - Add CERN OpenID contrib.
