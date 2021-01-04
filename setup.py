@@ -69,6 +69,7 @@ install_requires = [
     'invenio-accounts>=1.3.0',
     'invenio-base>=1.2.3',
     'invenio-i18n>=1.2.0',
+    'invenio-theme>=1.3.4',
     'invenio-mail>=1.0.0',
     'uritools>=1.0.1',
 ]
