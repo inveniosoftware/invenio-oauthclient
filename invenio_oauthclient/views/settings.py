@@ -14,10 +14,13 @@ from operator import itemgetter
 
 import six
 from flask import Blueprint, current_app, render_template, request
-from flask_babelex import gettext as _
+from flask_babelex import lazy_gettext as _
 from flask_breadcrumbs import register_breadcrumb
 from flask_login import current_user, login_required
 from flask_menu import register_menu
+from speaklater import make_lazy_string
+
+from invenio_theme.proxies import current_theme_icons
 
 from ..models import RemoteAccount
 from ..proxies import current_oauthclient
@@ -35,7 +38,8 @@ blueprint = Blueprint(
 @login_required
 @register_menu(
     blueprint, 'settings.oauthclient',
-    _('%(icon)s Linked accounts', icon='<i class="fa fa-link fa-fw"></i>'),
+    _('%(icon)s Linked accounts', icon=make_lazy_string(
+        lambda: f'<i class="{current_theme_icons.link}"></i>')),
     order=3,
     active_when=lambda: request.endpoint.startswith(
         'invenio_oauthclient_settings.'),
