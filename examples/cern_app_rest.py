@@ -127,6 +127,12 @@ app.config.update(
     SECURITY_PASSWORD_SALT='security-password-salt',
     SECURITY_SEND_REGISTER_EMAIL=False,
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
+    APP_THEME=['semantic-ui'],
+    THEME_ICONS={
+      'semantic-ui': dict(
+            link='linkify icon'
+      )
+    }
 )
 
 Babel(app)

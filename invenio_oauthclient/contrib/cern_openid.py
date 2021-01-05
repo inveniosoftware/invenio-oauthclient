@@ -241,7 +241,9 @@ def get_resource(remote, token_response=None):
     response = remote.get(REMOTE_APP_RESOURCE_API_URL)
     dict_response = get_dict_from_response(response)
     if token_response:
-        token_data = decode(token_response["access_token"], verify=False)
+        token_data = decode(token_response["access_token"],
+                            options={"verify_signature": False},
+                            algorithms=["HS256"])
         dict_response.update(token_data)
     session["cern_resource"] = dict_response
     return dict_response
