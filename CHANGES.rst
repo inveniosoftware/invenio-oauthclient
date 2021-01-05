@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.4.1 (released 2021-01-04)
+
+- Use `invenio-theme` THEME_ICONS config
+- Fix disconnect button styling
+
 Version 1.4.0 (released 2020-12-09)
 
 - Use centrally managed test dependencies.
