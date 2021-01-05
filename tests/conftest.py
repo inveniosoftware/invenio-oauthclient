@@ -116,7 +116,13 @@ def base_app(request):
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SECURITY_PASSWORD_HASH='plaintext',
         SECURITY_PASSWORD_SCHEMES=['plaintext'],
-        APP_ALLOWED_HOSTS=['localhost']
+        APP_ALLOWED_HOSTS=['localhost'],
+        APP_THEME=['semantic-ui'],
+        THEME_ICONS={
+            'semantic-ui': dict(
+                link='linkify icon'
+            )
+        }
     )
     FlaskMenu(base_app)
     Babel(base_app)
