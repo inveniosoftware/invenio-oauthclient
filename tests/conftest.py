@@ -116,6 +116,7 @@ def base_app(request):
         OAUTHCLIENT_KEYCLOAK_USER_INFO_URL=helper.user_info_url,
         OAUTHCLIENT_KEYCLOAK_REALM_URL=helper.realm_url,
         OAUTHCLIENT_KEYCLOAK_VERIFY_AUD=True,
+        OAUTHCLIENT_KEYCLOAK_VERIFY_EXP=False,
         OAUTHCLIENT_KEYCLOAK_AUD="invenio",
         KEYCLOAK_APP_CREDENTIALS=dict(
             consumer_key="keycloak_key_changeme",

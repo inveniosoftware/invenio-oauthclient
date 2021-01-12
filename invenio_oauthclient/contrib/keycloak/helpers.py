@@ -70,6 +70,17 @@ def get_user_info(remote, resp_token,
         else:
             options.update({"verify_aud": False})
 
+        # consult the config whether to check signature expiration
+        should_verify_expiration = current_app.config.get(
+            "OAUTHCLIENT_KEYCLOAK_VERIFY_EXP",
+            False
+        )
+
+        if should_verify_expiration:
+            options.update({"verify_exp": True})
+        else:
+            options.update({"verify_exp": False})
+
         user_info = jwt.decode(token,
                                key=pubkey,
                                algorithms=[alg],
