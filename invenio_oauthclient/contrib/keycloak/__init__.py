@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2020-2021 TU Wien.
+#
+# Invenio-Keycloak is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+
 """Toolkit for creating remote apps that enable sign in/up with Keycloak.
 
 **Note:** In contrast to e.g. GitHub, Keycloak is a self-hosted solution that
