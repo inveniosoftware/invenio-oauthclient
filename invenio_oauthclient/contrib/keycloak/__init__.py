@@ -66,10 +66,10 @@ document, where we focus on configuring Invenio.
         )
 
 3. Now go to ``CFG_SITE_SECURE_URL/oauth/login/keycloak/`` (e.g.
-   https://localhost:4000/oauth/login/keycloak/) and log in.
+   https://localhost:5000/oauth/login/keycloak/) and log in.
 
 4. After authenticating successfully, you should see Keycloak listed under
-   Linked accounts: https://localhost:4000/account/settings/linkedaccounts/
+   Linked accounts: https://localhost:5000/account/settings/linkedaccounts/
 """
 
 from .handlers import disconnect_handler, disconnect_rest_handler, \
