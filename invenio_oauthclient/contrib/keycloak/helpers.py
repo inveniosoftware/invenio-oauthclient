@@ -76,8 +76,6 @@ def get_user_info(remote, resp_token,
                                audience=expected_aud,
                                options=options)
 
-        return user_info
-
     except Exception as e:
         if not fallback_to_endpoint:
             raise OAuthKeycloakUserInfoError(
@@ -91,3 +89,5 @@ def get_user_info(remote, resp_token,
         # and the response's `data` field is a dict
         url = current_app.config["OAUTHCLIENT_KEYCLOAK_USER_INFO_URL"]
         user_info = remote.get(url).data
+
+    return user_info
