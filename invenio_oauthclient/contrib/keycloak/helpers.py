@@ -10,29 +10,7 @@
 import jwt
 from flask import current_app
 
-
-def _get_config_item(item):
-    return current_app.config.get("OAUTHCLIENT_" + item)
-
-
-def _get_user_info_url():
-    """Get URL for the Keycloak userinfo endpoint from `app.config`."""
-    return _get_config_item("KEYCLOAK_USER_INFO_URL")
-
-
-def _get_realm_url():
-    """Get URL for the Keycloak realm from `app.config`."""
-    return _get_config_item("KEYCLOAK_REALM_URL")
-
-
-def _get_aud():
-    """Get the target audience ('aud' field) for Keycloak's JWT."""
-    return _get_config_item("KEYCLOAK_AUD")
-
-
-def _get_verify_aud():
-    """Get the boolean flag whether or not to check 'aud' in JWT."""
-    return _get_config_item("KEYCLOAK_VERIFY_AUD")
+from ...errors import OAuthKeycloakUserInfoError
 
 
 def _format_public_key(public_key):
@@ -49,7 +27,8 @@ def _format_public_key(public_key):
 
 def get_public_key(remote):
     """Get the realm's public key with the ID kid from Keycloak."""
-    certs_resp = remote.get(_get_realm_url()).data
+    realm_url = current_app.config["OAUTHCLIENT_KEYCLOAK_REALM_URL"]
+    certs_resp = remote.get(realm_url).data
     key = certs_resp["public_key"]
 
     return key
@@ -77,24 +56,38 @@ def get_user_info(remote, resp_token,
             options = {}
 
         # consult the config whether to check the target audience
-        options.update({"verify_aud": False})
-        aud = _get_aud()
-        if _get_verify_aud() and (aud is not None):
+        should_verify_aud = current_app.config.get(
+            "OAUTHCLIENT_KEYCLOAK_VERIFY_AUD",
+            False
+        )
+        expected_aud = current_app.config.get(
+            "OAUTHCLIENT_KEYCLOAK_AUD",
+            None
+        )
+
+        if should_verify_aud and (expected_aud is not None):
             options.update({"verify_aud": True})
+        else:
+            options.update({"verify_aud": False})
 
         user_info = jwt.decode(token,
                                key=pubkey,
                                algorithms=[alg],
-                               audience=aud,
+                               audience=expected_aud,
                                options=options)
 
-    except:
+        return user_info
+
+    except Exception as e:
         if not fallback_to_endpoint:
-            raise
+            raise OAuthKeycloakUserInfoError(
+                "Error while fetching user information: {}".format(e),
+                remote,
+                resp_token
+            )
 
         # as a fallback, we can still contact Keycloak's userinfo endpoint
         # `remote.get(...)` automatically includes OAuth2 tokens in the header
         # and the response's `data` field is a dict
-        user_info = remote.get(_get_user_info_url()).data
-
-    return user_info
+        url = current_app.config["OAUTHCLIENT_KEYCLOAK_USER_INFO_URL"]
+        user_info = remote.get(url).data
