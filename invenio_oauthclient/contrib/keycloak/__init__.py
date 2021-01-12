@@ -41,6 +41,9 @@ document, where we focus on configuring Invenio.
         OAUTHCLIENT_KEYCLOAK_VERIFY_AUD = True
         OAUTHCLIENT_KEYCLOAK_AUD = "invenio"
 
+        # enable/disable checking if the JWT signature has expired
+        OAUTHCLIENT_KEYCLOAK_VERIFY_EXP = True
+
         # the settings helper can also be used to create the REMOTE APP dicts
         OAUTHCLIENT_KEYCLOAK_REMOTE_APP = helper.remote_app()
         OAUTHCLIENT_KEYCLOAK_REMOTE_REST_APP = helper.remote_rest_app()
