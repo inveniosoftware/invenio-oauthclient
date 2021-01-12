@@ -35,13 +35,13 @@ e.g.:
 from flask import current_app, redirect, url_for
 from flask_login import current_user
 from invenio_db import db
+
 from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.utils import oauth_link_external_id, \
     oauth_unlink_external_id
 
-from .helpers import _format_public_key, _get_aud, _get_realm_url, \
-    _get_user_info_url, _get_verify_aud, get_public_key, get_user_info
+from .helpers import get_user_info
 
 KEYCLOAK_EXTERNAL_METHOD = "keycloak"
 
