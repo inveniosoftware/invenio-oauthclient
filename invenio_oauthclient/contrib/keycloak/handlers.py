@@ -58,13 +58,13 @@ def info_handler(remote, resp):
     result = {
         "user": {
             "active": True,
-            "email": user_info.get("email"),
+            "email": user_info["email"],
             "profile": {
                 "full_name": user_info.get("name"),
                 "username": user_info.get("preferred_username"),
             }
         },
-        "external_id": user_info.get("sub"),
+        "external_id": user_info["sub"],
         "external_method": KEYCLOAK_EXTERNAL_METHOD,
     }
 
@@ -77,7 +77,7 @@ def setup_handler(remote, token, resp):
 
     with db.session.begin_nested():
         # fetch the user's Keycloak ID and set it in extra_data
-        keycloak_id = user_info.get("sub")
+        keycloak_id = user_info["sub"]
         token.remote_account.extra_data = {
             "keycloak_id": keycloak_id,
         }
