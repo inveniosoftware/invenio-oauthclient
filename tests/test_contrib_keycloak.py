@@ -284,7 +284,8 @@ def test_get_userinfo_from_token(app,
                   example_keycloak_realm_info)
 
     token = example_keycloak_token["id_token"]
-    expected_result = jwt.decode(token, verify=False)
+    options = {"verify_signature": False}
+    expected_result = jwt.decode(token, verify=False, options=options)
 
     with app.test_client() as c:
         # ensure that remote apps have been loaded (before first request)
