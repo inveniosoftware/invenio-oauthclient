@@ -159,6 +159,7 @@ def base_app(request):
             if str(db.engine.url) != 'sqlite://':
                 drop_database(str(db.engine.url))
             shutil.rmtree(instance_path)
+            db.engine.dispose()
 
     request.addfinalizer(teardown)
 
