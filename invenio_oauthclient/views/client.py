@@ -166,7 +166,8 @@ def rest_authorized(remote_app=None):
         return _authorized(remote_app)
     except OAuthRemoteNotFound:
         abort(404)
-    except (AssertionError, BadData):
+    except (AssertionError, BadData) as e:
+        current_app.logger.error(str(e))
         if current_app.config.get('OAUTHCLIENT_STATE_ENABLED', True) or (
            not(current_app.debug or current_app.testing)):
             return response_handler(
@@ -179,6 +180,7 @@ def rest_authorized(remote_app=None):
                     )
                 )
     except OAuthException as e:
+        current_app.logger.error(str(e))
         if e.type == 'invalid_response':
             return response_handler(
                 None,
