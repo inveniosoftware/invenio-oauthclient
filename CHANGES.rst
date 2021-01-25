@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.3.6 (released 2021-01-25)
+
+- REST auth: add exception logger
+
 Version 1.3.5 (released 2020-10-30)
 
 - CERN Open ID: handle login via User Token
