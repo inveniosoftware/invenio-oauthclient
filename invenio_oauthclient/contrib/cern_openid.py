@@ -151,11 +151,16 @@ REMOTE_REST_APP.update(
 )
 """CERN Openid Remote REST Application."""
 
-REMOTE_APP_RESOURCE_API_URL = (
+OAUTHCLIENT_CERN_OPENID_USERINFO_URL = (
     "https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/userinfo"
 )
-REMOTE_APP_LOGOUT_URL = (
-    "https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/logout"
+
+OAUTHCLIENT_CERN_OPENID_JWT_TOKEN_DECODE_PARAMS = dict(
+    options=dict(
+        verify_signature=False,
+        verify_aud=False,
+    ),
+    algorithms=["HS256", "RS256"]
 )
 
 cern_oauth_blueprint = Blueprint("cern_openid_oauth", __name__)
@@ -238,10 +243,18 @@ def get_resource(remote, token_response=None):
     if cached_resource:
         return cached_resource
 
-    response = remote.get(REMOTE_APP_RESOURCE_API_URL)
+    url = current_app.config.get(
+        "OAUTHCLIENT_CERN_OPENID_USERINFO_URL",
+        OAUTHCLIENT_CERN_OPENID_USERINFO_URL,
+    )
+    response = remote.get(url)
     dict_response = get_dict_from_response(response)
     if token_response:
-        token_data = decode(token_response["access_token"], verify=False)
+        decoding_params = current_app.config.get(
+            "OAUTHCLIENT_CERN_OPENID_JWT_TOKEN_DECODE_PARAMS",
+            OAUTHCLIENT_CERN_OPENID_JWT_TOKEN_DECODE_PARAMS,
+        )
+        token_data = decode(token_response["access_token"], **decoding_params)
         dict_response.update(token_data)
     session["cern_resource"] = dict_response
     return dict_response
