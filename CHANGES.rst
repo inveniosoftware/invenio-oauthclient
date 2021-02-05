@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.4.3 (released 2021-02-05)
+
+- REST auth: add exception logger
+
 Version 1.4.2 (released 2021-01-15)
 
 - Add Keycloak contrib.
