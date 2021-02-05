@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 1.4.4 (released 2021-02-05)
+
+- CERN OpenID: make /userinfo endpoint and JWT token decode parameters
+  configurable
+
 Version 1.4.3 (released 2021-02-05)
 
 - REST auth: add exception logger
