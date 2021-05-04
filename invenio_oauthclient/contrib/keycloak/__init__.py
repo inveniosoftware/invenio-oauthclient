@@ -12,11 +12,20 @@ requires a bit of configuration to allow OAuth client applications, such as
 Invenio. An explanation of how to set up Keycloak is out of scope for this
 document, where we focus on configuring Invenio.
 
+0. Decide on your keycloak app name, for example ``keycloak``. It will be
+   needed in multiple places in this configuration.
+   Choose a name that has only letters and does not contain spaces. This name
+   will be also used as URL path and to look for configuration variables
+   such as ``OAUTHCLIENT_<APP_NAME>_REALM_URL``.
 
-0. Set up a Keycloak server and make sure it is configured appropriately,
+1. Set up a Keycloak server and make sure it is configured appropriately,
    i.e. a client application for Invenio is configured in a realm in Keycloak.
+   In your server, set the redirect URI as
+   "https://myinveniohost.com/oauth/authorized/keycloak/".
+   Make sure that the the name of the app, ``keycloak``, matches the path in
+   the URL.
 
-1. Add the following items to your configuration (``invenio.cfg``).
+2. Add the following items to your configuration (``invenio.cfg``).
    The ``KeycloakSettingsHelper`` class can be used to help with setting up
    the configuration values:
 
@@ -25,6 +34,8 @@ document, where we focus on configuring Invenio.
         from invenio_oauthclient.contrib import keycloak as k
 
         helper = k.KeycloakSettingsHelper(
+            title="My organization",
+            description="My organization authentication provider",
             base_url="http://yourkeycloakserver.com:8080",
             realm="invenio"
         )
@@ -44,21 +55,21 @@ document, where we focus on configuring Invenio.
         # enable/disable checking if the JWT signature has expired
         OAUTHCLIENT_KEYCLOAK_VERIFY_EXP = True
 
-        # the settings helper can also be used to create the REMOTE APP dicts
-        OAUTHCLIENT_KEYCLOAK_REMOTE_APP = helper.remote_app()
-        OAUTHCLIENT_KEYCLOAK_REMOTE_REST_APP = helper.remote_rest_app()
-
         # add Keycloak to the dictionary of remote apps
         OAUTHCLIENT_REMOTE_APPS = dict(
-            keycloak=OAUTHCLIENT_KEYCLOAK_REMOTE_APP,
+            keycloak=helper.remote_app,
             # ...
         )
 
-        # to automatically set a user's email address on sign-up, the
-        # registration forms have to be extended
+        # set the following configuration to True to automatically use the
+        # user's email address as account email
         USERPROFILES_EXTEND_SECURITY_FORMS = True
 
-2. Grab the *Client ID* and *Client Secret* from the client application in
+   By default, the title will be displayed as label for the login button,
+    for example ``Login with My organization``. The description will be
+    displayed in the user account section.
+
+3. Grab the *Client ID* and *Client Secret* from the client application in
    Keycloak and add them to your instance configuration (``invenio.cfg``):
 
    .. code-block:: python
@@ -68,19 +79,16 @@ document, where we focus on configuring Invenio.
             consumer_secret='<CLIENT SECRET>',
         )
 
-3. Now go to ``CFG_SITE_SECURE_URL/oauth/login/keycloak/`` (e.g.
+4. Now go to ``CFG_SITE_SECURE_URL/oauth/login/keycloak/`` (e.g.
    https://localhost:5000/oauth/login/keycloak/) and log in.
 
-4. After authenticating successfully, you should see Keycloak listed under
+5. After authenticating successfully, you should see Keycloak listed under
    Linked accounts: https://localhost:5000/account/settings/linkedaccounts/
 """
 
 from .handlers import disconnect_handler, disconnect_rest_handler, \
     info_handler, setup_handler
-from .settings import OAUTHCLIENT_KEYCLOAK_AUD, \
-    OAUTHCLIENT_KEYCLOAK_REALM_URL, OAUTHCLIENT_KEYCLOAK_REMOTE_APP, \
-    OAUTHCLIENT_KEYCLOAK_REMOTE_REST_APP, OAUTHCLIENT_KEYCLOAK_USER_INFO_URL, \
-    OAUTHCLIENT_KEYCLOAK_VERIFY_AUD, KeycloakSettingsHelper
+from .settings import KeycloakSettingsHelper
 
 __all__ = (
     "disconnect_handler",
@@ -88,10 +96,4 @@ __all__ = (
     "info_handler",
     "setup_handler",
     "KeycloakSettingsHelper",
-    "OAUTHCLIENT_KEYCLOAK_AUD",
-    "OAUTHCLIENT_KEYCLOAK_REALM_URL",
-    "OAUTHCLIENT_KEYCLOAK_REMOTE_APP",
-    "OAUTHCLIENT_KEYCLOAK_REMOTE_REST_APP",
-    "OAUTHCLIENT_KEYCLOAK_USER_INFO_URL",
-    "OAUTHCLIENT_KEYCLOAK_VERIFY_AUD",
 )

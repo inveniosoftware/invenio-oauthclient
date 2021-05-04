@@ -67,8 +67,9 @@ def base_app(request):
     # allow HTTP for keycloak tests, and create the KEYCLOAK_REMOTE_APP
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
     base_url, realm = "http://localhost:8080", "test"
-    helper = KeycloakSettingsHelper(base_url=base_url, realm=realm)
-    KEYCLOAK_REMOTE_APP = helper.remote_app()
+    helper = KeycloakSettingsHelper(title="Keycloak", description="",
+                                    base_url=base_url, realm=realm)
+    KEYCLOAK_REMOTE_APP = helper.remote_app
 
     instance_path = tempfile.mkdtemp()
     base_app = Flask('testapp')

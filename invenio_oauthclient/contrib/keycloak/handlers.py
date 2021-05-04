@@ -43,8 +43,6 @@ from invenio_oauthclient.utils import oauth_link_external_id, \
 
 from .helpers import get_user_info
 
-KEYCLOAK_EXTERNAL_METHOD = "keycloak"
-
 
 def info_handler(remote, resp):
     """Retrieve remote account information for finding matching local users."""
@@ -65,7 +63,7 @@ def info_handler(remote, resp):
             }
         },
         "external_id": user_info["sub"],
-        "external_method": KEYCLOAK_EXTERNAL_METHOD,
+        "external_method": remote.name,
     }
 
     return result
@@ -85,7 +83,7 @@ def setup_handler(remote, token, resp):
         user = token.remote_account.user
         external_id = {
             "id": keycloak_id,
-            "method": KEYCLOAK_EXTERNAL_METHOD
+            "method": remote.name
         }
 
         # link account with external Keycloak ID
@@ -105,7 +103,7 @@ def _disconnect(remote, *args, **kwargs):
     if keycloak_id:
         external_id = {
             "id": keycloak_id,
-            "method": KEYCLOAK_EXTERNAL_METHOD
+            "method": remote.name
         }
 
         oauth_unlink_external_id(external_id)
