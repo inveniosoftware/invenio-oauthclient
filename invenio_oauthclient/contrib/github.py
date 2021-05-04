@@ -74,6 +74,7 @@ from flask import current_app, redirect, url_for
 from flask_login import current_user
 from invenio_db import db
 
+from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.handlers import authorized_signup_handler, \
     oauth_error_handler
@@ -85,55 +86,65 @@ from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.utils import oauth_link_external_id, \
     oauth_unlink_external_id
 
-BASE_APP = dict(
-    title='GitHub',
-    description='Software collaboration platform.',
-    icon='fa fa-github',
-    params=dict(
-        request_token_params={'scope': 'user,user:email'},
-        base_url='https://api.github.com/',
-        request_token_url=None,
-        access_token_url='https://github.com/login/oauth/access_token',
-        access_token_method='POST',
-        authorize_url='https://github.com/login/oauth/authorize',
-        app_key='GITHUB_APP_CREDENTIALS',
-    )
-)
-REMOTE_APP = dict(BASE_APP)
-REMOTE_APP.update(dict(
-    authorized_handler='invenio_oauthclient.handlers'
-                       ':authorized_signup_handler',
-    disconnect_handler='invenio_oauthclient.contrib.github'
-                       ':disconnect_handler',
-    signup_handler=dict(
-        info='invenio_oauthclient.contrib.github:account_info',
-        setup='invenio_oauthclient.contrib.github:account_setup',
-        view='invenio_oauthclient.handlers:signup_handler',
-    )
-))
+
+class GitHubOAuthSettingsHelper(OAuthSettingsHelper):
+    """Default configuration for GitHub OAuth provider."""
+
+    def __init__(self, title=None, description=None, base_url=None,
+                 app_key=None, icon=None):
+        """Constructor."""
+        super().__init__(
+            title or "GitHub",
+            description or "Software collaboration platform.",
+            base_url or "https://api.github.com/",
+            app_key or "GITHUB_APP_CREDENTIALS",
+            icon=icon or "fa fa-github",
+            request_token_params={"scope": "user,user:email"},
+            access_token_url="https://github.com/login/oauth/access_token",
+            authorize_url="https://github.com/login/oauth/authorize"
+        )
+
+    def get_handlers(self):
+        """Return GitHub auth handlers."""
+        return dict(
+            authorized_handler='invenio_oauthclient.handlers'
+                               ':authorized_signup_handler',
+            disconnect_handler='invenio_oauthclient.contrib.github'
+                               ':disconnect_handler',
+            signup_handler=dict(
+                info='invenio_oauthclient.contrib.github:account_info',
+                setup='invenio_oauthclient.contrib.github:account_setup',
+                view='invenio_oauthclient.handlers:signup_handler',
+            )
+        )
+
+    def get_rest_handlers(self):
+        """Return GitHub auth REST handlers."""
+        return dict(
+            authorized_handler='invenio_oauthclient.handlers.rest'
+                               ':authorized_signup_handler',
+            disconnect_handler='invenio_oauthclient.contrib.github'
+                               ':disconnect_rest_handler',
+            signup_handler=dict(
+                info='invenio_oauthclient.contrib.github:account_info',
+                setup='invenio_oauthclient.contrib.github:account_setup',
+                view='invenio_oauthclient.handlers.rest:signup_handler',
+            ),
+            response_handler='invenio_oauthclient.handlers.rest'
+                             ':default_remote_response_handler',
+            authorized_redirect_url='/',
+            disconnect_redirect_url='/',
+            signup_redirect_url='/',
+            error_redirect_url='/'
+        )
+
+
+_github_app = GitHubOAuthSettingsHelper()
+
+BASE_APP = _github_app.base_app
+REMOTE_APP = _github_app.remote_app
 """GitHub remote application configuration."""
-
-
-REMOTE_REST_APP = dict(BASE_APP)
-REMOTE_REST_APP.update(dict(
-    authorized_handler='invenio_oauthclient.handlers.rest'
-                       ':authorized_signup_handler',
-    disconnect_handler='invenio_oauthclient.contrib.github'
-                       ':disconnect_rest_handler',
-    signup_handler=dict(
-        info='invenio_oauthclient.contrib.github:account_info',
-        setup='invenio_oauthclient.contrib.github:account_setup',
-        view='invenio_oauthclient.handlers.rest:signup_handler',
-    ),
-    response_handler=(
-        'invenio_oauthclient.handlers.rest:default_remote_response_handler'
-    ),
-    authorized_redirect_url='/',
-    disconnect_redirect_url='/',
-    signup_redirect_url='/',
-    error_redirect_url='/'
-
-))
+REMOTE_REST_APP = _github_app.remote_rest_app
 """GitHub remote rest application configuration."""
 
 

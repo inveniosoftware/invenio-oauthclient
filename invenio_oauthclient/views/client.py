@@ -88,7 +88,6 @@ def _login(remote_app, authorized_view_name):
         'next': next_param,
         'sid': _create_identifier(),
     })
-
     return oauth.remote_apps[remote_app].authorize(
         callback=callback_url,
         state=state_token,

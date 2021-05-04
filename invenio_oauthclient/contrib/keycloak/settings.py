@@ -7,8 +7,10 @@
 
 """Pre-defined defaults and helpers for Invenio-Keycloak configuration."""
 
+from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 
-class KeycloakSettingsHelper:
+
+class KeycloakSettingsHelper(OAuthSettingsHelper):
     """Helper for creating REMOTE_APP configuration dictionaries for Keycloak.
 
     This class can be used to easily create a base configuration with sensible
@@ -27,29 +29,28 @@ class KeycloakSettingsHelper:
     endpoint URLs.
     """
 
-    def __init__(self, base_url, realm):
+    def __init__(self, title, description, base_url, realm, app_key=None,
+                 icon=None, **kwargs):
         """The constructor takes two arguments.
 
         :param base_url: The base URL on which Keycloak is running
                             (e.g. "http://localhost:8080")
         :param realm: Realm in which the invenio client application is defined
         """
-        self.base_url = base_url
-        self.realm = realm
-        self._access_token_url = self.make_url("token")
-        self._authorize_url = self.make_url("auth")
-        self._user_info_url = self.make_url("userinfo")
-        self._realm_url = self.make_realm_url()
+        app_key = app_key or "KEYCLOAK_APP_CREDENTIALS"
+        base_url = "{}/".format(base_url.rstrip("/"))  # add leading `/`
 
-    @property
-    def access_token_url(self):
-        """URL for the access token endpoint."""
-        return self._access_token_url
+        self._realm_url = "{}auth/realms/{}".format(base_url, realm)
 
-    @property
-    def authorize_url(self):
-        """URL for the authorization endpoint."""
-        return self._authorize_url
+        access_token_url = self.make_url(self._realm_url, "token")
+        authorize_url = self.make_url(self._realm_url, "auth")
+        self._user_info_url = self.make_url(self._realm_url, "userinfo")
+
+        super().__init__(title, description, base_url, app_key, icon=icon,
+                         request_token_params={"scope": "openid"},
+                         access_token_url=access_token_url,
+                         authorize_url=authorize_url,
+                         **kwargs)
 
     @property
     def user_info_url(self):
@@ -61,26 +62,18 @@ class KeycloakSettingsHelper:
         """URL for the realm's endpoint."""
         return self._realm_url
 
-    def make_realm_url(self):
-        """Create a URL pointing towards the Keycloak realm."""
-        base_url = self.base_url.rstrip("/")
-        return "{}/auth/realms/{}".format(base_url, self.realm)
-
-    def make_url(self, endpoint):
+    @staticmethod
+    def make_url(realm_url, endpoint):
         """Create an endpoint URL following the default Keycloak URL schema.
 
+        :param realm_url: The realm base URL
         :param endpoint: The endpoint to use (e.g. "auth", "token", ...)
         """
-        return "{}/protocol/openid-connect/{}" \
-            .format(self.make_realm_url(), endpoint)
+        return "{}/protocol/openid-connect/{}".format(realm_url, endpoint)
 
-    def remote_app(self):
-        """Create a KEYCLOAK_REMOTE_APP using the given base URL and realm."""
+    def get_handlers(self):
+        """Return a dict with the auth handlers."""
         return dict(
-            title="Keycloak",
-            description="Your local keycloak installation",
-            icon="",
-
             authorized_handler="invenio_oauthclient.handlers"
                                ":authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.keycloak.handlers"
@@ -92,24 +85,11 @@ class KeycloakSettingsHelper:
                      ":setup_handler",
                 view="invenio_oauthclient.handlers:signup_handler"
             ),
-
-            params=dict(
-                base_url=self.base_url,
-
-                request_token_params={"scope": "openid"},
-                request_token_url=None,
-
-                access_token_url=self.access_token_url,
-                access_token_method="POST",
-
-                authorize_url=self.authorize_url,
-                app_key="KEYCLOAK_APP_CREDENTIALS",
-            )
         )
 
-    def remote_rest_app(self):
-        """Crete a KEYCLOAK_REMOTE_REST_APP using the given configuration."""
-        return self.remote_app().update(dict(
+    def get_rest_handlers(self):
+        """Return a dict with the auth REST handlers."""
+        return dict(
             authorized_handler="invenio_oauthclient.handlers.rest"
                                ":authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.keycloak.handlers"
@@ -131,14 +111,4 @@ class KeycloakSettingsHelper:
             disconnect_redirect_url="/",
             signup_redirect_url="/",
             error_redirect_url="/"
-        ))
-
-
-helper = KeycloakSettingsHelper("https://locahost:8080", "invenio")
-OAUTHCLIENT_KEYCLOAK_REALM_URL = helper.realm_url
-OAUTHCLIENT_KEYCLOAK_USER_INFO_URL = helper.user_info_url
-OAUTHCLIENT_KEYCLOAK_REMOTE_APP = helper.remote_app()
-OAUTHCLIENT_KEYCLOAK_REMOTE_REST_APP = helper.remote_rest_app()
-OAUTHCLIENT_KEYCLOAK_VERIFY_AUD = True
-OAUTHCLIENT_KEYCLOAK_VERIFY_EXP = True
-OAUTHCLIENT_KEYCLOAK_AUD = "invenio"
+        )

@@ -7,10 +7,29 @@
 
 """Helper functions for the endpoint handlers."""
 
+import re
+
 import jwt
 from flask import current_app
 
-from ...errors import OAuthKeycloakUserInfoError
+from ...errors import OAuthError, OAuthKeycloakUserInfoError
+
+AZ_09_DASHES_UNDERSCORES = r"^[A-Za-z0-9_-]+$"
+
+
+def is_app_name_valid(app_name):
+    """Validate app name."""
+    return re.match(AZ_09_DASHES_UNDERSCORES, app_name) is not None
+
+
+def _generate_config_prefix(remote):
+    """Validate the app name so that it can be used in config vars."""
+    app_name = remote.name
+    if not is_app_name_valid(app_name):
+        raise OAuthError(f"Invalid app name {app_name}. "
+                         "It should only contain letters, numbers, dashes "
+                         "and underscores", remote)
+    return f"OAUTHCLIENT_{app_name.upper()}"
 
 
 def _format_public_key(public_key):
@@ -25,13 +44,10 @@ def _format_public_key(public_key):
     return public_key
 
 
-def get_public_key(remote):
+def get_public_key(remote, realm_url):
     """Get the realm's public key with the ID kid from Keycloak."""
-    realm_url = current_app.config["OAUTHCLIENT_KEYCLOAK_REALM_URL"]
     certs_resp = remote.get(realm_url).data
-    key = certs_resp["public_key"]
-
-    return key
+    return certs_resp["public_key"]
 
 
 def get_user_info(remote, resp_token,
@@ -46,10 +62,12 @@ def get_user_info(remote, resp_token,
         endpoint mechanism when verifying the 'id_token' fails
     :param options: A dictionary with additional options for `jwt.decode`
     """
+    config_prefix = _generate_config_prefix(remote)
     try:
         # try to parse the "id_token" part of Keycloak's (JWT) response
         token = resp_token["id_token"]
-        pubkey = _format_public_key(get_public_key(remote))
+        realm_url = current_app.config[f"{config_prefix}_REALM_URL"]
+        pubkey = _format_public_key(get_public_key(remote, realm_url))
         alg = jwt.get_unverified_header(token)["alg"]
 
         if not isinstance(options, dict):
@@ -57,11 +75,11 @@ def get_user_info(remote, resp_token,
 
         # consult the config whether to check the target audience
         should_verify_aud = current_app.config.get(
-            "OAUTHCLIENT_KEYCLOAK_VERIFY_AUD",
+            f"{config_prefix}_VERIFY_AUD",
             False
         )
         expected_aud = current_app.config.get(
-            "OAUTHCLIENT_KEYCLOAK_AUD",
+            f"{config_prefix}_AUD",
             None
         )
 
@@ -72,7 +90,7 @@ def get_user_info(remote, resp_token,
 
         # consult the config whether to check signature expiration
         should_verify_expiration = current_app.config.get(
-            "OAUTHCLIENT_KEYCLOAK_VERIFY_EXP",
+            f"{config_prefix}_VERIFY_EXP",
             False
         )
 
@@ -98,7 +116,7 @@ def get_user_info(remote, resp_token,
         # as a fallback, we can still contact Keycloak's userinfo endpoint
         # `remote.get(...)` automatically includes OAuth2 tokens in the header
         # and the response's `data` field is a dict
-        url = current_app.config["OAUTHCLIENT_KEYCLOAK_USER_INFO_URL"]
+        url = current_app.config[f"{config_prefix}_USER_INFO_URL"]
         user_info = remote.get(url).data
 
     return user_info

@@ -9,15 +9,16 @@
 
 import httpretty
 import jwt
-from flask import Flask, session, url_for
+import pytest
+from flask import session, url_for
 from flask_login import current_user, login_user
 from helpers import get_state, mock_keycloak
 from invenio_accounts.models import User
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.contrib.keycloak.helpers import _format_public_key, \
-    get_public_key, get_user_info
-from invenio_oauthclient.handlers import token_session_key
+    get_user_info
+from invenio_oauthclient.errors import OAuthError
 from invenio_oauthclient.models import UserIdentity
 
 # - - - - - - - - - - - - - -#
@@ -338,3 +339,18 @@ def test_get_userinfo_from_endpoint(app,
 
         assert user_info is not None
         assert user_info == example_keycloak_userinfo.data
+
+
+def test_raise_on_invalid_app_name():
+    """Test that the app name format is validated."""
+    class FakeRemote:
+        """Fake remote class."""
+        def __init__(self, name):
+            """Constructor."""
+            self.name = name
+
+    for invalid in ["i n v a l i d", "ke'c.ak"]:
+        fr = FakeRemote(invalid)
+        assert fr.name == invalid
+        with pytest.raises(OAuthError):
+            get_user_info(fr, None)
