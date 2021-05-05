@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C)      2021 TU Wien.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -119,6 +120,9 @@ setup(
         ],
         'invenio_base.api_blueprints': [
             'invenio_oauthclient_rest = invenio_oauthclient.views.client:rest_blueprint',
+        ],
+        'invenio_config.module': [
+            'invenio_oauthclient = invenio_oauthclient.config',
         ],
         'invenio_db.alembic': [
             'invenio_oauthclient = invenio_oauthclient:alembic',

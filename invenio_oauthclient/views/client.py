@@ -8,8 +8,9 @@
 
 """Client blueprint used to handle OAuth callbacks."""
 
-from flask import Blueprint, abort, current_app, request, url_for
+from flask import Blueprint, abort, current_app, redirect, request, url_for
 from flask_oauthlib.client import OAuthException
+from invenio_accounts.views import login as base_login
 from invenio_db import db
 from itsdangerous import BadData
 
@@ -58,6 +59,28 @@ def post_ext_init(state):
         'OAUTHCLIENT_SETTINGS_TEMPLATE',
         app.config.get('SETTINGS_TEMPLATE',
                        'invenio_oauthclient/settings/base.html'))
+
+
+@blueprint.route("/login")
+def auto_redirect_login(*args, **kwargs):
+    """Handle automatic redirect to external auth service if configured."""
+    local_login_enabled = current_app.config.get(
+        "ACCOUNTS_LOCAL_LOGIN_ENABLED", False
+    )
+    auto_redirect_enabled = current_app.config.get(
+        "OAUTHCLIENT_AUTO_REDIRECT_TO_EXTERNAL_LOGIN", False
+    )
+    would_redirect = auto_redirect_enabled and not local_login_enabled
+    remote_apps = list(current_oauthclient.oauth.remote_apps)
+
+    if would_redirect and len(remote_apps) == 1:
+        # if local login is disabled and we only have one OAuth2 remote app
+        # configured, we forward directly to that
+        url = url_for("invenio_oauthclient.login", remote_app=remote_apps[0])
+        return redirect(url)
+
+    else:
+        return base_login(*args, **kwargs)
 
 
 def _login(remote_app, authorized_view_name):
