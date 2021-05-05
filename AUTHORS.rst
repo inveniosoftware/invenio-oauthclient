@@ -35,3 +35,4 @@ Contributors
 - Sami Hiltunen
 - Tibor Simko
 - Zacharias Zacharodimos
+- Maximilian Moser

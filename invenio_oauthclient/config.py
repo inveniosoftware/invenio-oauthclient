@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C)      2021 TU Wien.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -235,6 +236,8 @@ setting ``remote_app`` in your remote application configuration.
 
 """
 
+from .views.client import auto_redirect_login
+
 OAUTHCLIENT_REMOTE_APPS = {}
 """Configuration of remote applications."""
 
@@ -258,3 +261,20 @@ OAUTHCLIENT_REST_DEFAULT_ERROR_REDIRECT_URL = '/'
 
 OAUTHCLIENT_REST_DEFAULT_RESPONSE_HANDLER = None
 """Default REST response handler."""
+
+OAUTHCLIENT_AUTO_REDIRECT_TO_EXTERNAL_LOGIN = False
+"""Redirect to the only external login service under specific conditions.
+
+If this option is enabled and there is exactly one external authentication
+service enabled (i.e. one OAuthClient remote app is configured, and local
+login is disabled), the login view function will automatically redirect to
+this external authentication service.
+"""
+
+ACCOUNTS_LOGIN_VIEW_FUNCTION = auto_redirect_login
+"""The view function to use for the login endpoint.
+
+This can be either an import string, or the view function itself.
+If set to None, the default login view function from Flask-Security will be
+left as is.
+"""
