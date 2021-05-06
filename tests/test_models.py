@@ -8,8 +8,6 @@
 
 """Test case for models."""
 
-from __future__ import absolute_import
-
 from invenio_db import db
 
 from invenio_oauthclient.models import RemoteAccount, RemoteToken

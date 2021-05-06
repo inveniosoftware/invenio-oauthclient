@@ -8,8 +8,6 @@
 
 """Test case for github oauth remote app."""
 
-from __future__ import absolute_import
-
 from collections import namedtuple
 
 import mock

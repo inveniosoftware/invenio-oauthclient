@@ -8,8 +8,6 @@
 
 """Test case for CERN oauth remote app_rest."""
 
-from __future__ import absolute_import
-
 import os
 from datetime import timedelta
 

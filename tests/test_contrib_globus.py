@@ -8,19 +8,15 @@
 
 """Test case for globus oauth remote app."""
 
-from __future__ import absolute_import
-
 import json
-from collections import namedtuple
 
 import pytest
 from flask import session, url_for
 from flask_login import current_user
 from flask_oauthlib.client import OAuthResponse
 from flask_security import login_user
-from helpers import check_redirect_location, mock_remote_get, mock_response
+from helpers import mock_remote_get, mock_response
 from invenio_accounts.models import User
-from mock import MagicMock
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient._compat import _create_identifier

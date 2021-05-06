@@ -8,24 +8,12 @@
 
 """Test handlers."""
 
-from __future__ import absolute_import, print_function
-
 import pytest
-from flask import session, url_for
-from flask_login import current_user
-from flask_oauthlib.client import OAuth as FlaskOAuth
-from flask_security import login_user, logout_user
-from flask_security.confirmable import _security
-from helpers import check_redirect_location
-from werkzeug.routing import BuildError
 
-from invenio_oauthclient import InvenioOAuthClient, current_oauthclient
-from invenio_oauthclient.errors import AlreadyLinkedError, OAuthResponseError
+from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.handlers import response_token_setter, token_getter
 from invenio_oauthclient.models import RemoteToken
 from invenio_oauthclient.utils import oauth_authenticate
-from invenio_oauthclient.views.client import blueprint as blueprint_client
-from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 
 
 def test_token_setter(app, remote):

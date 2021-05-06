@@ -8,8 +8,6 @@
 
 """Test case for ORCID oauth remote app."""
 
-from __future__ import absolute_import
-
 import httpretty
 from flask import session, url_for
 from flask_login import current_user

@@ -8,8 +8,6 @@
 
 """Invenio-OAuthClient provides OAuth web authorization support."""
 
-from __future__ import absolute_import, print_function
-
 import warnings
 
 from flask_login import user_logged_out

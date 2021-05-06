@@ -8,8 +8,6 @@
 
 """Handlers for customizing oauthclient endpoints."""
 
-from __future__ import absolute_import, print_function
-
 from functools import partial, wraps
 
 from flask import current_app, flash, redirect, render_template, request, \

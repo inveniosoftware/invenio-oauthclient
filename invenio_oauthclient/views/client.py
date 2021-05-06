@@ -8,14 +8,10 @@
 
 """Client blueprint used to handle OAuth callbacks."""
 
-from __future__ import absolute_import
-
-from flask import Blueprint, abort, current_app, flash, redirect, request, \
-    url_for
+from flask import Blueprint, abort, current_app, request, url_for
 from flask_oauthlib.client import OAuthException
 from invenio_db import db
 from itsdangerous import BadData
-from werkzeug.local import LocalProxy
 
 from .._compat import _create_identifier
 from ..errors import OAuthRemoteNotFound

@@ -8,27 +8,24 @@
 
 """Test case for views."""
 
-from __future__ import absolute_import
-
 import time
 
 import pytest
 from flask import url_for
 from flask_oauthlib.client import OAuth as FlaskOAuth
-from flask_security import login_user
 from helpers import check_response_redirect_url, \
     check_response_redirect_url_args
 from invenio_accounts.testutils import login_user_via_session
 from invenio_db import db
 from itsdangerous import TimedJSONWebSignatureSerializer
-from mock import MagicMock, patch
+from mock import MagicMock
 from simplejson import JSONDecodeError
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient import InvenioOAuthClientREST
 from invenio_oauthclient._compat import _create_identifier
 from invenio_oauthclient.handlers import token_getter
-from invenio_oauthclient.models import RemoteAccount, RemoteToken
+from invenio_oauthclient.models import RemoteToken
 from invenio_oauthclient.views.client import rest_blueprint, serializer
 
 
