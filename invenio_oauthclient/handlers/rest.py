@@ -8,13 +8,10 @@
 
 """Handlers for customizing oauthclient endpoints."""
 
-from __future__ import absolute_import, print_function
-
 from functools import partial, wraps
 
 from flask import abort, current_app, jsonify, make_response, redirect, \
-    render_template, request, session, url_for
-from flask_login import current_user
+    render_template, request, url_for
 from invenio_db import db
 from six.moves.urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
@@ -23,16 +20,11 @@ from ..errors import AlreadyLinkedError, OAuthClientAlreadyAuthorized, \
     OAuthClientMustRedirectSignup, OAuthClientTokenNotFound, \
     OAuthClientTokenNotSet, OAuthClientUnAuthorized, \
     OAuthClientUserNotRegistered, OAuthError, OAuthRejectedRequestError
-from ..models import RemoteAccount
 from ..proxies import current_oauthclient
-from ..signals import account_info_received, account_setup_committed, \
-    account_setup_received
-from ..utils import oauth_authenticate, oauth_get_user
+from ..utils import create_csrf_disabled_registrationform, fill_form
 from .base import base_authorized_signup_handler, base_disconnect_handler, \
     base_signup_handler
-from .utils import create_csrf_disabled_registrationform, fill_form, \
-    get_session_next_url, response_token_setter, token_getter, \
-    token_session_key, token_setter
+from .utils import response_token_setter
 
 
 def response_handler_postmessage(remote, url, payload=None):

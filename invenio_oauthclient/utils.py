@@ -8,8 +8,6 @@
 
 """Utility methods to help find, authenticate or register a remote user."""
 
-from __future__ import absolute_import, print_function
-
 import six
 from flask import after_this_request, current_app, request
 from flask_security import login_user, logout_user

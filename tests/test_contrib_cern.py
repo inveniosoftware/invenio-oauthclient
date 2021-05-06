@@ -8,8 +8,6 @@
 
 """Test case for CERN oauth remote app."""
 
-from __future__ import absolute_import
-
 from flask import g, session, url_for
 from flask_security import login_user, logout_user
 from helpers import get_state, mock_remote_get, mock_response

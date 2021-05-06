@@ -8,8 +8,6 @@
 
 """Account settings blueprint for oauthclient."""
 
-from __future__ import absolute_import
-
 from operator import itemgetter
 
 import six

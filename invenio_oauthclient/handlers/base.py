@@ -8,31 +8,20 @@
 
 """Handlers for customizing oauthclient endpoints."""
 
-from __future__ import absolute_import, print_function
-
-from functools import partial, wraps
-
-import six
-from flask import current_app, flash, redirect, render_template, request, \
-    session, url_for
-from flask_babelex import gettext as _
+from flask import session
 from flask_login import current_user
 from invenio_db import db
-from werkzeug.utils import import_string
 
-from ..errors import AlreadyLinkedError, OAuthCERNRejectedAccountError, \
-    OAuthClientAlreadyAuthorized, OAuthClientError, \
+from ..errors import OAuthClientAlreadyAuthorized, \
     OAuthClientMustRedirectLogin, OAuthClientMustRedirectSignup, \
     OAuthClientTokenNotFound, OAuthClientTokenNotSet, \
-    OAuthClientUnAuthorized, OAuthClientUserNotRegistered, OAuthError, \
-    OAuthRejectedRequestError, OAuthResponseError
-from ..models import RemoteAccount, RemoteToken
+    OAuthClientUnAuthorized, OAuthClientUserNotRegistered
+from ..models import RemoteAccount
 from ..proxies import current_oauthclient
 from ..signals import account_info_received, account_setup_committed, \
     account_setup_received
-from ..utils import create_csrf_disabled_registrationform, \
-    create_registrationform, fill_form, oauth_authenticate, oauth_get_user, \
-    oauth_register
+from ..utils import create_csrf_disabled_registrationform, fill_form, \
+    oauth_authenticate, oauth_get_user, oauth_register
 from .utils import get_session_next_url, response_token_setter, token_getter, \
     token_session_key, token_setter
 

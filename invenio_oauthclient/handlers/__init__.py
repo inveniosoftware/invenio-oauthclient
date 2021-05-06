@@ -8,8 +8,6 @@
 
 """Handlers for customizing oauthclient endpoints."""
 
-from __future__ import absolute_import, print_function
-
 from .rest import authorized_default_handler as authorized_default_handler_rest
 from .rest import authorized_signup_handler as authorized_signup_handler_rest
 from .rest import disconnect_handler as disconnect_handler_rest

@@ -8,28 +8,18 @@
 
 """Handlers for customizing oauthclient endpoints."""
 
-from __future__ import absolute_import, print_function
-
 from functools import partial, wraps
 
 import six
-from flask import current_app, flash, jsonify, redirect, render_template, \
-    request, session, url_for
-from flask_babelex import gettext as _
+from flask import current_app, session
 from flask_login import current_user
 from invenio_db import db
-from six.moves.urllib_parse import urlencode
 from werkzeug.utils import import_string
 
 from ..errors import OAuthClientError, OAuthRejectedRequestError, \
     OAuthResponseError
-from ..models import RemoteAccount, RemoteToken
+from ..models import RemoteToken
 from ..proxies import current_oauthclient
-from ..signals import account_info_received, account_setup_committed, \
-    account_setup_received
-from ..utils import create_csrf_disabled_registrationform, \
-    create_registrationform, fill_form, oauth_authenticate, oauth_get_user, \
-    oauth_register
 
 
 #

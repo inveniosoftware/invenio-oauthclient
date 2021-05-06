@@ -8,13 +8,11 @@
 
 """Test case for github oauth remote app."""
 
-from __future__ import absolute_import
-
 from collections import namedtuple
 
 import mock
 import pytest
-from flask import session, url_for
+from flask import url_for
 from flask_login import current_user
 from flask_security import login_user
 from helpers import check_redirect_location, \

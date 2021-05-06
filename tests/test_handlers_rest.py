@@ -8,19 +8,17 @@
 
 """Test handlers."""
 
-from __future__ import absolute_import, print_function
-
 import pytest
-from flask import current_app, session, url_for
+from flask import session, url_for
 from flask_login import current_user
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from flask_security import login_user, logout_user
 from flask_security.confirmable import _security
-from helpers import check_redirect_location, check_response_redirect_url_args
+from helpers import check_response_redirect_url_args
 from werkzeug.routing import BuildError
 
 from invenio_oauthclient import InvenioOAuthClientREST, current_oauthclient
-from invenio_oauthclient.errors import AlreadyLinkedError, OAuthResponseError
+from invenio_oauthclient.errors import AlreadyLinkedError
 from invenio_oauthclient.handlers import token_session_key, token_setter
 from invenio_oauthclient.handlers.rest import authorized_signup_handler, \
     disconnect_handler, oauth_resp_remote_error_handler, \

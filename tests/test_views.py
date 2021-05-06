@@ -8,8 +8,6 @@
 
 """Test case for views."""
 
-from __future__ import absolute_import
-
 import time
 
 import pytest
@@ -20,7 +18,7 @@ from helpers import check_response_redirect_url
 from invenio_accounts.testutils import login_user_via_session
 from invenio_db import db
 from itsdangerous import TimedJSONWebSignatureSerializer
-from mock import MagicMock, patch
+from mock import MagicMock
 from simplejson import JSONDecodeError
 from six.moves.urllib_parse import parse_qs, urlparse
 
