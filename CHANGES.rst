@@ -8,6 +8,13 @@
 Changes
 =======
 
+Version 1.5.0 (released 2021-05-07)
+
+- Keycloak: refactor settings helper to allow multiple instances of
+  configured keycloak authentication providers at the same time
+- OAuth: create a new settings helper to set up in an easier way a OAuth
+  authentication provider.
+
 Version 1.4.4 (released 2021-02-05)
 
 - CERN OpenID: make /userinfo endpoint and JWT token decode parameters
