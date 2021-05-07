@@ -7,21 +7,35 @@
   under the terms of the MIT License; see LICENSE file for more details.
 #}
 
+{% macro render_checkbox(field, label='') %}
+  <div class="ui checkbox">
+    {{field(class_="form-control")}}
+    <label>{{label}}</label>
+  </div>
+{% endmacro %}
+
 {% macro render_field(field, icon="", placeholder='', autofocus=False) %}
   <div class="field {% if field.errors %} error{% endif %}">
-    {%- set extras = dict(autofocus="") if autofocus else dict() %}
-    {{field(class_="form-control", placeholder=placeholder or _(field.label.text | string), **extras)}}
-    {%- if icon %}
-    <i class="{{icon}}" aria-hidden="true" ></i>
+    {%- if field.widget.input_type == 'hidden' %}
+      {{ field() }}
+    {%- elif field.widget.input_type == 'checkbox' %}
+      {{ render_checkbox(field, label=_(field.label.text | string)) }}
+    {%- else %}
+      {%- set extras = dict(autofocus="") if autofocus else dict() %}
+      {%- set _placeholder = placeholder if placeholder else _(field.label.text | string) %}
+      {{field(class_="form-control", placeholder=_placeholder, **extras)}}
+      {%- if icon %}
+      <i class="{{icon}}" aria-hidden="true" ></i>
+      {%- endif%}
     {%- endif%}
   </div>
   {%- if field.errors %}
-      <div class="ui pointing red basic label">
-        {%- for error in field.errors %}
-        <p>{{error}}</p>
-        {%- endfor %}
-      </div>
-    {%- endif %}
+    <div class="ui pointing red basic label">
+      {%- for error in field.errors %}
+      <p>{{error}}</p>
+      {%- endfor %}
+    </div>
+  {%- endif %}
 {% endmacro %}
 
 

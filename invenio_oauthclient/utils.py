@@ -103,14 +103,87 @@ def oauth_authenticate(client_id, user, require_existing_link=False):
     return False
 
 
-def oauth_register(form):
+def filter_user_info(user_info, precedence_mask=None):
+    """Filter the user info dictionary according to the precedence mask.
+
+    If the precedence_mask keyword argument is not specified, the value
+    from the configuration is used.
+    This should be the normal call convention of this function.
+
+    :param user_info: The user info dictionary.
+    :param precedence_mask: The precedence mask to use.
+    """
+    if precedence_mask is None:
+        precedence_mask = current_app.config.get(
+            "OAUTHCLIENT_USER_INFO_PRECEDENCE_MASK",
+            {"email": True},
+        )
+
+    # for each of the user info values, check if they are supposed
+    # to take precedence over user input (as per precedence mask)
+    for key, user_info_value in list(user_info.items()):
+        precedence_value = precedence_mask.get(key, False)
+        info_val_dict = isinstance(user_info_value, dict)
+        prec_val_dict = isinstance(precedence_value, dict)
+
+        if info_val_dict and prec_val_dict:
+            # if both values in the mask and user_info are dicts,
+            # investigate deeper
+            filter_user_info(user_info_value, precedence_mask[key])
+
+        elif prec_val_dict:
+            # the precedence dictionary says it's a dict, but
+            # it's actually a value... inconsistent!
+            user_info.pop(key, None)
+
+        elif not precedence_value:
+            user_info.pop(key, None)
+
+
+def patch_dictionary(orig_dict, patch_dict):
+    """Replace the fields mentioned in the patch, while leaving others as is.
+
+    Note: The first argument's content will be changed during the process.
+
+    :param orig_dict: A dictionary.
+    :param patch_dict: The dictionary whose values should take precedence.
+    """
+    for key in patch_dict.keys():
+        val = patch_dict[key]
+        orig_val = orig_dict.get(key)
+
+        if isinstance(val, dict) and isinstance(orig_val, dict):
+            patch_dictionary(orig_val, val)
+        else:
+            orig_dict[key] = val
+
+
+def remove_csrf_tokens(user_data):
+    """Remove CSRF tokens from the user data."""
+    user_data.pop("csrf_token", None)
+    for key, value in list(user_data.items()):
+        if isinstance(value, dict):
+            remove_csrf_tokens(value)
+
+
+def oauth_register(form, user_info=None):
     """Register user if possible.
 
     :param form: A form instance.
+    :param user_info: The user info dictionary.
     :returns: A :class:`invenio_accounts.models.User` instance.
     """
     if form.validate():
         data = form.to_dict()
+
+        # let relevant information from the OAuth service's user info
+        # have precedence over the values specified by the user
+        if user_info:
+            filter_user_info(user_info)
+            patch_dictionary(data, user_info)
+
+        # remove the CSRF tokens to avoid unexpected keyword arguments
+        remove_csrf_tokens(data)
         user = register_user(**data)
         _datastore.commit()
         return user
@@ -183,17 +256,25 @@ def load_or_import_from_config(key, app=None, default=None):
     return obj_or_import_string(imp, default=default)
 
 
-def create_registrationform(*args, **kwargs):
-    """Make a registration form."""
+def _create_registrationform(*args, **kwargs):
+    """Default registration form after external auth success."""
     class RegistrationForm(_security.confirm_register_form):
         password = None
         recaptcha = None
+        submit = None  # defined in the template
     return RegistrationForm(*args, **kwargs)
 
 
-def create_csrf_disabled_registrationform():
+def create_registrationform(*args, **kwargs):
+    """Make a registration form."""
+    func = current_app.config["OAUTHCLIENT_SIGNUP_FORM"]
+    return func(*args, **kwargs)
+
+
+def create_csrf_disabled_registrationform(remote):
     """Create a registration form with CSRF disabled."""
-    return create_registrationform(**_get_csrf_disabled_param())
+    func = current_app.config["OAUTHCLIENT_SIGNUP_FORM"]
+    return func(oauth_remote_app=remote, **_get_csrf_disabled_param())
 
 
 def fill_form(form, data):
@@ -205,10 +286,11 @@ def fill_form(form, data):
     """
     for (key, value) in data.items():
         if hasattr(form, key):
+            field = getattr(form, key)
             if isinstance(value, dict):
-                fill_form(getattr(form, key), value)
-            else:
-                getattr(form, key).data = value
+                fill_form(field, value)
+            elif field is not None:
+                field.data = value
     return form
 
 

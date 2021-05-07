@@ -64,7 +64,7 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
 
         if user is None:
             # Auto sign-up if user not found
-            form = create_csrf_disabled_registrationform()
+            form = create_csrf_disabled_registrationform(remote)
             form = fill_form(
                 form,
                 account_info['user']
@@ -164,7 +164,7 @@ def base_signup_handler(remote, form, *args, **kwargs):
         response = session.get(session_prefix + '_response')
 
         # Register user
-        user = oauth_register(form)
+        user = oauth_register(form, account_info['user'])
 
         if user is None:
             raise OAuthClientUserNotRegistered()

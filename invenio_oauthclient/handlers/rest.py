@@ -243,7 +243,7 @@ def signup_handler(remote, *args, **kwargs):
     remote_app_config = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
         remote.name]
     try:
-        form = create_csrf_disabled_registrationform()
+        form = create_csrf_disabled_registrationform(remote)
         form = fill_form(form, request.json or {})
         next_url = base_signup_handler(remote, form, *args, **kwargs)
         if form.is_submitted():
