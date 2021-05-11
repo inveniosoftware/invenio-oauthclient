@@ -20,10 +20,10 @@ from ..errors import AlreadyLinkedError, OAuthClientAlreadyAuthorized, \
     OAuthClientMustRedirectSignup, OAuthClientTokenNotFound, \
     OAuthClientTokenNotSet, OAuthClientUnAuthorized, \
     OAuthClientUserNotRegistered, OAuthError, OAuthRejectedRequestError
+from ..utils import create_registrationform
 from .base import base_authorized_signup_handler, base_disconnect_handler, \
     base_signup_handler
 from .utils import response_token_setter
-from ..utils import create_registrationform
 
 
 def _oauth_error_handler(remote, f, *args, **kwargs):
