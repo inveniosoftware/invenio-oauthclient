@@ -12,8 +12,10 @@ import httpretty
 from flask import session, url_for
 from flask_login import current_user
 from flask_security import login_user
+from flask_security.utils import hash_password
 from helpers import check_response_redirect_url_args, get_state, mock_response
 from invenio_accounts.models import User
+from invenio_db import db
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.contrib.orcid import account_info
@@ -129,6 +131,23 @@ def test_authorized_signup(app_rest_with_userprofiles,
         #  assert hasattr(locmem, 'outbox') and len(locmem.outbox) == 1
 
         # Disconnect link
+        # should not work, because it's the user's only means of login
+        resp = c.get(
+            url_for('invenio_oauthclient.rest_disconnect', remote_app='orcid')
+        )
+        assert resp.status_code == 400
+
+        user = User.query.filter_by(email=example_email).one()
+        assert 1 == UserIdentity.query.filter_by(
+            method='orcid', id_user=user.id,
+            id=example_data['orcid']
+        ).count()
+
+        # set a password for the user
+        user.password = hash_password("1234")
+        db.session.commit()
+
+        # Disconnect again
         resp = c.get(
             url_for('invenio_oauthclient.rest_disconnect', remote_app='orcid'))
         assert resp.status_code == 302
@@ -140,6 +159,7 @@ def test_authorized_signup(app_rest_with_userprofiles,
             method='orcid', id_user=user.id,
             id=example_data['orcid']
         ).count()
+
         assert RemoteAccount.query.filter_by(user_id=user.id).count() == 0
         assert RemoteToken.query.count() == 0
 

@@ -15,8 +15,10 @@ import pytest
 from flask import session, url_for
 from flask_login import current_user
 from flask_security import login_user
+from flask_security.utils import hash_password
 from helpers import check_redirect_location, mock_response
 from invenio_accounts.models import User
+from invenio_db import db
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient._compat import _create_identifier
@@ -103,16 +105,33 @@ def test_authorized_signup_valid_user(app, example_github):
             assert user.active
 
             # Disconnect link
+            # should not work, because it's the user's only means of login
+            resp = c.get(
+                url_for('invenio_oauthclient.disconnect', remote_app='github')
+            )
+            assert resp.status_code == 400
+
+            user = User.query.filter_by(email=example_email).one()
+            assert 1 == UserIdentity.query.filter_by(
+                method='github', id_user=user.id,
+                id='githubuser'
+            ).count()
+
+            # set a password for the user
+            user.password = hash_password("1234")
+            db.session.commit()
+
+            # Disconnect again
             resp = c.get(
                 url_for('invenio_oauthclient.disconnect', remote_app='github'))
             assert resp.status_code == 302
 
-            # User exists
             user = User.query.filter_by(email=example_email).one()
             assert 0 == UserIdentity.query.filter_by(
-                method='orcid', id_user=user.id,
+                method='github', id_user=user.id,
                 id='githubuser'
             ).count()
+
             assert RemoteAccount.query.filter_by(user_id=user.id).count() == 0
             assert RemoteToken.query.count() == 0
 
@@ -185,14 +204,30 @@ def test_authorized_signup_username_already_exists(app, example_github, user):
             assert my_user.active
 
             # Disconnect link
+            # should not work, because it's the user's only means of login
+            resp = c.get(
+                url_for('invenio_oauthclient.disconnect', remote_app='github')
+            )
+            assert resp.status_code == 400
+
+            my_user = User.query.filter_by(email=example_email).one()
+            assert 1 == UserIdentity.query.filter_by(
+                method='github', id_user=my_user.id,
+                id='githubuser'
+            ).count()
+
+            # set a password for the user
+            my_user.password = hash_password("1234")
+            db.session.commit()
+
+            # Disconnect again
             resp = c.get(
                 url_for('invenio_oauthclient.disconnect', remote_app='github'))
             assert resp.status_code == 302
 
-            # User exists
             my_user = User.query.filter_by(email=example_email).one()
             assert 0 == UserIdentity.query.filter_by(
-                method='orcid', id_user=my_user.id,
+                method='github', id_user=my_user.id,
                 id='githubuser'
             ).count()
             assert RemoteAccount.query.filter_by(
@@ -278,7 +313,7 @@ def test_authorized_already_authenticated(app, models_fixture, example_github):
             # User exists
             u = User.query.filter_by(email=existing_email).one()
             assert 0 == UserIdentity.query.filter_by(
-                method='orcid', id_user=u.id,
+                method='github', id_user=u.id,
                 id='githubuser'
             ).count()
             assert RemoteAccount.query.filter_by(user_id=u.id).count() == 0

@@ -470,8 +470,6 @@ def test_settings_view(views_fixture):
     with app.app_context():
         with app.test_client() as client:
             user = datastore.find_user(email='existing@inveniosoftware.org')
-            assert app.config["ACCOUNTS_LOCAL_LOGIN_ENABLED"]
-            assert user.password is not None
             RemoteAccount.create(user.get_id(), 'testid', None)
 
             resp = client.get(url_for('invenio_oauthclient_settings.index'),
