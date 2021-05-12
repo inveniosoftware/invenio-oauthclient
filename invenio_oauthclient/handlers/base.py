@@ -11,6 +11,7 @@
 from flask import session
 from flask_login import current_user
 from invenio_db import db
+from pkg_resources import require
 
 from ..errors import OAuthClientAlreadyAuthorized, \
     OAuthClientMustRedirectLogin, OAuthClientMustRedirectSignup, \
@@ -22,8 +23,9 @@ from ..signals import account_info_received, account_setup_committed, \
     account_setup_received
 from ..utils import create_csrf_disabled_registrationform, fill_form, \
     oauth_authenticate, oauth_get_user, oauth_register
-from .utils import get_session_next_url, response_token_setter, token_getter, \
-    token_session_key, token_setter
+from .utils import get_session_next_url, \
+    require_more_than_one_external_account, response_token_setter, \
+    token_getter, token_session_key, token_setter
 
 
 #
@@ -110,6 +112,7 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
         return next_url
 
 
+@require_more_than_one_external_account
 def base_disconnect_handler(remote, *args, **kwargs):
     """Handle unlinking of remote account.
 

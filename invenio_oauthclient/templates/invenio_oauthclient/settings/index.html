@@ -14,6 +14,7 @@
 {% set panel_title = _("Linked accounts") %}
 {% set panel_icon = "fa fa-link" %}
 {% set num_linked_services = services|selectattr("account")|list|length %}
+{% set can_disconnect = (num_linked_services > 1 or not only_external_login) %}
 
 {% block settings_body %}
 <div class="panel-body">
@@ -28,7 +29,7 @@
       {% block oauth_controls scoped %}
       <div class="pull-right">
           {# we'll only show the "disconnect" button if it's not the only way for the user to log in #}
-          {%- if s.account and (num_linked_services > 1 or not local_login_impossible) -%}
+          {%- if s.account and can_disconnect -%}
           <a href="{{url_for('invenio_oauthclient.disconnect', remote_app=s.appid)}}" class="btn btn-default btn-xs"><i class="fa fa-times-circle"></i> {{ _('Disconnect') }}</a>
           {%- elif not s.account -%}
           <a href="{{url_for('invenio_oauthclient.login', remote_app=s.appid)}}" class="btn btn-default btn-xs"><i class="fa fa-link"></i> {{ _('Connect') }}</a>

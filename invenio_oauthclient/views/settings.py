@@ -89,5 +89,5 @@ def index():
     return render_template(
         'invenio_oauthclient/settings/index.html',
         services=services,
-        local_login_impossible=not local_login_possible,
+        only_external_login=not local_login_possible,
     )

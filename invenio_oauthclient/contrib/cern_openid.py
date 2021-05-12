@@ -76,6 +76,8 @@ from jwt import decode
 
 from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
 from invenio_oauthclient.handlers.rest import response_handler
+from invenio_oauthclient.handlers.utils import \
+    require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.proxies import current_oauthclient
 from invenio_oauthclient.utils import oauth_link_external_id, \
@@ -320,6 +322,7 @@ def account_info_rest(remote, resp):
         )
 
 
+@require_more_than_one_external_account
 def _disconnect(remote, *args, **kwargs):
     """Handle unlinking of remote account."""
     if not current_user.is_authenticated:
