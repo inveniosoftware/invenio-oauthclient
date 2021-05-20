@@ -37,6 +37,8 @@ from flask_login import current_user
 from invenio_db import db
 
 from invenio_oauthclient.handlers.rest import response_handler
+from invenio_oauthclient.handlers.utils import \
+    require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.utils import oauth_link_external_id, \
     oauth_unlink_external_id
@@ -90,6 +92,7 @@ def setup_handler(remote, token, resp):
         oauth_link_external_id(user, external_id)
 
 
+@require_more_than_one_external_account
 def _disconnect(remote, *args, **kwargs):
     """Common logic for handling disconnection of remote accounts."""
     if not current_user.is_authenticated:

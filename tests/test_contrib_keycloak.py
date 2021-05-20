@@ -12,8 +12,10 @@ import jwt
 import pytest
 from flask import session, url_for
 from flask_login import current_user, login_user
+from flask_security.utils import hash_password
 from helpers import get_state, mock_keycloak
 from invenio_accounts.models import User
+from invenio_db import db
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.contrib.keycloak.helpers import _format_public_key, \
@@ -106,7 +108,31 @@ def test_authorized_signup_valid_user(app_with_userprofiles,
         ).one()
         assert uid.user is user
 
-        # disconnect the Keycloak account again
+        # try to disconnect the Keycloak account again
+        # which shouldn't work, because it's the user's only means of login
+        resp = c.get(
+            url_for("invenio_oauthclient.disconnect", remote_app="keycloak")
+        )
+
+        assert resp.status_code == 400
+
+        # check that the user still exists
+        user = User.query.filter_by(email=example_keycloak["email"]).one()
+        assert user is not None
+
+        # check that the Keycloak account hasn't been unlinked
+        count = UserIdentity.query.filter_by(
+            method="keycloak",
+            id_user=user.id,
+            id=example_keycloak["sub"]
+        ).count()
+        assert count == 1
+
+        # set a password for the user
+        user.password = hash_password("1234")
+        db.session.commit()
+
+        # try to disconnect the Keycloak account again
         resp = c.get(
             url_for("invenio_oauthclient.disconnect", remote_app="keycloak")
         )
@@ -117,7 +143,7 @@ def test_authorized_signup_valid_user(app_with_userprofiles,
         user = User.query.filter_by(email=example_keycloak["email"]).one()
         assert user is not None
 
-        # check that the Keycloak account has been unlinked
+        # check that the Keycloak account hasn't been unlinked
         count = UserIdentity.query.filter_by(
             method="keycloak",
             id_user=user.id,

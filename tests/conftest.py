@@ -72,6 +72,7 @@ def base_app(request):
     instance_path = tempfile.mkdtemp()
     base_app = Flask('testapp')
     base_app.config.update(
+        ACCOUNTS_LOCAL_LOGIN_ENABLED=True,
         TESTING=True,
         WTF_CSRF_ENABLED=False,
         LOGIN_DISABLED=False,

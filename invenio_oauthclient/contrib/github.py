@@ -82,6 +82,8 @@ from invenio_oauthclient.handlers.rest import \
     authorized_signup_handler as authorized_signup_rest_handler
 from invenio_oauthclient.handlers.rest import \
     oauth_resp_remote_error_handler, response_handler
+from invenio_oauthclient.handlers.utils import \
+    require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.utils import oauth_link_external_id, \
     oauth_unlink_external_id
@@ -261,6 +263,7 @@ def authorized_rest(resp, remote):
     return authorized_signup_rest_handler(resp, remote)
 
 
+@require_more_than_one_external_account
 def _disconnect(remote, *args, **kwargs):
     """Handle unlinking of remote account.
 

@@ -13,6 +13,8 @@
 
 {% set panel_title = _("Linked accounts") %}
 {% set panel_icon = "linkify icon" %}
+{% set num_linked_services = services|selectattr("account")|list|length %}
+{% set can_disconnect = (num_linked_services > 1 or not only_external_login) %}
 
 {% block settings_body %}
 <div class="ui segment">
@@ -27,9 +29,10 @@
     <div class="ui basic segment">
       {% block oauth_controls scoped %}
       <div class="right floated content">
-          {%- if s.account -%}
+          {# we'll only show the "disconnect" button if it's not the only way for the user to log in #}
+          {%- if s.account and can_disconnect -%}
           <a href="{{url_for('invenio_oauthclient.disconnect', remote_app=s.appid)}}" class="ui compact button mini"><i class="close icon"></i> {{ _('Disconnect') }}</a>
-          {%- else -%}
+          {%- elif not s.account -%}
           <a href="{{url_for('invenio_oauthclient.login', remote_app=s.appid)}}" class="ui compact basic button mini"><i class="linkify icon"></i> {{ _('Connect') }}</a>
           {%- endif -%}
       </div>

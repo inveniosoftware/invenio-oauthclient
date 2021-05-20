@@ -15,6 +15,7 @@ import pytest
 from flask import current_app, g, session, url_for
 from flask_login import current_user
 from flask_security import login_user, logout_user
+from flask_security.utils import hash_password
 from helpers import check_response_redirect_url_args, get_state, \
     mock_remote_get, mock_response
 from six.moves.urllib_parse import parse_qs, urlparse
@@ -117,6 +118,7 @@ def test_account_setup(app_rest, example_cern_openid_rest, models_fixture):
 
     datastore = app_rest.extensions['invenio-accounts'].datastore
     user = datastore.find_user(email='john.doe@cern.ch')
+    user.password = hash_password("1234")
     assert user
 
     with app_rest.test_request_context():

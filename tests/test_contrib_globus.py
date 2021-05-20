@@ -15,8 +15,10 @@ from flask import session, url_for
 from flask_login import current_user
 from flask_oauthlib.client import OAuthResponse
 from flask_security import login_user
+from flask_security.utils import hash_password
 from helpers import mock_remote_get, mock_response
 from invenio_accounts.models import User
+from invenio_db import db
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient._compat import _create_identifier
@@ -84,6 +86,22 @@ def test_authorized_signup_valid_user(app, example_globus):
         assert user.active
 
         # Disconnect link
+        # should not work, because it's the user's only means of login
+        resp = c.get(
+            url_for('invenio_oauthclient.disconnect', remote_app='globus')
+        )
+        assert resp.status_code == 400
+
+        user = User.query.filter_by(email='carberry@inveniosoftware.org').one()
+        assert 1 == UserIdentity.query.filter_by(
+            method='globus', id_user=user.id,
+        ).count()
+
+        # set a password for the user
+        user.password = hash_password("1234")
+        db.session.commit()
+
+        # Disconnect again
         resp = c.get(
             url_for('invenio_oauthclient.disconnect', remote_app='globus'))
         assert resp.status_code == 302
@@ -91,8 +109,7 @@ def test_authorized_signup_valid_user(app, example_globus):
         # User exists
         user = User.query.filter_by(email='carberry@inveniosoftware.org').one()
         assert 0 == UserIdentity.query.filter_by(
-            method='orcid', id_user=user.id,
-            id='globususer'
+            method='globus', id_user=user.id,
         ).count()
         assert RemoteAccount.query.filter_by(user_id=user.id).count() == 0
         assert RemoteToken.query.count() == 0

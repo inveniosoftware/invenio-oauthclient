@@ -11,14 +11,14 @@
 from functools import partial, wraps
 
 import six
-from flask import current_app, session
+from flask import abort, current_app, session
 from flask_login import current_user
 from invenio_db import db
 from werkzeug.utils import import_string
 
 from ..errors import OAuthClientError, OAuthRejectedRequestError, \
     OAuthResponseError
-from ..models import RemoteToken
+from ..models import RemoteAccount, RemoteToken
 from ..proxies import current_oauthclient
 
 
@@ -245,4 +245,47 @@ def authorized_handler(f, authorized_response):
     def decorated(*args, **kwargs):
         data = authorized_response()
         return f(*((data,) + args), **kwargs)
+    return decorated
+
+
+def require_more_than_one_external_account(f):
+    """Require that the user has more than one external account for login.
+
+    If the user only has one linked external account and no means for logging
+    in via local credentials, the decorated function won't be executed.
+    This decorator is useful for disconnect handlers, to prevent users from
+    disconnecting their last potential means of authentication.
+    """
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if current_user.is_anonymous:
+            return f(*args, **kwargs)
+
+        local_login_enabled = current_app.config.get(
+            "ACCOUNTS_LOCAL_LOGIN_ENABLED", True
+        )
+        password_set = current_user.password is not None
+        local_login_possible = local_login_enabled and password_set
+
+        remote_apps = current_app.config["OAUTHCLIENT_REMOTE_APPS"]
+        accounts = RemoteAccount.query.filter_by(
+            user_id=current_user.get_id()
+        ).all()
+
+        # find out all of the linked external accounts for the user
+        # that are currently configured and not hidden
+        linked_accounts = [
+            acc for acc in accounts
+            if acc.client_id in remote_apps and
+            not remote_apps[acc.client_id].get("hide", False)
+        ]
+
+        # execute the function only if local login is possible, or
+        # there's more than one linked external account
+        if local_login_possible or len(linked_accounts) > 1:
+            return f(*args, **kwargs)
+
+        else:
+            abort(400)
+
     return decorated

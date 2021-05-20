@@ -77,6 +77,8 @@ from invenio_db import db
 
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 from invenio_oauthclient.handlers.rest import response_handler
+from invenio_oauthclient.handlers.utils import \
+    require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.utils import oauth_link_external_id, \
     oauth_unlink_external_id
@@ -210,6 +212,7 @@ def account_info(remote, resp):
     }
 
 
+@require_more_than_one_external_account
 def _disconnect(remote, *args, **kwargs):
     """Handle unlinking of remote account.
 

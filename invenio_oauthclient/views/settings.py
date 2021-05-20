@@ -79,7 +79,15 @@ def index():
     # Sort according to title
     services.sort(key=itemgetter('title'))
 
+    # Check if local login is possible
+    local_login_enabled = current_app.config.get(
+        "ACCOUNTS_LOCAL_LOGIN_ENABLED", True
+    )
+    password_set = current_user.password is not None
+    local_login_possible = local_login_enabled and password_set
+
     return render_template(
         'invenio_oauthclient/settings/index.html',
-        services=services
+        services=services,
+        only_external_login=not local_login_possible,
     )
