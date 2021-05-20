@@ -93,7 +93,7 @@ class GitHubOAuthSettingsHelper(OAuthSettingsHelper):
     """Default configuration for GitHub OAuth provider."""
 
     def __init__(self, title=None, description=None, base_url=None,
-                 app_key=None, icon=None):
+                 app_key=None, icon=None, precedence_mask=None):
         """Constructor."""
         super().__init__(
             title or "GitHub",
@@ -103,7 +103,8 @@ class GitHubOAuthSettingsHelper(OAuthSettingsHelper):
             icon=icon or "fa fa-github",
             request_token_params={"scope": "user,user:email"},
             access_token_url="https://github.com/login/oauth/access_token",
-            authorize_url="https://github.com/login/oauth/authorize"
+            authorize_url="https://github.com/login/oauth/authorize",
+            precedence_mask=precedence_mask,
         )
 
     def get_handlers(self):

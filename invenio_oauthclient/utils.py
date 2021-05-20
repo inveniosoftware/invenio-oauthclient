@@ -103,22 +103,12 @@ def oauth_authenticate(client_id, user, require_existing_link=False):
     return False
 
 
-def filter_user_info(user_info, precedence_mask=None):
+def filter_user_info(user_info, precedence_mask):
     """Filter the user info dictionary according to the precedence mask.
-
-    If the precedence_mask keyword argument is not specified, the value
-    from the configuration is used.
-    This should be the normal call convention of this function.
 
     :param user_info: The user info dictionary.
     :param precedence_mask: The precedence mask to use.
     """
-    if precedence_mask is None:
-        precedence_mask = current_app.config.get(
-            "OAUTHCLIENT_USER_INFO_PRECEDENCE_MASK",
-            {"email": True},
-        )
-
     # for each of the user info values, check if they are supposed
     # to take precedence over user input (as per precedence mask)
     for key, user_info_value in list(user_info.items()):
@@ -132,8 +122,8 @@ def filter_user_info(user_info, precedence_mask=None):
             filter_user_info(user_info_value, precedence_mask[key])
 
         elif prec_val_dict:
-            # the precedence dictionary says it's a dict, but
-            # it's actually a value... inconsistent!
+            # the precedence mask says it's a dict, but it is actually
+            # a different value... remove this inconsistent user_info value
             user_info.pop(key, None)
 
         elif not precedence_value:
@@ -166,7 +156,7 @@ def remove_csrf_tokens(user_data):
             remove_csrf_tokens(value)
 
 
-def oauth_register(form, user_info=None):
+def oauth_register(form, user_info=None, precedence_mask=None):
     """Register user if possible.
 
     :param form: A form instance.
@@ -179,7 +169,8 @@ def oauth_register(form, user_info=None):
         # let relevant information from the OAuth service's user info
         # have precedence over the values specified by the user
         if user_info:
-            filter_user_info(user_info)
+            default_mask = {"email": True}
+            filter_user_info(user_info, precedence_mask or default_mask)
             patch_dictionary(data, user_info)
 
         # remove the CSRF tokens to avoid unexpected keyword arguments

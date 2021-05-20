@@ -88,10 +88,14 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
     """Default configuration for ORCID OAuth provider."""
 
     def __init__(self, title=None, description=None, base_url=None,
-                 app_key=None, access_token_url=None, authorize_url=None):
+                 app_key=None, access_token_url=None, authorize_url=None,
+                 precedence_mask=None):
         """Constructor."""
         access_token_url = access_token_url or "https://orcid.org/oauth/token"
         authorize_url = authorize_url or "https://orcid.org/oauth/authorize"
+        precedence_mask = precedence_mask or {
+            "email": False,
+        }
 
         super().__init__(
             title or "ORCID",
@@ -102,7 +106,9 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
                                   "show_login": "true"},
             access_token_url=access_token_url,
             authorize_url=authorize_url,
-            content_type="application/json")
+            content_type="application/json",
+            precedence_mask=precedence_mask,
+        )
 
     def get_handlers(self):
         """Return ORCID auth handlers."""

@@ -257,7 +257,7 @@ def test_patch_dictionary():
 
 def test_precedence_mask(app):
     """Test if the precedence mask configuration is read properly."""
-    app.config["OAUTHCLIENT_USER_INFO_PRECEDENCE_MASK"] = {
+    precedence_mask = {
         "email": True,
         "profile": {
             "username": True,
@@ -310,7 +310,7 @@ def test_precedence_mask(app):
         }
     }
 
-    filter_user_info(user_info)
+    filter_user_info(user_info, precedence_mask)
 
     assert user_info == expected_filtered_user_info
 

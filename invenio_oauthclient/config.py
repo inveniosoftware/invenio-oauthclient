@@ -55,6 +55,8 @@ keys:
 - ``authorized_handler`` - Import path to authorized callback handler.
 - ``disconnect_handler`` - Import path to disconnect callback handler.
 - ``signup_handler`` - A dictionary of import path to sign up callback handler.
+- ``precedence_mask`` - A mask determining which user info values should
+  override user input during sign-up.
 
 .. code-block:: python
 
@@ -70,10 +72,64 @@ keys:
                 setup="...",
                 view="...",
             ),
+            precedence_mask=dict(
+                email=True
+            ),
             params=dict(...),
             )
         )
     )
+
+Note on the ``precedence_mask``:
+
+This mask is used during sign-up of new users via external OAuth
+providers, to determine for which of the new user's properties the
+`user_info` given by the OAuth provider must take precedence over
+any user input.
+
+Any properties marked with `True` in the precedence mask will be
+taken from the OAuth service's `user_info` dictionary, overriding
+any potential user input from registration forms.
+Properties not appearing in the precedence mask (or marked with
+`False`) will be used as specified by the user.
+If a property is missing from the `user_info` dictionary, the
+configured value in the precedence mask is irrelevant.
+
+For instance, if the following user info were given by the OAuth
+remote app during signup, and the precedence mask configured as
+follows:
+
+.. code-block:: python
+
+    # user_info from the oauth remote app
+    {
+        "email": "user@inveniosoftware.org",
+        "password": "somepassword",
+        "profile": {
+            "username": "test-user",
+            "full_name": "Test User",
+        }
+    }
+
+    # precedence_mask
+    {
+        "email": True,
+        "profile": {
+            "username": True,
+            "full_name": False,
+        }
+    }
+
+Then, the values for `email` and `profile.username` from the
+`user_info` would be overriding any user input from the registration
+form.
+All other values would be used as provided by the user in the form.
+
+WARNING: Allowing users to specify their email address arbitrarily
+(`precedence_mask["email"] = False`) during sign-up may have severe
+security implications, as the linking of external accounts with
+accounts in Invenio is done by matching email addresses!
+
 
 Remote REST application
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -108,6 +164,7 @@ same keys as Remote application in addition to:
             disconnect_redirect_url="...",
             signup_redirect_url="...",
             error_redirect_url="...",
+            precedence_mask=dict(...),
             params=dict(...),
             )
         )
@@ -274,60 +331,6 @@ If this option is enabled and there is exactly one external authentication
 service enabled (i.e. one OAuthClient remote app is configured, and local
 login is disabled), the login view function will automatically redirect to
 this external authentication service.
-"""
-
-OAUTHCLIENT_USER_INFO_PRECEDENCE_MASK = {
-    "email": True,
-    "profile": {
-        "username": False,
-        "full_name": False,
-    }
-}
-"""Mask determining which user info values should override user input.
-
-This mask is used during sign-up of new users via external OAuth providers,
-to determine for which of the new user's properties the `user_info` given
-by the OAuth provider must take precedence over any user input.
-
-Any properties marked with `True` in the precedence mask will be taken
-from the OAuth service's `user_info` dictionary, overriding any potential
-user input from registration forms.
-Properties not appearing in the precedence mask (or marked with `False`)
-will be used as specified by the user.
-If a property is missing from the `user_info` dictionary, the configured
-value in the precedence mask is irrelevant.
-
-For instance, if the following user info were given by the OAuth remote app
-during signup, and the precedence mask configured as follows:
-
-.. code-block:: python
-    >>> user_info_from_oauth_remote_app
-    {
-        "email": "user@inveniosoftware.org",
-        "password": "somepassword",
-        "profile": {
-            "username": "test-user",
-            "full_name": "Test User",
-        }
-    }
-
-    >>> precedence_mask
-    {
-        "email": True,
-        "profile": {
-            "username": True,
-            "full_name": False,
-        }
-    }
-
-Then, the values for `email` and `profile.username` from the `user_info`
-would be overriding any user input from the registration form.
-All other values would be used as provided by the user in the form.
-
-WARNING: Allowing users to specify their email address arbitrarily
-(`OAUTHCLIENT_USER_INFO_PRECEDENCE_MASK["email"] = False`) during sign-up
-may have severe security implications, as the linking of external
-accounts with accounts in Invenio is done by matching email addresses!
 """
 
 ACCOUNTS_LOGIN_VIEW_FUNCTION = auto_redirect_login
