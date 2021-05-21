@@ -28,6 +28,7 @@ class OAuthSettingsHelper:
         access_token_method="POST",
         request_token_params=None,
         request_token_url=None,
+        precedence_mask=None,
         **kwargs,
     ):
         """The constructor."""
@@ -36,11 +37,20 @@ class OAuthSettingsHelper:
         request_token_params = request_token_params or {"scope": ""}
         access_token_url = access_token_url or f"{self.base_url}oauth2/token"
         authorize_url = authorize_url or f"{self.base_url}oauth2/authorize"
+        precedence_mask = precedence_mask or {
+            "email": True,
+            "password": False,
+            "profile": {
+                "username": False,
+                "full_name": False,
+            },
+        }
 
         self.base_app = dict(
             title=title,
             description=description,
             icon=icon,
+            precedence_mask=precedence_mask,
             params=dict(
                 base_url=self.base_url,
                 request_token_params=request_token_params,

@@ -143,7 +143,7 @@ def signup_handler(remote, *args, **kwargs):
     :returns: Redirect response or the template rendered.
     """
     try:
-        form = create_registrationform(request.form)
+        form = create_registrationform(request.form, oauth_remote_app=remote)
         next_url = base_signup_handler(remote, form, *args, **kwargs)
         if form.is_submitted():
             if next_url:

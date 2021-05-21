@@ -19,17 +19,20 @@
     {%- block signup_header %}
       <div class="ui center aligned header">
         <div class="content">
+          <div class="ui hidden divider"></div>
           {%- block signup_app_icon %}
-          {% if app_icon -%}
-          <i class="{{app_icon}}"></i>
-          {% endif %}
+            {% if app_icon -%}
+            <i class="{{app_icon}}"></i>
+            {% endif %}
           {%- endblock %}
-          {{ _('Sign-up with %(title)s!', title=app_title) }}
-          <div class="sub header">
+          <h3 class="ui header">
+            {{ _('Sign-up with %(title)s!', title=app_title) }}
+          </h3>
+          <h5 class="ui grey header">
             {{ _('Fill in your details to complete your registration. You only have to do this once.') }}
-          </div>
+          </h5>
+          <div class="ui hidden divider"></div>
         </div>
-        <hr />
     </div>
     {% endblock %}
     {%- block signup_form %}
@@ -37,6 +40,10 @@
       {%- for field in form %}
         {{ render_field(field) }}
       {%- endfor %}
+      <div class="ui hidden divider"></div>
+      <button type="submit" class="ui fluid large signup submit button">
+        <i class="ui edit outline icon"></i>{{ _('Complete registration') }}
+      </button>
     </form>
     {%- endblock %}
   </div>

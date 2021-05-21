@@ -30,6 +30,7 @@
       {%- for field in form %}
         {{ render_field(field) }}
       {%- endfor %}
+      <input type="submit" value="{{_('Complete registration')}}" />
     </form>
     {%- endblock %}
   </div>

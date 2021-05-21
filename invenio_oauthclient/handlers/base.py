@@ -8,7 +8,7 @@
 
 """Handlers for customizing oauthclient endpoints."""
 
-from flask import session
+from flask import current_app, session
 from flask_login import current_user
 from invenio_db import db
 from pkg_resources import require
@@ -64,12 +64,14 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
 
         if user is None:
             # Auto sign-up if user not found
-            form = create_csrf_disabled_registrationform()
+            form = create_csrf_disabled_registrationform(remote)
             form = fill_form(
                 form,
                 account_info['user']
             )
-            user = oauth_register(form)
+            remote_apps = current_app.config['OAUTHCLIENT_REMOTE_APPS']
+            precedence_mask = remote_apps[remote.name].get("precedence_mask")
+            user = oauth_register(form, account_info['user'], precedence_mask)
 
             # if registration fails ...
             if user is None:
@@ -162,9 +164,11 @@ def base_signup_handler(remote, form, *args, **kwargs):
     if form.validate_on_submit():
         account_info = session.get(session_prefix + '_account_info')
         response = session.get(session_prefix + '_response')
+        remote_apps = current_app.config['OAUTHCLIENT_REMOTE_APPS']
+        precedence_mask = remote_apps[remote.name].get("precedence_mask")
 
         # Register user
-        user = oauth_register(form)
+        user = oauth_register(form, account_info['user'], precedence_mask)
 
         if user is None:
             raise OAuthClientUserNotRegistered()

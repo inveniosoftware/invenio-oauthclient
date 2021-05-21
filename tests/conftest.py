@@ -44,6 +44,7 @@ from invenio_oauthclient.contrib.keycloak import KeycloakSettingsHelper
 from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_oauthclient.contrib.orcid import \
     REMOTE_REST_APP as ORCID_REMOTE_REST_APP
+from invenio_oauthclient.utils import _create_registrationform
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.client import rest_blueprint
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
@@ -77,6 +78,7 @@ def base_app(request):
         WTF_CSRF_ENABLED=False,
         LOGIN_DISABLED=False,
         CACHE_TYPE='simple',
+        OAUTHCLIENT_SIGNUP_FORM=_create_registrationform,
         OAUTHCLIENT_REMOTE_APPS=dict(
             cern=CERN_REMOTE_APP,
             cern_openid=CERN_OPENID_REMOTE_APP,

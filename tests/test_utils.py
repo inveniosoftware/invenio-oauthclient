@@ -17,10 +17,12 @@ from six.moves.urllib.parse import quote_plus
 
 from invenio_oauthclient.errors import AlreadyLinkedError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
+from invenio_oauthclient.proxies import current_oauthclient
 from invenio_oauthclient.utils import _get_external_id, \
     create_csrf_disabled_registrationform, create_registrationform, \
-    fill_form, get_safe_redirect_target, oauth_authenticate, oauth_get_user, \
-    oauth_link_external_id, oauth_unlink_external_id, obj_or_import_string, \
+    fill_form, filter_user_info, get_safe_redirect_target, \
+    oauth_authenticate, oauth_get_user, oauth_link_external_id, \
+    oauth_unlink_external_id, obj_or_import_string, patch_dictionary, \
     rebuild_access_tokens
 
 
@@ -130,9 +132,12 @@ def test_app_registrationform_has_csrf(app_with_csrf, form_test_data):
 
 def test_registrationform_disable_csrf(app_with_csrf, form_test_data):
     """App with CSRF enabled, test if registration form removes it."""
+    remote_apps = current_oauthclient.oauth.remote_apps
+    first_remote_app = list(remote_apps.values())[0]
     filled_form = _fill_form(app_with_csrf,
                              create_csrf_disabled_registrationform,
-                             form_test_data)
+                             form_test_data,
+                             remote=first_remote_app)
 
     assert 'profile' not in filled_form
     _assert_no_csrf_token(filled_form)
@@ -163,9 +168,12 @@ def test_app_registrationform_userprofile_has_csrf(app_with_userprofiles_csrf,
 def test_registrationform_userprofile_disable_csrf(app_with_userprofiles_csrf,
                                                    form_test_data):
     """App with CSRF enabled and UserProfile, test if reg. form removes it."""
+    remote_apps = current_oauthclient.oauth.remote_apps
+    first_remote_app = list(remote_apps.values())[0]
     filled_form = _fill_form(app_with_userprofiles_csrf,
                              create_csrf_disabled_registrationform,
-                             form_test_data)
+                             form_test_data,
+                             remote=first_remote_app)
 
     assert 'profile' in filled_form
     assert 'csrf_token' not in filled_form.profile
@@ -203,14 +211,112 @@ def _assert_no_csrf_token(form):
     assert 'csrf_token' not in form or form.csrf_token.data is None
 
 
-def _fill_form(app, form, data):
+def _fill_form(app, form, data, *form_args, **form_kwargs):
     """Fill the input form with the provided data."""
     with app.test_request_context():
         filled_form = fill_form(
-            form(),
+            form(*form_args, **form_kwargs),
             data
         )
 
         filled_form.validate()
 
         return filled_form
+
+
+def test_patch_dictionary():
+    """Test the dictionary patch function."""
+    orig_dict = {
+        "email": "user@inveniosoftware.org",
+        "profile": {
+            "username": "user"
+        },
+    }
+
+    # patch some existing properties, add new ones, and leave some as is
+    patch_dict = {
+        "email": "admin@inveniosoftware.org",
+        "profile": {
+            "full_name": "Test User",
+        },
+        "extra": [1, 2, 3],
+    }
+
+    expected = {
+        "email": "admin@inveniosoftware.org",
+        "profile": {
+            "username": "user",
+            "full_name": "Test User",
+        },
+        "extra": [1, 2, 3],
+    }
+
+    patch_dictionary(orig_dict, patch_dict)
+    assert orig_dict == expected
+
+
+def test_precedence_mask(app):
+    """Test if the precedence mask configuration is read properly."""
+    precedence_mask = {
+        "email": True,
+        "password": False,
+        "profile": {
+            "username": True,
+            "full_name": False,
+            "extra1": True,
+            "extra2": True,
+            "extra3": False,
+        }
+    }
+
+    user_info = {
+        "email": "user@inveniosoftware.org",
+        "password": "somepassword",
+        "profile": {
+            "username": "test-user",
+            "full_name": "Test User",
+            "extra2": 2,
+            "extra3": 3,
+            "extra4": 4,
+        }
+    }
+
+    expected_filtered_user_info = {
+        "email": "user@inveniosoftware.org",
+        "profile": {
+            "username": "test-user",
+            "extra2": 2,
+            "extra4": 4,
+        }
+    }
+
+    input_values = {
+        "email": "admin@inveniosoftware.org",
+        "password": "anotherpassword",
+        "profile": {
+            "username": "admin",
+            "full_name": "Ruler of the World",
+            "extra2": 0,
+            "extra3": 0,
+        }
+    }
+
+    expected_values = {
+        "email": "user@inveniosoftware.org",
+        "password": "anotherpassword",
+        "profile": {
+            "username": "test-user",
+            "full_name": "Ruler of the World",
+            "extra2": 2,
+            "extra3": 0,
+            "extra4": 4,
+        }
+    }
+
+    filter_user_info(user_info, precedence_mask)
+
+    assert user_info == expected_filtered_user_info
+
+    patch_dictionary(input_values, user_info)
+
+    assert input_values == expected_values

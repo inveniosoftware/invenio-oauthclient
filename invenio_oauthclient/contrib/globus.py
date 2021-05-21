@@ -84,14 +84,16 @@ class GlobusOAuthSettingsHelper(OAuthSettingsHelper):
     external_method = "globus"
 
     def __init__(self, title=None, description=None, base_url=None,
-                 app_key=None):
+                 app_key=None, precedence_mask=None):
         """Constructor."""
         super().__init__(
             title or "Globus",
             description or "Research data management simplified.",
             base_url or "https://auth.globus.org/v2/",
             app_key or "GLOBUS_APP_CREDENTIALS",
-            request_token_params={"scope": "openid email profile"})
+            request_token_params={"scope": "openid email profile"},
+            precedence_mask=precedence_mask,
+        )
 
     def get_handlers(self):
         """Return Globus auth handlers."""
