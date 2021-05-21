@@ -39,6 +39,7 @@ class OAuthSettingsHelper:
         authorize_url = authorize_url or f"{self.base_url}oauth2/authorize"
         precedence_mask = precedence_mask or {
             "email": True,
+            "password": False,
             "profile": {
                 "username": False,
                 "full_name": False,

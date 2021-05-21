@@ -259,6 +259,7 @@ def test_precedence_mask(app):
     """Test if the precedence mask configuration is read properly."""
     precedence_mask = {
         "email": True,
+        "password": False,
         "profile": {
             "username": True,
             "full_name": False,
@@ -285,6 +286,7 @@ def test_precedence_mask(app):
         "profile": {
             "username": "test-user",
             "extra2": 2,
+            "extra4": 4,
         }
     }
 
@@ -307,6 +309,7 @@ def test_precedence_mask(app):
             "full_name": "Ruler of the World",
             "extra2": 2,
             "extra3": 0,
+            "extra4": 4,
         }
     }
 

@@ -87,11 +87,11 @@ providers, to determine for which of the new user's properties the
 `user_info` given by the OAuth provider must take precedence over
 any user input.
 
-Any properties marked with `True` in the precedence mask will be
-taken from the OAuth service's `user_info` dictionary, overriding
-any potential user input from registration forms.
-Properties not appearing in the precedence mask (or marked with
-`False`) will be used as specified by the user.
+Properties marked with `False` in the precedence mask will be used
+as specified by the user.
+Any properties marked with `True` (or not appearing) in the precedence
+mask will be taken from the OAuth service's `user_info` dictionary,
+overriding any potential user input from registration forms.
 If a property is missing from the `user_info` dictionary, the
 configured value in the precedence mask is irrelevant.
 

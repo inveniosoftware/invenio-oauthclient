@@ -112,7 +112,7 @@ def filter_user_info(user_info, precedence_mask):
     # for each of the user info values, check if they are supposed
     # to take precedence over user input (as per precedence mask)
     for key, user_info_value in list(user_info.items()):
-        precedence_value = precedence_mask.get(key, False)
+        precedence_value = precedence_mask.get(key, True)
         info_val_dict = isinstance(user_info_value, dict)
         prec_val_dict = isinstance(precedence_value, dict)
 
