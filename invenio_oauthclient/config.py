@@ -332,11 +332,3 @@ service enabled (i.e. one OAuthClient remote app is configured, and local
 login is disabled), the login view function will automatically redirect to
 this external authentication service.
 """
-
-ACCOUNTS_LOGIN_VIEW_FUNCTION = auto_redirect_login
-"""The view function to use for the login endpoint.
-
-This can be either an import string, or the view function itself.
-If set to None, the default login view function from Flask-Security will be
-left as is.
-"""

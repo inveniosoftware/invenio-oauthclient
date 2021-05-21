@@ -63,7 +63,19 @@ def post_ext_init(state):
 
 @blueprint.route("/login")
 def auto_redirect_login(*args, **kwargs):
-    """Handle automatic redirect to external auth service if configured."""
+    """Handles automatic redirect to external auth service.
+
+    The login endpoint will redirect automatically to the external
+    auth service is the following conditions are met:
+
+    * local login is disabled
+    * redirect to external login is enabled
+    * only one external auth service is configured
+
+    This function should be set as value of the invenio-accounts
+    config var ``ACCOUNTS_LOGIN_VIEW_FUNCTION``. It should be defined in
+    the Invenio application configuration to ensure that is correctly loaded.
+    """
     local_login_enabled = current_app.config.get(
         "ACCOUNTS_LOCAL_LOGIN_ENABLED", False
     )

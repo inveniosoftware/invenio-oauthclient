@@ -69,7 +69,7 @@ install_requires = [
     'oauthlib>=1.1.2,<3.0.0',
     'Flask-OAuthlib>=0.9.6',
     'blinker>=1.4',
-    'invenio-accounts>=1.4.4',
+    'invenio-accounts>=1.4.5',
     'invenio-i18n>=1.2.0',
     'invenio-theme>=1.3.4',
     'invenio-mail>=1.0.0',
@@ -121,9 +121,6 @@ setup(
         ],
         'invenio_base.api_blueprints': [
             'invenio_oauthclient_rest = invenio_oauthclient.views.client:rest_blueprint',
-        ],
-        'invenio_config.module': [
-            'invenio_oauthclient = invenio_oauthclient.config',
         ],
         'invenio_db.alembic': [
             'invenio_oauthclient = invenio_oauthclient:alembic',
