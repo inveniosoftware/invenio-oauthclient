@@ -391,6 +391,7 @@ def get_resource(remote):
 
 def _account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
+    g.oauth_logged_in_with_remote = remote
     resource = get_resource(remote)
 
     valid_identities = current_app.config.get(
@@ -511,6 +512,11 @@ def on_identity_changed(sender, identity):
         disconnect_identity(identity)
         return
 
+    remote = g.get("oauth_logged_in_with_remote", None)
+    if not remote or remote.name != "cern":
+        # signal coming from another remote app
+        return
+
     client_id = current_app.config['CERN_APP_CREDENTIALS']['consumer_key']
     account = RemoteAccount.get(
         user_id=current_user.get_id(),
@@ -518,7 +524,6 @@ def on_identity_changed(sender, identity):
     )
     groups = []
     if account:
-        remote = find_remote_by_client_id(client_id)
         resource = get_resource(remote)
         refresh = current_app.config.get(
             'OAUTHCLIENT_CERN_REFRESH_TIMEDELTA',

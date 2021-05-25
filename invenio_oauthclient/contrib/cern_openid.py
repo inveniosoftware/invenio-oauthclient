@@ -264,6 +264,7 @@ def get_resource(remote, token_response=None):
 
 def _account_info(remote, resp):
     """Retrieve remote account information used to find local user."""
+    g.oauth_logged_in_with_remote = remote
     resource = get_resource(remote, resp)
 
     valid_roles = current_app.config.get(
@@ -388,6 +389,11 @@ def on_identity_changed(sender, identity):
         disconnect_identity(identity)
         return
 
+    remote = g.get("oauth_logged_in_with_remote", None)
+    if not remote or remote.name != "cern_openid":
+        # signal coming from another remote app
+        return
+
     logged_in_via_token = hasattr(current_user, 'login_via_oauth2') \
         and getattr(current_user, 'login_via_oauth2')
 
@@ -405,7 +411,6 @@ def on_identity_changed(sender, identity):
             OAUTHCLIENT_CERN_OPENID_REFRESH_TIMEDELTA,
         )
         if refresh:
-            remote = find_remote_by_client_id(client_id)
             resource = get_resource(remote)
             roles.extend(
                 account_roles_and_extra_data(
