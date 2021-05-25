@@ -125,6 +125,9 @@ def test_account_setup(app_rest, example_cern_openid_rest, models_fixture):
         resp = disconnect_rest_handler(ioc.remote_apps['cern_openid'])
         assert resp.status_code >= 300
 
+        # simulate login (account_info fetch)
+        g.oauth_logged_in_with_remote = ioc.remote_apps['cern_openid']
+
         login_user(user)
         assert len(g.identity.provides) == 3
 
@@ -134,6 +137,7 @@ def test_account_setup(app_rest, example_cern_openid_rest, models_fixture):
         assert OAUTHCLIENT_CERN_OPENID_SESSION_KEY not in session
 
         # Login again to test the disconnect handler
+        g.oauth_logged_in_with_remote = ioc.remote_apps['cern_openid']
         login_user(user)
         assert len(g.identity.provides) == 3
 
@@ -192,6 +196,7 @@ def test_account_info_not_allowed_account(app_rest, example_cern_openid_rest):
 
     mock_remote_get(ioc, 'cern_openid', example_response)
     resp = account_info_rest(ioc.remote_apps['cern_openid'], None)
+    assert g.oauth_logged_in_with_remote == ioc.remote_apps['cern_openid']
 
     assert resp.status_code == 302
     expected_url_args = {

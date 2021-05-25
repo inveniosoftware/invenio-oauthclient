@@ -87,6 +87,7 @@ def test_account_info(app, example_cern):
 
     assert account_info(
         ioc.remote_apps['cern'], None) == example_account_info
+    assert g.oauth_logged_in_with_remote == ioc.remote_apps['cern']
 
     assert account_info(ioc.remote_apps['cern'], {}) == \
         dict(
@@ -134,6 +135,9 @@ def test_account_setup(app, example_cern, models_fixture):
         resp = disconnect_handler(ioc.remote_apps['cern'])
         assert resp.status_code >= 300
 
+        # simulate login (account_info fetch)
+        g.oauth_logged_in_with_remote = ioc.remote_apps['cern']
+
         login_user(user)
         assert len(g.identity.provides) == 7
 
@@ -143,6 +147,7 @@ def test_account_setup(app, example_cern, models_fixture):
         assert OAUTHCLIENT_CERN_SESSION_KEY not in session
 
         # Login again to test the disconnect handler
+        g.oauth_logged_in_with_remote = ioc.remote_apps['cern']
         login_user(user)
         assert len(g.identity.provides) == 7
 
