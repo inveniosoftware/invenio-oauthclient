@@ -8,6 +8,17 @@
 Changes
 =======
 
+Version 1.5.1 (released 2021-05-26)
+
+- Allow to automatically redirect to the external login provider under
+  certain conditions.
+- Disable the possibility to disconnect the last external account to
+  always have at least one external account connected (when configured).
+- Make registration form customizable to allow adding extra form fields
+  when the user login the first time.
+- CERN contribs: fix bug that will execute login/logout signal for CERN
+  contribs even if the user logged in a different way.
+
 Version 1.5.0 (released 2021-05-07)
 
 - Keycloak: refactor settings helper to allow multiple instances of
