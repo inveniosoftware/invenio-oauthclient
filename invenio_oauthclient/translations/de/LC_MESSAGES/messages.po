@@ -1,102 +1,147 @@
 # Translations template for invenio-oauthclient.
-# Copyright (C) 2016 CERN
+# Copyright (C) 2021 CERN
+# Copyright (C) 2021 Graz University of Technology.
 # This file is distributed under the same license as the invenio-oauthclient
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
 # 
-#, fuzzy
+# Translators:
+# Alizee Pace <alizee.pace@gmail.com>, 2021
+# Tibor Simko <tibor.simko@cern.ch>, 2021
+# Mojib Wali <mojib.wali@tugraz.at>, 2021
+# Chriz Uniba <christina.zeller@uni-bamberg.de>, 2021
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-oauthclient 1.0.0a10\n"
+"Project-Id-Version: invenio-oauthclient 1.5.1\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
-"POT-Creation-Date: 2016-09-09 15:01+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Alizee Pace <alizee.pace@gmail.com>, 2016\n"
+"POT-Creation-Date: 2021-06-10 13:58+0200\n"
+"PO-Revision-Date: 2016-08-18 15:19+0000\n"
+"Last-Translator: Chriz Uniba <christina.zeller@uni-bamberg.de>, 2021\n"
 "Language-Team: German (https://www.transifex.com/inveniosoftware/teams/23537/de/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.9.1\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: invenio_oauthclient/admin.py:64
+#: invenio_oauthclient/admin.py:51
 msgid "ID"
 msgstr "ID"
 
-#: invenio_oauthclient/admin.py:65
+#: invenio_oauthclient/admin.py:52 invenio_oauthclient/admin.py:112
 msgid "User ID"
 msgstr "Benutzer-ID"
 
-#: invenio_oauthclient/admin.py:66
+#: invenio_oauthclient/admin.py:53
 msgid "Client ID"
 msgstr "Client-ID"
 
-#: invenio_oauthclient/admin.py:95
+#: invenio_oauthclient/admin.py:82
 msgid "ID Remote Account"
-msgstr "Entfernter-Account-ID"
+msgstr "ID externes Konto"
 
-#: invenio_oauthclient/admin.py:102 invenio_oauthclient/admin.py:108
+#: invenio_oauthclient/admin.py:111
+msgid "Email"
+msgstr "E-Mail"
+
+#: invenio_oauthclient/admin.py:119 invenio_oauthclient/admin.py:126
+#: invenio_oauthclient/admin.py:133
 msgid "User Management"
 msgstr "Benutzerverwaltung"
 
-#: invenio_oauthclient/handlers.py:189
+#: invenio_oauthclient/admin.py:120
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:14
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:14
+#: invenio_oauthclient/views/settings.py:47
+msgid "Linked accounts"
+msgstr "Verknüpfte Konten"
+
+#: invenio_oauthclient/admin.py:127
+msgid "Linked account tokens"
+msgstr "Verknüpfte Konto-Tokens"
+
+#: invenio_oauthclient/admin.py:134
+msgid "Linked account identities"
+msgstr "Verknüpfte Konto-Identitäten"
+
+#: invenio_oauthclient/contrib/cern.py:429
+#: invenio_oauthclient/contrib/cern_openid.py:306
+msgid "CERN account not allowed."
+msgstr "CERN-Konto nicht erlaubt."
+
+#: invenio_oauthclient/handlers/ui.py:42
+msgid "External service is already linked to another account."
+msgstr "Der externe Dienst ist bereits mit einem anderen Konto verknüpft."
+
+#: invenio_oauthclient/handlers/ui.py:47
 msgid "You rejected the authentication request."
 msgstr "Sie haben die Authentifizierungsanfrage abgelehnt."
 
-#: invenio_oauthclient/handlers.py:193
-msgid "External service is already linked to another account."
-msgstr "Der außwärtige Dienst is bereits zu einem anderen Account verbunden."
-
-#: invenio_oauthclient/handlers.py:447
+#: invenio_oauthclient/handlers/ui.py:173
 msgid "Authorization with remote service failed."
-msgstr "Autorisierung mit dem außwärtigen Dienst fehlgeschlagen."
+msgstr "Autorisierung mit externem Dienst fehlgeschlagen."
 
-#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:40
+#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:24
 msgid "Close"
 msgstr "Schließen"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:58
+#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:41
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/_macros.html:60
 #, python-format
 msgid "Sign in with %(title)s"
 msgstr "Mit %(title)s einloggen"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:34
+#: invenio_oauthclient/templates/invenio_oauthclient/login_user.html:21
+msgid "OR"
+msgstr "ODER"
+
+#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:24
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:29
 #, python-format
 msgid "Sign-up with %(title)s!"
-msgstr "Melden Sie sich mit %(title)s an!"
+msgstr "Registrieren Sie sich mit %(title)s!"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:35
+#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:25
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:32
 msgid ""
 "Fill in your details to complete your registration. You only have to do this"
 " once."
 msgstr ""
-"Füllen Sie bitte Ihren Daten aus, um Ihre Registrierung abzuschließen."
+"Füllen Sie bitte Ihren Daten ein, um Ihre Registrierung abzuschließen. Dies "
+"ist nur einmalig nötig."
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:25
-#: invenio_oauthclient/views/settings.py:54
-msgid "Linked accounts"
-msgstr "Verbundene Konten"
+#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:33
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:45
+msgid "Complete registration"
+msgstr "Registrierung abschließen"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:22
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:22
 #, python-format
 msgid ""
 "Tired of entering password for %(sitename)s every time you sign in? Set up "
 "single sign-on with one or more of the services below:"
 msgstr ""
-"Sind Sie müde, Ihr Passwort für %(sitename)s jedes mal beim Einloggen "
-"einzugeben? Bauen Sie Single-Sign-On mit einem, der folgenden Webdiensten "
-"auf:"
+"Wollen Sie nicht jedes Mal beim Einloggen auf %(sitename)s Ihr Passwort "
+"eingeben? Verwenden Sie Single-Sign-On mit einem der folgenden Diensten:"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:41
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:33
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:34
 msgid "Disconnect"
-msgstr "Verbinden"
-
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:43
-msgid "Connect"
 msgstr "Trennen"
 
-#: invenio_oauthclient/views/settings.py:48
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:35
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:36
+msgid "Connect"
+msgstr "Verbinden"
+
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:26
+msgid "Or"
+msgstr "Oder"
+
+#: invenio_oauthclient/views/settings.py:38
 #, python-format
 msgid "%(icon)s Linked accounts"
-msgstr "%(icon)s Verbundene Konten"
+msgstr "%(icon)s Verknüpfte Konten"
