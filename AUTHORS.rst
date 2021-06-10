@@ -36,3 +36,4 @@ Contributors
 - Tibor Simko
 - Zacharias Zacharodimos
 - Maximilian Moser
+- Mojib Wali
