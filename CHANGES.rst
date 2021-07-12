@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.5.2 (released 2021-07-12)
+
+- Add german translations
+
 Version 1.5.1 (released 2021-05-26)
 
 - Allow to automatically redirect to the external login provider under
