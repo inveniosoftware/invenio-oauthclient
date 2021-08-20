@@ -191,6 +191,6 @@ BASE_APP = _gitlab.base_app
 REMOTE_APP = _gitlab.remote_app
 """GitLab.COM remote application configuration."""
 
-REMOTE_REST_APP = _github_app.remote_rest_app
+REMOTE_REST_APP = _gitlab.remote_rest_app
 """GitLab.COM remote REST application configuration."""
 
