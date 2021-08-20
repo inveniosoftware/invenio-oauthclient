@@ -186,10 +186,11 @@ def gitlab_disconnect_handler(remote, *args, **kwargs):
 _gitlab = GitlabOAuthSettingsHelper()
 
 BASE_APP = _gitlab.base_app
+"""GitLab.COM base application configuration."""
 
 REMOTE_APP = _gitlab.remote_app
-"""GitLab remote application configuration."""
+"""GitLab.COM remote application configuration."""
 
 REMOTE_REST_APP = _github_app.remote_rest_app
-"""GitLab remote rest application configuration."""
+"""GitLab.COM remote REST application configuration."""
 
