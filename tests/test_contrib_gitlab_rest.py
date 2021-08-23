@@ -24,10 +24,11 @@ from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient import current_oauthclient
 from invenio_oauthclient._compat import _create_identifier
-from invenio_oauthclient.contrib.gitlab import authorized_rest
 from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken, UserIdentity
 from invenio_oauthclient.views.client import serializer
+
+#from invenio_oauthclient.contrib.gitlab import authorized_rest
 
 
 def _get_state():
