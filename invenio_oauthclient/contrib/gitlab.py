@@ -128,7 +128,7 @@ def _request_user_info(remote, resp):
 
 def gitlab_account_info(remote, resp):
     user_info = _request_user_info(remote, resp)
-    _id = user_info['id']
+    _id = str(user_info['id'])
     _email = user_info['email']
     _username = user_info['username']
     _full_name = user_info['name']
@@ -140,7 +140,7 @@ def gitlab_account_info(remote, resp):
                 full_name = _full_name
             ),
         ),
-        external_id = str(_id),
+        external_id = _id,
         external_method = 'gitlab'
     )
 
@@ -148,7 +148,7 @@ def gitlab_account_info(remote, resp):
 def gitlab_account_setup(remote, token, resp):
     user_info = _request_user_info(remote, resp)
 
-    _id = user_info['id']
+    _id = str(user_info['id'])
     _email = user_info['email']
     _username = user_info['username']
     _full_name = user_info['name']
@@ -159,7 +159,7 @@ def gitlab_account_setup(remote, token, resp):
         # Create user <-> external id link.
         oauth_link_external_id(
             token.remote_account.user, dict(
-                id=str(_id),
+                id=_id,
                 method='gitlab')
         )
 
