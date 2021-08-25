@@ -408,13 +408,17 @@ def example_github(request):
 
 @pytest.fixture
 def example_gitlab(request):
-    """GitLab example data."""
+    """
+    GitLab example data.
+
+    Example responses: https://docs.gitlab.com/ee/api/oauth2.html
+    """
     return {
-        'name': 'Josiah Carberry',
+        # 'name': 'Josiah Carberry',
         'expires_in': 3599,
         'access_token': 'test_access_token',
         'refresh_token': 'test_refresh_token',
-        'scope': '/authenticate',
+        # 'scope': '/authenticate',
         'token_type': 'bearer',
     }
 
