@@ -27,23 +27,46 @@ from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
 
 from invenio_oauthclient import InvenioOAuthClient, InvenioOAuthClientREST
-from invenio_oauthclient.contrib.cern import REMOTE_APP as CERN_REMOTE_APP
+
+# CERN
+from invenio_oauthclient.contrib.cern import \
+    REMOTE_APP as CERN_REMOTE_APP
 from invenio_oauthclient.contrib.cern import \
     REMOTE_REST_APP as CERN_REMOTE_REST_APP
+
+# CERN/OpenID
 from invenio_oauthclient.contrib.cern_openid import \
     REMOTE_APP as CERN_OPENID_REMOTE_APP
 from invenio_oauthclient.contrib.cern_openid import \
     REMOTE_REST_APP as CERN_OPENID_REMOTE_REST_APP
-from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
+
+# GitHub
+from invenio_oauthclient.contrib.github import \
+    REMOTE_APP as GITHUB_REMOTE_APP
 from invenio_oauthclient.contrib.github import \
     REMOTE_REST_APP as GITHUB_REMOTE_REST_APP
-from invenio_oauthclient.contrib.globus import REMOTE_APP as GLOBUS_REMOTE_APP
+
+# GitLab
+from invenio_oauthclient.contrib.gitlab import \
+    REMOTE_APP as GITLAB_REMOTE_APP
+from invenio_oauthclient.contrib.gitlab import \
+    REMOTE_REST_APP as GITLAB_REMOTE_REST_APP
+
+# Globus
+from invenio_oauthclient.contrib.globus import \
+    REMOTE_APP as GLOBUS_REMOTE_APP
 from invenio_oauthclient.contrib.globus import \
     REMOTE_REST_APP as GLOBUS_REMOTE_REST_APP
+
+# KeyCloak
 from invenio_oauthclient.contrib.keycloak import KeycloakSettingsHelper
-from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
+
+# OrcID
+from invenio_oauthclient.contrib.orcid import \
+    REMOTE_APP as ORCID_REMOTE_APP
 from invenio_oauthclient.contrib.orcid import \
     REMOTE_REST_APP as ORCID_REMOTE_REST_APP
+
 from invenio_oauthclient.utils import _create_registrationform
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.client import rest_blueprint
@@ -84,6 +107,7 @@ def base_app(request):
             cern_openid=CERN_OPENID_REMOTE_APP,
             orcid=ORCID_REMOTE_APP,
             github=GITHUB_REMOTE_APP,
+            gitlab=GITLAB_REMOTE_APP,
             globus=GLOBUS_REMOTE_APP,
             keycloak=KEYCLOAK_REMOTE_APP,
         ),
@@ -92,12 +116,17 @@ def base_app(request):
             cern_openid=CERN_OPENID_REMOTE_REST_APP,
             orcid=ORCID_REMOTE_REST_APP,
             github=GITHUB_REMOTE_REST_APP,
+            gitlab=GITLAB_REMOTE_REST_APP,
             globus=GLOBUS_REMOTE_REST_APP,
         ),
         OAUTHCLIENT_STATE_EXPIRES=300,
         GITHUB_APP_CREDENTIALS=dict(
             consumer_key='github_key_changeme',
             consumer_secret='github_secret_changeme',
+        ),
+        GITLAB_APP_CREDENTIALS=dict(
+            consumer_key='gitlab_key_changeme',
+            consumer_secret='gitlab_secret_changeme',
         ),
         ORCID_APP_CREDENTIALS=dict(
             consumer_key='orcid_key_changeme',
