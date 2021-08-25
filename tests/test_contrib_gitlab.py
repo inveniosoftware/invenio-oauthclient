@@ -22,11 +22,10 @@ from invenio_db import db
 from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient._compat import _create_identifier
+from invenio_oauthclient.contrib.gitlab import authorized
 from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken, UserIdentity
 from invenio_oauthclient.views.client import serializer
-
-#from invenio_oauthclient.contrib.gitlab import authorized
 
 
 def _get_state():
@@ -36,13 +35,15 @@ def _get_state():
 
 def test_login(app):
     """Test gitlab login."""
+    print(type(app))
     client = app.test_client()
+    print(type(client))
 
     resp = client.get(
         url_for('invenio_oauthclient.login', remote_app='gitlab',
                 next='/someurl/')
     )
-    assert resp.status_code == 302
+    assert resp.status_code == 302, resp.data
 
     params = parse_qs(urlparse(resp.location).query)
     assert params['response_type'], ['code']
@@ -59,16 +60,10 @@ class MockGl(object):
         """Init."""
         self._email = email
 
-    def emails(self):
-        """Get emails."""
-        Email = namedtuple('Email', 'verified primary email')
-        yield Email(verified=True, primary=True,
+    def json(self):
+        """Mock requests.get(...).json()"""
+        return dict(id='123456', name='John Lagalaga', username='mynick',
                     email=self._email)
-
-    def me(self):
-        """Mock me."""
-        Me = namedtuple('Me', 'id name login')
-        return Me(id='123456', name='John', login='mynick')
 
 
 def test_authorized_signup_valid_user(app, example_gitlab):
@@ -77,7 +72,7 @@ def test_authorized_signup_valid_user(app, example_gitlab):
 
     with app.test_client() as c:
         # User login with email 'info'
-        with mock.patch('github3.login') as MockLogin:
+        with mock.patch('requests.get') as MockLogin:
             MockLogin.return_value = MockGl(email='info@inveniosoftware.org')
 
             # Ensure remote apps have been loaded (due to before first
@@ -137,8 +132,8 @@ def test_authorized_signup_valid_user(app, example_gitlab):
             assert RemoteToken.query.count() == 0
 
         # User login with another email ('info2')
-        with mock.patch('github3.login') as MockLogin:
-            MockLogin.return_value = MockGh(email='info2@inveniosoftware.org')
+        with mock.patch('requests.get') as MockLogin:
+            MockLogin.return_value = MockGl(email='info2@inveniosoftware.org')
 
             # User authorized the requests and is redirect back
             resp = c.get(
@@ -162,8 +157,8 @@ def test_authorized_signup_username_already_exists(app, example_gitlab, user):
 
     with app.test_client() as c:
         # User login with email 'info'
-        with mock.patch('github3.login') as MockLogin:
-            MockLogin.return_value = MockGh(email=example_email)
+        with mock.patch('requests.get') as MockLogin:
+            MockLogin.return_value = MockGl(email=example_email)
 
             # Ensure remote apps have been loaded (due to before first
             # request)
@@ -271,8 +266,8 @@ def test_authorized_already_authenticated(app, models_fixture, example_gitlab):
         login_user(user)
         return 'Logged In'
 
-    with mock.patch('github3.login') as MockLogin:
-        MockLogin.return_value = MockGh(email='info@inveniosoftware.org')
+    with mock.patch('requests.get') as MockLogin:
+        MockLogin.return_value = MockGl(email='info@inveniosoftware.org')
 
         with app.test_client() as client:
 
