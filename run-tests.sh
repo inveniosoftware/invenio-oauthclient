@@ -8,7 +8,9 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 # Usage:
-#   env DB=postgresql ./run-tests.sh [<specific_module_test.py>]
+#   env DB=postgresql ./run-tests.sh [cli-options] [<specific_module_test.py>]
+#   Eg:
+#   ./run-tests.sh -x tests/test_contrib_gitlab.py
 
 # Quit on errors
 set -o errexit
