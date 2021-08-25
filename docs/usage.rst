@@ -13,6 +13,11 @@ GitHub
 
 .. automodule:: invenio_oauthclient.contrib.github
 
+GitLab
+------
+
+.. automodule:: invenio_oauthclient.contrib.gitlab
+
 ORCID
 -----
 

@@ -11,28 +11,88 @@ from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_exter
 from flask import current_app, redirect, url_for
 from flask_login import current_user
 
-#_GITLAB_SERVER_ = 'gitlab.com'
-#OAUTHCLIENT_REMOTE_APPS = {
-#    "gitlab": dict(
-#        description = 'Gitlab-GMAP login authentication',
-#        icon = 'fa fa-gitlab',
-#        title = 'Gitlab',
-#        params = dict(
-#            base_url = f'https://{_GITLAB_SERVER_}/api/v4',
-#            authorize_url = f'https://{_GITLAB_SERVER_}/oauth/authorize',
-#            access_token_url = f'https://{_GITLAB_SERVER_}/oauth/token',
-#            request_token_params = {'scope': 'email read_user'},
-#            consumer_secret = os.environ['CONSUMER_SECRET'],
-#            consumer_key = os.environ['CONSUMER_KEY'],
-#            access_token_method = 'POST',
-#            request_token_url = None,
-#        ),
-#        precedence_mask = {
-#            "email": True,
-#        },
-#    )
-#}
+"""Pre-configured remote application for enabling sign in/up with GitLab.
 
+Besides the public https://gitlab.com, GitLab can also be installed on
+premises (e.g, ``https://gitlab.example.com``). By default, ``gitlab.com``
+is used, but you can set custom values for your own/on premises instance.
+The sections below cover both cases.
+
+1. First thing to do is to create a new application in GitLab
+(see https://docs.gitlab.com/ee/integration/oauth_provider.html for
+instructions on how to register it). Basically, you wanna go to
+``https://<gitlab-address>/-/profile/applications``. Make sure to:
+  * check scopes ``read_user`` and ``email``
+  * set _redirect URI_ to ``CFG_SITE_SECURE_URL/oauth/authorized/gitlab/``
+
+
+2. Once the application is registered you'll have access to the *Application ID*
+   and *Secret* keys. Those will be used in the next step inside your (Invenio)
+   instance configuration file (``invenio.cfg``).
+
+
+3a. Edit your Invenio instance configuration and add the GitLab app secret keys:
+
+   .. code-block:: python
+
+        from invenio_oauthclient.contrib import gitlab
+
+        OAUTHCLIENT_REMOTE_APPS = dict(
+            gitlab=github.REMOTE_APP,
+        )
+
+        GITLAB_APP_CREDENTIALS = dict(
+            consumer_key='<APPLICATION ID>',
+            consumer_secret='<APPLICATION SECRET>',
+        )
+
+
+3b. *IF* the GitLab server is different from ``gitlab.com``, running on your
+    premises at ``gitlab.example.com``, for example, you have to say so:
+
+   .. code-block:: python
+
+        from invenio_oauthclient.contrib import gitlab
+
+        _gl_ = 'https://gitlab.exampl.com'
+
+        mygitlab = gitlab.GitlabOAuthSettingsHelper(
+            access_token_url = f"{_gl_}/oauth/token"
+            authorize_url = f"{_gl_}/oauth/authorize"
+            base_url = f"{_gl_}/api/v4"
+        )
+
+        OAUTHCLIENT_REMOTE_APPS = dict(
+            gitlab = mygitlab.remote_app,
+        )
+
+        GITLAB_APP_CREDENTIALS = dict(
+            consumer_key = '<APPLICATION ID>',
+            consumer_secret = '<APPLICATION SECRET>',
+        )
+
+
+5. Now go to ``CFG_SITE_SECURE_URL/oauth/login/gitlab/`` (e.g.
+   http://127.0.0.1:5000/oauth/login/gitlab/)
+
+6. Also, you should see GitLab listed under Linked accounts:
+   http://127.0.0.1:5000/account/settings/linkedaccounts/
+
+By default the GitLab module will try first look if a link already exists
+between a GitLab account and a user. If no link is found, the module tries to
+retrieve the user email address from GitHub to match it with a local user. If
+this fails, the user is asked to provide an email address to sign-up.
+
+In templates you can add a sign in/up link:
+
+.. code-block:: jinja
+
+    <a href='{{url_for('invenio_oauthclient.login', remote_app='gitlab')}}'>
+      Sign in with GitLab
+    </a>
+
+For more details you can play with a :doc:`working example <examplesapp>`.
+"""
 
 
 class GitlabOAuthSettingsHelper(OAuthSettingsHelper):
@@ -67,7 +127,7 @@ class GitlabOAuthSettingsHelper(OAuthSettingsHelper):
                 app_key or "GITLAB_APP_CREDENTIALS"
             ),
             request_token_params = (
-                request_token_params or {'scope': 'read_user'}
+                request_token_params or {'scope': 'read_user email'}
             ),
             precedence_mask = (
                 precedence_mask or {'email': True}
@@ -193,4 +253,3 @@ REMOTE_APP = _gitlab.remote_app
 
 REMOTE_REST_APP = _gitlab.remote_rest_app
 """GitLab.COM remote REST application configuration."""
-
