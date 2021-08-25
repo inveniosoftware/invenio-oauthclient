@@ -3,8 +3,10 @@ import os
 from invenio_db import db
 
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
+from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.handlers import authorized_signup_handler, oauth_error_handler
 from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
+from invenio_oauthclient.handlers.rest import oauth_resp_remote_error_handler, response_handler
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_external_id
 
@@ -181,8 +183,6 @@ def _request_user_info(remote, resp):
     import requests
     headers={'Authorization': f'{resp["token_type"]} {resp["access_token"]}'}
     r = requests.get(remote.base_url + '/user', headers=headers)
-    if r.status_code != 200:
-        return None
     return r.json()
 
 
@@ -241,6 +241,48 @@ def gitlab_disconnect_handler(remote, *args, **kwargs):
     if remote_account:
         with db.session.begin_nested():
             remote_account.delete()
+
+    return redirect(url_for('invenio_oauthclient_settings.index'))
+
+
+@oauth_error_handler
+def authorized(resp, remote):
+    """Authorized callback handler for GitLab.
+
+    :param resp: The response.
+    :param remote: The remote application.
+    """
+    if resp and 'error' in resp:
+        if resp['error'] == 'bad_verification_code':
+            return redirect(url_for('invenio_oauthclient.login',
+                                    remote_app='gitlab'))
+        elif resp['error'] in ['incorrect_client_credentials',
+                               'redirect_uri_mismatch']:
+            raise OAuthResponseError(
+                'Application mis-configuration in GitLab', remote, resp
+            )
+
+    return authorized_signup_handler(resp, remote)
+
+
+@oauth_resp_remote_error_handler
+def authorized_rest(resp, remote):
+    """Authorized callback handler for GitLab.
+
+    :param resp: The response.
+    :param remote: The remote application.
+    """
+    if resp and 'error' in resp:
+        if resp['error'] == 'bad_verification_code':
+            return redirect(url_for('invenio_oauthclient.rest_login',
+                                    remote_app='gitlab'))
+        elif resp['error'] in ['incorrect_client_credentials',
+                               'redirect_uri_mismatch']:
+            raise OAuthResponseError(
+                'Application mis-configuration in GitLab', remote, resp
+            )
+
+    return authorized_signup_rest_handler(resp, remote)
 
 
 _gitlab = GitlabOAuthSettingsHelper()
