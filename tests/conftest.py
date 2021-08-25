@@ -378,6 +378,19 @@ def example_github(request):
 
 
 @pytest.fixture
+def example_gitlab(request):
+    """GitLab example data."""
+    return {
+        'name': 'Josiah Carberry',
+        'expires_in': 3599,
+        'access_token': 'test_access_token',
+        'refresh_token': 'test_refresh_token',
+        'scope': '/authenticate',
+        'token_type': 'bearer',
+    }
+
+
+@pytest.fixture
 def example_globus(request):
     """Globus example data."""
     return {
