@@ -35,15 +35,13 @@ def _get_state():
 
 def test_login(app):
     """Test gitlab login."""
-    print(type(app))
     client = app.test_client()
-    print(type(client))
 
     resp = client.get(
         url_for('invenio_oauthclient.login', remote_app='gitlab',
                 next='/someurl/')
     )
-    assert resp.status_code == 302, resp.data
+    assert resp.status_code == 302
 
     params = parse_qs(urlparse(resp.location).query)
     assert params['response_type'], ['code']
@@ -61,8 +59,8 @@ class MockGl(object):
         self._email = email
 
     def json(self):
-        """Mock requests.get(...).json()"""
-        return dict(id='123456', name='John Lagalaga', username='mynick',
+        """Mock Requests result.json"""
+        return dict(id='gitlabuser', name='John', username='mynick',
                     email=self._email)
 
 
@@ -110,11 +108,11 @@ def test_authorized_signup_valid_user(app, example_gitlab):
             user = User.query.filter_by(email=example_email).one()
             assert 1 == UserIdentity.query.filter_by(
                 method='gitlab', id_user=user.id,
-                id='123456'
+                id='gitlabuser'
             ).count()
 
             # set a password for the user
-            user.password = hash_password("mockkey")
+            user.password = hash_password("1234")
             db.session.commit()
 
             # Disconnect again
@@ -125,7 +123,7 @@ def test_authorized_signup_valid_user(app, example_gitlab):
             user = User.query.filter_by(email=example_email).one()
             assert 0 == UserIdentity.query.filter_by(
                 method='gitlab', id_user=user.id,
-                id='123456'
+                id='gitlabuser'
             ).count()
 
             assert RemoteAccount.query.filter_by(user_id=user.id).count() == 0
@@ -186,7 +184,7 @@ def test_authorized_signup_username_already_exists(app, example_gitlab, user):
                 resp.headers['Location'],
                 data={
                     'email': example_email,
-                    'password': 'mockpass',
+                    'password': '123456',
                     'profile.username': 'pippo2',
                     'profile.full_name': 'pluto',
                 }
@@ -209,11 +207,11 @@ def test_authorized_signup_username_already_exists(app, example_gitlab, user):
             my_user = User.query.filter_by(email=example_email).one()
             assert 1 == UserIdentity.query.filter_by(
                 method='gitlab', id_user=my_user.id,
-                id='123456'
+                id='gitlabuser'
             ).count()
 
             # set a password for the user
-            my_user.password = hash_password("mockpass")
+            my_user.password = hash_password("1234")
             db.session.commit()
 
             # Disconnect again
@@ -224,7 +222,7 @@ def test_authorized_signup_username_already_exists(app, example_gitlab, user):
             my_user = User.query.filter_by(email=example_email).one()
             assert 0 == UserIdentity.query.filter_by(
                 method='gitlab', id_user=my_user.id,
-                id='123456'
+                id='gitlabuser'
             ).count()
             assert RemoteAccount.query.filter_by(
                 user_id=my_user.id).count() == 0
@@ -310,7 +308,7 @@ def test_authorized_already_authenticated(app, models_fixture, example_gitlab):
             u = User.query.filter_by(email=existing_email).one()
             assert 0 == UserIdentity.query.filter_by(
                 method='gitlab', id_user=u.id,
-                id='123456'
+                id='gitlabuser'
             ).count()
             assert RemoteAccount.query.filter_by(user_id=u.id).count() == 0
             assert RemoteToken.query.count() == 0
