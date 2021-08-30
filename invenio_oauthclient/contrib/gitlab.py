@@ -1,18 +1,3 @@
-import os
-
-from invenio_db import db
-
-from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
-from invenio_oauthclient.errors import OAuthResponseError
-from invenio_oauthclient.handlers import authorized_signup_handler, oauth_error_handler
-from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
-from invenio_oauthclient.handlers.rest import oauth_resp_remote_error_handler, response_handler
-from invenio_oauthclient.models import RemoteAccount
-from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_external_id
-
-from flask import current_app, redirect, url_for
-from flask_login import current_user
-
 """Pre-configured remote application for enabling sign in/up with GitLab.
 
 Besides the public https://gitlab.com, GitLab can also be installed on
@@ -21,11 +6,11 @@ is used, but you can set custom values for your own/on premises instance.
 The sections below cover both cases.
 
 1. First thing to do is to create a new application in GitLab
-(see https://docs.gitlab.com/ee/integration/oauth_provider.html for
-instructions on how to register it). Basically, you wanna go to
-``https://<gitlab-address>/-/profile/applications``. Make sure to:
-  * check scopes ``read_user`` and ``email``
-  * set _redirect URI_ to ``CFG_SITE_SECURE_URL/oauth/authorized/gitlab/``
+   (see https://docs.gitlab.com/ee/integration/oauth_provider.html for
+   instructions on how to register it). Basically, you wanna go to
+   ``https://<gitlab-address>/-/profile/applications``. Make sure to:
+   * check scopes ``read_user`` and ``email``
+   * set redirect URI to ``CFG_SITE_SECURE_URL/oauth/authorized/gitlab/``
 
 
 2. Once the application is registered you'll have access to the *Application ID*
@@ -33,14 +18,14 @@ instructions on how to register it). Basically, you wanna go to
    instance configuration file (``invenio.cfg``).
 
 
-3a. Edit your Invenio instance configuration and add the GitLab app secret keys:
+3. Edit your Invenio instance configuration and add the GitLab app secret keys:
 
    .. code-block:: python
 
         from invenio_oauthclient.contrib import gitlab
 
         OAUTHCLIENT_REMOTE_APPS = dict(
-            gitlab=github.REMOTE_APP,
+            gitlab=gitlab.REMOTE_APP,
         )
 
         GITLAB_APP_CREDENTIALS = dict(
@@ -49,8 +34,8 @@ instructions on how to register it). Basically, you wanna go to
         )
 
 
-3b. *IF* the GitLab server is different from ``gitlab.com``, running on your
-    premises at ``gitlab.example.com``, for example, you have to say so:
+3. *IF* the GitLab server is different from ``gitlab.com``, running on your
+   premises at ``gitlab.example.com``, for example, you have to say so:
 
    .. code-block:: python
 
@@ -96,8 +81,30 @@ In templates you can add a sign in/up link:
 For more details you can play with a :doc:`working example <examplesapp>`.
 """
 
+import os
+
+from invenio_db import db
+
+from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
+from invenio_oauthclient.errors import OAuthResponseError
+from invenio_oauthclient.handlers import \
+    authorized_signup_handler, oauth_error_handler
+from invenio_oauthclient.handlers.rest import \
+    authorized_signup_handler as authorized_signup_rest_handler
+from invenio_oauthclient.handlers.rest import \
+    oauth_resp_remote_error_handler, response_handler
+from invenio_oauthclient.handlers.utils import \
+    require_more_than_one_external_account
+from invenio_oauthclient.models import RemoteAccount
+from invenio_oauthclient.utils import \
+    oauth_link_external_id, oauth_unlink_external_id
+
+from flask import current_app, redirect, url_for
+from flask_login import current_user
+
 
 class GitlabOAuthSettingsHelper(OAuthSettingsHelper):
+    """Default configuration for GitLab OAuth provider."""
     def __init__(self,
         title=None,
         description=None,
@@ -111,6 +118,7 @@ class GitlabOAuthSettingsHelper(OAuthSettingsHelper):
         request_token_url=None,
         precedence_mask=None,
         ):
+        """Constructor."""
 
         _glcom_ = 'https://gitlab.com'
         kwargs = dict(
@@ -143,8 +151,10 @@ class GitlabOAuthSettingsHelper(OAuthSettingsHelper):
         super().__init__(**kwargs)
 
     def get_handlers(self):
+        """Return GitLab auth handlers."""
         return dict(
-            authorized_handler='invenio_oauthclient.handlers:authorized_signup_handler',
+            authorized_handler= 'invenio_oauthclient.handlers'
+                                ':authorized_signup_handler',
             disconnect_handler=gitlab_disconnect_handler,
             signup_handler=dict(
                 info=gitlab_account_info,
@@ -154,15 +164,18 @@ class GitlabOAuthSettingsHelper(OAuthSettingsHelper):
         )
 
     def get_rest_handlers(self):
+        """Return GitLab auth REST handlers."""
         return dict(
-            authorized_handler='invenio_oauthclient.handlers.rest:authorized_signup_handler',
+            authorized_handler= 'invenio_oauthclient.handlers.rest'
+                                ':authorized_signup_handler',
             disconnect_handler=gitlab_disconnect_rest_handler,
             signup_handler=dict(
                 info=gitlab_account_info,
                 setup=gitlab_account_setup,
                 view='invenio_oauthclient.handlers.rest:signup_handler',
             ),
-            response_handler='invenio_oauthclient.handlers.rest:default_remote_response_handler',
+            response_handler= 'invenio_oauthclient.handlers.rest'
+                              ':default_remote_response_handler',
             authorized_redirect_url='/',
             disconnect_redirect_url='/',
             signup_redirect_url='/',
@@ -171,6 +184,14 @@ class GitlabOAuthSettingsHelper(OAuthSettingsHelper):
 
 
 def _request_user_info(remote, resp):
+    """Retrieve remote account information used to find local user.
+
+    It returns the JSON response
+
+    :param remote: The remote application.
+    :param resp: The response.
+    :returns: A dictionary representing the response (JSON).
+    """
     # We could here, like in contrib.github, use an auxiliary library (eg, python-gitlab)
     # I've chosen not to use to not add a dependency for such small use.
     # The equivalent in python-gitlab for the request below is:
@@ -187,6 +208,32 @@ def _request_user_info(remote, resp):
 
 
 def gitlab_account_info(remote, resp):
+    """Retrieve remote account information used to find local user.
+
+    It returns a dictionary with the following structure:
+
+    .. code-block:: python
+
+        {
+            'user': {
+                'email': '...',
+                'profile': {
+                    'username': '...',
+                    'full_name': '...',
+                }
+            },
+            'external_id': 'gitlab-unique-identifier',
+            'external_method': 'gitlab',
+        }
+
+    Information inside the user dictionary are available for other modules.
+    For example, they are used from the module invenio-userprofiles to fill
+    the user profile.
+
+    :param remote: The remote application.
+    :param resp: The response.
+    :returns: A dictionary with the user information.
+    """
     user_info = _request_user_info(remote, resp)
     _id = str(user_info['id'])
     _email = user_info['email']
@@ -206,6 +253,12 @@ def gitlab_account_info(remote, resp):
 
 
 def gitlab_account_setup(remote, token, resp):
+    """Perform additional setup after user have been logged in.
+
+    :param remote: The remote application.
+    :param token: The token value.
+    :param resp: The response.
+    """
     user_info = _request_user_info(remote, resp)
 
     _id = str(user_info['id'])
@@ -236,7 +289,7 @@ def _disconnect(remote, *args, **kwargs):
 
     remote_account = RemoteAccount.get(user_id=current_user.get_id(),
                                        client_id=remote.consumer_key)
-    external_method = 'github'
+    external_method = 'gitlab'
     external_ids = [i.id for i in current_user.external_identifiers
                     if i.method == external_method]
 
