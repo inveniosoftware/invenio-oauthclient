@@ -13,7 +13,7 @@ The sections below cover both cases.
    * set redirect URI to ``CFG_SITE_SECURE_URL/oauth/authorized/gitlab/``
 
 
-2. Once the application is registered you'll have access to the *Application ID*
+2. Once the application is registered you'll have access to the Application ID
    and *Secret* keys. Those will be used in the next step inside your (Invenio)
    instance configuration file (``invenio.cfg``).
 
@@ -105,46 +105,46 @@ from flask_login import current_user
 
 class GitlabOAuthSettingsHelper(OAuthSettingsHelper):
     """Default configuration for GitLab OAuth provider."""
-    def __init__(self,
-        title=None,
-        description=None,
-        base_url=None,
-        app_key=None,
-        icon=None,
-        access_token_url=None,
-        authorize_url=None,
-        access_token_method="POST",
-        request_token_params=None,
-        request_token_url=None,
-        precedence_mask=None,
-        ):
-        """Constructor."""
 
+    def __init__(self,
+                 title=None,
+                 description=None,
+                 base_url=None,
+                 app_key=None,
+                 icon=None,
+                 access_token_url=None,
+                 authorize_url=None,
+                 access_token_method="POST",
+                 request_token_params=None,
+                 request_token_url=None,
+                 precedence_mask=None,
+                 ):
+        """Constructor."""
         _glcom_ = 'https://gitlab.com'
         kwargs = dict(
-            access_token_method ="POST",
-            request_token_url = request_token_url,
-            access_token_url= (
+            access_token_method="POST",
+            request_token_url=request_token_url,
+            access_token_url=(
                 access_token_url or f"{_glcom_}/oauth/token"
             ),
-            authorize_url = (
+            authorize_url=(
                 authorize_url or f"{_glcom_}/oauth/authorize"
             ),
-            base_url = (
+            base_url=(
                 base_url or f"{_glcom_}/api/v4"
             ),
-            app_key = (
+            app_key=(
                 app_key or "GITLAB_APP_CREDENTIALS"
             ),
-            request_token_params = (
+            request_token_params=(
                 request_token_params or {'scope': 'read_user email'}
             ),
-            precedence_mask = (
+            precedence_mask=(
                 precedence_mask or {'email': True}
             ),
-            title = title or "Gitlab",
-            icon = icon or "fa fa-gitlab",
-            description = (
+            title=title or "Gitlab",
+            icon=icon or "fa fa-gitlab",
+            description=(
                 description or "Gitlab/OAuth server instance"
             ),
         )
@@ -153,8 +153,8 @@ class GitlabOAuthSettingsHelper(OAuthSettingsHelper):
     def get_handlers(self):
         """Return GitLab auth handlers."""
         return dict(
-            authorized_handler= 'invenio_oauthclient.handlers'
-                                ':authorized_signup_handler',
+            authorized_handler='invenio_oauthclient.handlers'
+                               ':authorized_signup_handler',
             disconnect_handler=gitlab_disconnect_handler,
             signup_handler=dict(
                 info=gitlab_account_info,
@@ -166,16 +166,16 @@ class GitlabOAuthSettingsHelper(OAuthSettingsHelper):
     def get_rest_handlers(self):
         """Return GitLab auth REST handlers."""
         return dict(
-            authorized_handler= 'invenio_oauthclient.handlers.rest'
-                                ':authorized_signup_handler',
+            authorized_handler='invenio_oauthclient.handlers.rest'
+                               ':authorized_signup_handler',
             disconnect_handler=gitlab_disconnect_rest_handler,
             signup_handler=dict(
                 info=gitlab_account_info,
                 setup=gitlab_account_setup,
                 view='invenio_oauthclient.handlers.rest:signup_handler',
             ),
-            response_handler= 'invenio_oauthclient.handlers.rest'
-                              ':default_remote_response_handler',
+            response_handler='invenio_oauthclient.handlers.rest'
+                             ':default_remote_response_handler',
             authorized_redirect_url='/',
             disconnect_redirect_url='/',
             signup_redirect_url='/',
@@ -192,17 +192,17 @@ def _request_user_info(remote, resp):
     :param resp: The response.
     :returns: A dictionary representing the response (JSON).
     """
-    # We could here, like in contrib.github, use an auxiliary library (eg, python-gitlab)
+    # We could here, like in contrib.github, use an auxiliary library
     # I've chosen not to use to not add a dependency for such small use.
     # The equivalent in python-gitlab for the request below is:
     # ```
-    # > import gitlab
-    # > gl = gitlab.Gitlab('https://gitlab.com', oauth_token=resp['access_token'])
-    # > gl.auth()
-    # > user_info = gl.user.attributes
+    # import gitlab
+    # gl = gitlab.Gitlab('https://gitlab.com',oauth_token=resp['access_token'])
+    # gl.auth()
+    # user_info = gl.user.attributes
     # ```
     import requests
-    headers={'Authorization': f'{resp["token_type"]} {resp["access_token"]}'}
+    headers = {'Authorization': f'{resp["token_type"]} {resp["access_token"]}'}
     r = requests.get(remote.base_url + '/user', headers=headers)
     return r.json()
 
@@ -240,15 +240,15 @@ def gitlab_account_info(remote, resp):
     _username = user_info['username']
     _full_name = user_info['name']
     return dict(
-        user = dict(
-            email = _email,
-            profile = dict(
-                username = _username,
-                full_name = _full_name
+        user=dict(
+            email=_email,
+            profile=dict(
+                username=_username,
+                full_name=_full_name
             ),
         ),
-        external_id = _id,
-        external_method = 'gitlab'
+        external_id=_id,
+        external_method='gitlab'
     )
 
 
@@ -321,6 +321,7 @@ def gitlab_disconnect_rest_handler(remote, *args, **kwargs):
     redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
         remote.name]['disconnect_redirect_url']
     return response_handler(remote, redirect_url)
+
 
 @oauth_error_handler
 def authorized(resp, remote):

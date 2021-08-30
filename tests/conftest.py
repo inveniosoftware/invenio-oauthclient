@@ -27,51 +27,37 @@ from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
 
 from invenio_oauthclient import InvenioOAuthClient, InvenioOAuthClientREST
-
 # CERN
-from invenio_oauthclient.contrib.cern import \
-    REMOTE_APP as CERN_REMOTE_APP
+from invenio_oauthclient.contrib.cern import REMOTE_APP as CERN_REMOTE_APP
 from invenio_oauthclient.contrib.cern import \
     REMOTE_REST_APP as CERN_REMOTE_REST_APP
-
 # CERN/OpenID
 from invenio_oauthclient.contrib.cern_openid import \
     REMOTE_APP as CERN_OPENID_REMOTE_APP
 from invenio_oauthclient.contrib.cern_openid import \
     REMOTE_REST_APP as CERN_OPENID_REMOTE_REST_APP
-
 # GitHub
-from invenio_oauthclient.contrib.github import \
-    REMOTE_APP as GITHUB_REMOTE_APP
+from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
 from invenio_oauthclient.contrib.github import \
     REMOTE_REST_APP as GITHUB_REMOTE_REST_APP
-
 # GitLab
-from invenio_oauthclient.contrib.gitlab import \
-    REMOTE_APP as GITLAB_REMOTE_APP
+from invenio_oauthclient.contrib.gitlab import REMOTE_APP as GITLAB_REMOTE_APP
 from invenio_oauthclient.contrib.gitlab import \
     REMOTE_REST_APP as GITLAB_REMOTE_REST_APP
-
 # Globus
-from invenio_oauthclient.contrib.globus import \
-    REMOTE_APP as GLOBUS_REMOTE_APP
+from invenio_oauthclient.contrib.globus import REMOTE_APP as GLOBUS_REMOTE_APP
 from invenio_oauthclient.contrib.globus import \
     REMOTE_REST_APP as GLOBUS_REMOTE_REST_APP
-
 # KeyCloak
 from invenio_oauthclient.contrib.keycloak import KeycloakSettingsHelper
-
 # OrcID
-from invenio_oauthclient.contrib.orcid import \
-    REMOTE_APP as ORCID_REMOTE_APP
+from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_oauthclient.contrib.orcid import \
     REMOTE_REST_APP as ORCID_REMOTE_REST_APP
-
 from invenio_oauthclient.utils import _create_registrationform
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.client import rest_blueprint
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
-
 from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
 
 try:
@@ -409,7 +395,7 @@ def example_github(request):
 @pytest.fixture
 def example_gitlab(request):
     """
-    GitLab example data.
+    Gitlab example data.
 
     Example responses: https://docs.gitlab.com/ee/api/oauth2.html
     """
