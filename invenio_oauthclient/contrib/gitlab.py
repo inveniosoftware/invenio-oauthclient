@@ -156,7 +156,7 @@ class GitlabOAuthSettingsHelper(OAuthSettingsHelper):
     def get_rest_handlers(self):
         return dict(
             authorized_handler='invenio_oauthclient.handlers.rest:authorized_signup_handler',
-            disconnect_handler=gitlab_disconnect_handler,
+            disconnect_handler=gitlab_disconnect_rest_handler,
             signup_handler=dict(
                 info=gitlab_account_info,
                 setup=gitlab_account_setup,
@@ -214,7 +214,7 @@ def gitlab_account_setup(remote, token, resp):
     _full_name = user_info['name']
 
     with db.session.begin_nested():
-        token.remote_account.extra_data = {'login': _username, 'id': _id}
+        token.remote_account.extra_data = {'username': _username, 'id': _id}
 
         # Create user <-> external id link.
         oauth_link_external_id(
@@ -225,13 +225,18 @@ def gitlab_account_setup(remote, token, resp):
 
 
 @require_more_than_one_external_account
-def gitlab_disconnect_handler(remote, *args, **kwargs):
+def _disconnect(remote, *args, **kwargs):
+    """Handle unlinking of remote account.
+
+    :param remote: The remote application.
+    :returns: The HTML response.
+    """
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
 
     remote_account = RemoteAccount.get(user_id=current_user.get_id(),
                                        client_id=remote.consumer_key)
-    external_method = 'gitlab'
+    external_method = 'github'
     external_ids = [i.id for i in current_user.external_identifiers
                     if i.method == external_method]
 
@@ -242,8 +247,27 @@ def gitlab_disconnect_handler(remote, *args, **kwargs):
         with db.session.begin_nested():
             remote_account.delete()
 
+
+def gitlab_disconnect_handler(remote, *args, **kwargs):
+    """Handle unlinking of remote account.
+
+    :param remote: The remote application.
+    :returns: The HTML response.
+    """
+    _disconnect(remote, *args, **kwargs)
     return redirect(url_for('invenio_oauthclient_settings.index'))
 
+
+def gitlab_disconnect_rest_handler(remote, *args, **kwargs):
+    """Handle unlinking of remote account.
+
+    :param remote: The remote application.
+    :returns: The HTML response.
+    """
+    _disconnect(remote, *args, **kwargs)
+    redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
+        remote.name]['disconnect_redirect_url']
+    return response_handler(remote, redirect_url)
 
 @oauth_error_handler
 def authorized(resp, remote):

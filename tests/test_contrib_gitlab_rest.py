@@ -61,16 +61,10 @@ class MockGl(object):
         """Init."""
         self._email = email
 
-    def emails(self):
-        """Get emails."""
-        Email = namedtuple('Email', 'verified primary email')
-        yield Email(verified=True, primary=True,
+    def json(self):
+        """Mock Requests result.json"""
+        return dict(id='gitlabuser', name='John', username='mynick',
                     email=self._email)
-
-    def me(self):
-        """Mock me."""
-        Me = namedtuple('Me', 'id name username')
-        return Me(id='123456', name='John', login='mynick')
 
 
 def test_authorized_signup_valid_user(app_rest, example_gitlab):
@@ -79,8 +73,8 @@ def test_authorized_signup_valid_user(app_rest, example_gitlab):
 
     with app_rest.test_client() as c:
         # User login with email 'info'
-        with mock.patch('github3.login') as MockLogin:
-            MockLogin.return_value = MockGh(email='info@inveniosoftware.org')
+        with mock.patch('requests.get') as MockLogin:
+            MockLogin.return_value = MockGl(email='info@inveniosoftware.org')
 
             # Ensure remote apps have been loaded (due to before first
             # request)
@@ -123,7 +117,7 @@ def test_authorized_signup_valid_user(app_rest, example_gitlab):
             user = User.query.filter_by(email=example_email).one()
             assert 1 == UserIdentity.query.filter_by(
                 method='gitlab', id_user=user.id,
-                id='123456'
+                id='gitlabuser'
             ).count()
 
             # set a password for the user
@@ -141,13 +135,13 @@ def test_authorized_signup_valid_user(app_rest, example_gitlab):
             user = User.query.filter_by(email=example_email).one()
             assert 0 == UserIdentity.query.filter_by(
                 method='gitlab', id_user=user.id,
-                id='123456'
+                id='gitlabuser'
             ).count()
             assert RemoteAccount.query.filter_by(user_id=user.id).count() == 0
             assert RemoteToken.query.count() == 0
 
         # User login with another email ('info2')
-        with mock.patch('github3.login') as MockLogin:
+        with mock.patch('requests.get') as MockLogin:
             MockLogin.return_value = MockGl(email='info2@inveniosoftware.org')
 
             # User authorized the requests and is redirect back
@@ -163,14 +157,15 @@ def test_authorized_signup_valid_user(app_rest, example_gitlab):
             assert user.email == example_email
 
 
-def test_authorized_signup_username_already_exists(app_rest, example_gitlab,
-                                                   user_rest):
+def test_authorized_signup_username_already_exists(
+                                                    app_rest, example_gitlab,
+                                                    user_rest):
     """Test authorized callback with sign-up."""
     example_email = 'another@email.it'
 
     with app_rest.test_client() as c:
         # User login with email 'info'
-        with mock.patch('github3.login') as MockLogin:
+        with mock.patch('requests.get') as MockLogin:
             MockLogin.return_value = MockGl(email=example_email)
 
             # Ensure remote apps have been loaded (due to before first
@@ -230,7 +225,7 @@ def test_authorized_signup_username_already_exists(app_rest, example_gitlab,
             my_user = User.query.filter_by(email=example_email).one()
             assert 1 == UserIdentity.query.filter_by(
                 method='gitlab', id_user=my_user.id,
-                id='123456'
+                id='gitlabuser'
             ).count()
 
             # set a password for the user
@@ -247,7 +242,7 @@ def test_authorized_signup_username_already_exists(app_rest, example_gitlab,
             my_user = User.query.filter_by(email=example_email).one()
             assert 0 == UserIdentity.query.filter_by(
                 method='gitlab', id_user=my_user.id,
-                id='123456'
+                id='gitlabuser'
             ).count()
             assert RemoteAccount.query.filter_by(
                 user_id=my_user.id).count() == 0
@@ -290,7 +285,7 @@ def test_authorized_already_authenticated(app_rest, models_fixture,
         login_user(user)
         return 'Logged In'
 
-    with mock.patch('github3.login') as MockLogin:
+    with mock.patch('requests.get') as MockLogin:
         MockLogin.return_value = MockGl(email='info@inveniosoftware.org')
 
         with app_rest.test_client() as client:
@@ -336,7 +331,7 @@ def test_authorized_already_authenticated(app_rest, models_fixture,
             u = User.query.filter_by(email=existing_email).one()
             assert 0 == UserIdentity.query.filter_by(
                 method='gitlab', id_user=u.id,
-                id='123456'
+                id='gitlabuser'
             ).count()
             assert RemoteAccount.query.filter_by(user_id=u.id).count() == 0
             assert RemoteToken.query.count() == 0
@@ -379,5 +374,3 @@ def test_authorized_rest_handler(app_rest):
         example_response = {'error': 'redirect_uri_mismatch'}
         with pytest.raises(OAuthResponseError):
             authorized_rest(example_response, remote)
-
-
