@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2020 FAIR Data Austria.
+# Copyright (C) 2020-2021 TU Wien.
 #
 # Invenio-Keycloak is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -312,7 +312,7 @@ def test_get_userinfo_from_token(app,
 
     token = example_keycloak_token["id_token"]
     options = {"verify_signature": False}
-    expected_result = jwt.decode(token, verify=False, options=options)
+    expected_result = jwt.decode(token, options=options)
 
     with app.test_client() as c:
         # ensure that remote apps have been loaded (before first request)
