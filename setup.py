@@ -63,7 +63,6 @@ setup_requires = [
 
 install_requires = [
     'invenio-base>=1.2.4',
-    'Flask>=1.1.4,<2.0.0',
     'Flask-Breadcrumbs>=0.5.0',
     'requests-oauthlib>=0.6.2,<1.2.0',
     'oauthlib>=1.1.2,<3.0.0',
