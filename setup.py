@@ -62,16 +62,16 @@ setup_requires = [
 ]
 
 install_requires = [
-    'invenio-base>=1.2.4',
-    'Flask-Breadcrumbs>=0.5.0',
-    'requests-oauthlib>=0.6.2,<1.2.0',
-    'oauthlib>=1.1.2,<3.0.0',
-    'Flask-OAuthlib>=0.9.6',
     'blinker>=1.4',
+    'Flask-Breadcrumbs>=0.5.0',
+    'Flask-OAuthlib>=0.9.6',
     'invenio-accounts>=1.4.5',
+    'invenio-base>=1.2.5',
     'invenio-i18n>=1.2.0',
-    'invenio-theme>=1.3.4',
     'invenio-mail>=1.0.0',
+    'invenio-theme>=1.3.4',
+    'oauthlib>=1.1.2,<3.0.0',
+    'requests-oauthlib>=0.6.2,<1.2.0',
     'uritools>=1.0.1',
 ]
 

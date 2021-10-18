@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.5.3 (released 2021-10-18)
+
+- Unpin Flask.
+
 Version 1.5.2 (released 2021-07-12)
 
 - Add german translations
