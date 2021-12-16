@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.5.4 (released 2021-10-18)
+
+- Add OpenAIRE AAI contrib.
+
 Version 1.5.3 (released 2021-10-18)
 
 - Unpin Flask.
