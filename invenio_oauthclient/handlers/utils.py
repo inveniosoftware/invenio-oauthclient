@@ -274,11 +274,18 @@ def require_more_than_one_external_account(f):
 
         # find out all of the linked external accounts for the user
         # that are currently configured and not hidden
+        consumer_keys = set()
+        remote_apps = current_app.config["OAUTHCLIENT_REMOTE_APPS"]
+        for name, remote_app in remote_apps.items():
+            if not remote_app.get("hide", False):
+                consumer_keys.add(name)  # backcompat with v1.5.4
+                remote_app_config = current_app.config[
+                    remote_app["params"]["app_key"]
+                ]
+                consumer_keys.add(remote_app_config["consumer_key"])
+
         linked_accounts = [
-            acc for acc in accounts
-            if acc.client_id in remote_apps and
-            not remote_apps[acc.client_id].get("hide", False)
-        ]
+            acc for acc in accounts if acc.client_id in consumer_keys]
 
         # execute the function only if local login is possible, or
         # there's more than one linked external account
