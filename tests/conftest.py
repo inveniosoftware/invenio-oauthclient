@@ -115,6 +115,10 @@ def base_app(request):
             consumer_key='globus_key_changeme',
             consumer_secret='globus_secret_changeme',
         ),
+        TEST_APP_CREDENTIALS=dict(
+            consumer_key='test_key_changeme',
+            consumer_secret='test_secret_changeme',
+        ),
         OAUTHCLIENT_KEYCLOAK_USER_INFO_URL=helper.user_info_url,
         OAUTHCLIENT_KEYCLOAK_REALM_URL=helper.realm_url,
         OAUTHCLIENT_KEYCLOAK_VERIFY_AUD=True,
@@ -284,6 +288,7 @@ def params():
             authorize_url='https://foo.bar/oauth/authorize',
             consumer_key=x,
             consumer_secret='testsecret',
+            app_key="TEST_APP_CREDENTIALS"
         )
 
     return params
