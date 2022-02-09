@@ -9,8 +9,9 @@
 """Views for OAuth."""
 
 from flask_admin.contrib.sqla import ModelView
+from invenio_accounts.admin import UserIdentityView, user_identity_adminview
 
-from .models import RemoteAccount, RemoteToken, UserIdentity
+from .models import RemoteAccount, RemoteToken
 
 
 def _(x):
@@ -83,36 +84,6 @@ class RemoteTokenView(ModelView):
     }
 
 
-class UserIdentityView(ModelView):
-    """Flask-Admin view to manage user identities from invenio-oauthclient."""
-
-    can_view_details = True
-    can_create = False
-
-    column_list = (
-        'id',
-        'method',
-        'id_user',
-        'user.email',
-    )
-
-    column_searchable_list = \
-        column_sortable_list = \
-        column_list
-
-    column_filters = (
-        'id',
-        'method',
-        'id_user',
-        'user.email',
-    )
-
-    column_labels = {
-        'user.email': _("Email"),
-        'id_user': _("User ID"),
-    }
-
-
 remote_account_adminview = {
     'model': RemoteAccount,
     'modelview': RemoteAccountView,
@@ -120,18 +91,12 @@ remote_account_adminview = {
     'name': _('Linked accounts'),
 }
 
+
 remote_token_adminview = {
     'model': RemoteToken,
     'modelview': RemoteTokenView,
     'category': _('User Management'),
     'name': _('Linked account tokens'),
-}
-
-user_identity_adminview = {
-    'model': UserIdentity,
-    'modelview': UserIdentityView,
-    'category': _('User Management'),
-    'name': _('Linked account identities'),
 }
 
 __all__ = ('remote_account_adminview', 'remote_token_adminview',

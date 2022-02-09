@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 1.6.0 (released TBD)
+
+- Moved UserIdentity to Invenio-Accounts.
+
 Version 1.5.4 (released 2021-10-18)
 
 - Add OpenAIRE AAI contrib.

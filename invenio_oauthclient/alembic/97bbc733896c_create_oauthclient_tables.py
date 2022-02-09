@@ -78,7 +78,6 @@ def downgrade():
                 'oauthclient_useridentity',
                 type_='foreignkey'
             )
-
     op.drop_index(
         'useridentity_id_user_method',
         table_name='oauthclient_useridentity')
