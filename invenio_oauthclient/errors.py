@@ -8,14 +8,9 @@
 
 """Module level errors."""
 
-
-class AlreadyLinkedError(Exception):
-    """Signifies that an account was already linked to another account."""
-
-    def __init__(self, user, external_id):
-        """Initialize exception."""
-        self.user = user
-        self.external_id = external_id
+# Imported here for backward compatibility after moving UserIdentity to
+# Invenio-Accounts.
+from invenio_accounts.errors import AlreadyLinkedError
 
 
 class OAuthError(Exception):

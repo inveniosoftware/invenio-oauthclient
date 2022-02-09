@@ -123,7 +123,7 @@ def test_db(request):
         db.create_all()
         tables = list(filter(lambda table: table.startswith('oauthclient'),
                              db.metadata.tables.keys()))
-        assert len(tables) == 3
+        assert len(tables) == 2
 
 
 def test_alembic(app):
@@ -135,12 +135,11 @@ def test_alembic(app):
             raise pytest.skip('Upgrades are not supported on SQLite.')
 
         assert not ext.alembic.compare_metadata()
+
         db.drop_all()
         ext.alembic.upgrade()
-
         assert not ext.alembic.compare_metadata()
+
         ext.alembic.downgrade(target='96e796392533')
         ext.alembic.upgrade()
-
         assert not ext.alembic.compare_metadata()
-        ext.alembic.downgrade(target='96e796392533')

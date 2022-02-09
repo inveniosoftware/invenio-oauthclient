@@ -22,7 +22,6 @@ from uritools import uricompose, urisplit
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string
 
-from .errors import AlreadyLinkedError
 from .models import RemoteAccount, RemoteToken, UserIdentity
 
 _security = LocalProxy(lambda: current_app.extensions['security'])
@@ -71,10 +70,10 @@ def oauth_get_user(client_id, account_info=None, access_token=None):
     if account_info:
         external_id = _get_external_id(account_info)
         if external_id:
-            user_identity = UserIdentity.query.filter_by(
-                id=external_id['id'], method=external_id['method']).first()
-            if user_identity:
-                return user_identity.user
+            user = UserIdentity.get_user(
+                external_id['method'], external_id['id'])
+            if user:
+                return user
         email = account_info.get('user', {}).get('email')
         if email:
             return User.query.filter_by(email=email).one_or_none()
@@ -93,7 +92,7 @@ def oauth_authenticate(client_id, user, require_existing_link=False):
     # Authenticate via the access token (access token used to get user_id)
     if not requires_confirmation(user):
         after_this_request(_commit)
-        if login_user(user, remember=False):
+        if login_user(user):
             if require_existing_link:
                 account = RemoteAccount.get(user.id, client_id)
                 if account is None:
@@ -189,15 +188,8 @@ def oauth_link_external_id(user, external_id=None):
     :raises invenio_oauthclient.errors.AlreadyLinkedError: Raised if already
         exists a link.
     """
-    try:
-        with db.session.begin_nested():
-            db.session.add(UserIdentity(
-                id=external_id['id'],
-                method=external_id['method'],
-                id_user=user.id
-            ))
-    except IntegrityError:
-        raise AlreadyLinkedError(user, external_id)
+    # Backward compatibility. Use UserIdentity directly instead of this method.
+    UserIdentity.create(user, external_id['method'], external_id['id'])
 
 
 def oauth_unlink_external_id(external_id):
@@ -205,9 +197,8 @@ def oauth_unlink_external_id(external_id):
 
     :param external_id: The external id associated with the user.
     """
-    with db.session.begin_nested():
-        UserIdentity.query.filter_by(id=external_id['id'],
-                                     method=external_id['method']).delete()
+    UserIdentity.delete_by_external_id(
+        external_id['method'], external_id['id'])
 
 
 def get_safe_redirect_target(arg='next'):

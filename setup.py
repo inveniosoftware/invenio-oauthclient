@@ -17,13 +17,12 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 tests_require = [
-    'pytest-invenio>=1.4.0',
-    'SQLAlchemy-Continuum>=1.2.1',
     'httpretty>=0.8.14',
     'invenio-userprofiles>=1.0.0',
-    'requests-oauthlib>=0.6.2,<1.2.0',
-    'oauthlib>=1.1.2,<3.0.0',
     'mock>=1.3.0',
+    'oauthlib>=1.1.2,<3.0.0',
+    'pytest-invenio>=1.4.2',
+    'requests-oauthlib>=0.6.2,<1.2.0',
     'simplejson>=3.8',
 ]
 
@@ -39,14 +38,14 @@ extras_require = {
         'uritemplate.py>=0.2.0,<2.0',
     ],
     'mysql': [
-        'invenio-db[mysql]>=1.0.9',
+        'invenio-db[mysql,versioning]>=1.0.11',
     ],
     'orcid': [],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.9',
+        'invenio-db[postgresql,versioning]>=1.0.11',
     ],
     'sqlite': [
-        'invenio-db>=1.0.9',
+        'invenio-db[versioning]>=1.0.11',
     ],
     'tests': tests_require,
 }
@@ -63,13 +62,12 @@ setup_requires = [
 
 install_requires = [
     'blinker>=1.4',
-    'Flask-Breadcrumbs>=0.5.0',
     'Flask-OAuthlib>=0.9.6',
-    'invenio-accounts>=1.4.5',
+    'invenio-accounts>=2.0.0.dev2',
     'invenio-base>=1.2.5',
-    'invenio-i18n>=1.2.0',
-    'invenio-mail>=1.0.0',
-    'invenio-theme>=1.3.4',
+    'invenio-i18n>=1.3.1',
+    'invenio-mail>=1.0.2',
+    'invenio-theme>=1.3.12',
     'oauthlib>=1.1.2,<3.0.0',
     'requests-oauthlib>=0.6.2,<1.2.0',
     'uritools>=1.0.1',
@@ -104,8 +102,6 @@ setup(
             'invenio_oauthclient.admin:remote_account_adminview',
             'invenio_oauth_remote_token = '
             'invenio_oauthclient.admin:remote_token_adminview',
-            'invenio_oauth_user_identity = '
-            'invenio_oauthclient.admin:user_identity_adminview',
         ],
         'invenio_base.apps': [
             'invenio_oauthclient = invenio_oauthclient:InvenioOAuthClient',

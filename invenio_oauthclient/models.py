@@ -9,7 +9,10 @@
 """Models for storing access tokens and links between users and remote apps."""
 
 from flask import current_app
-from invenio_accounts.models import User
+# UserIdentity imported for backward compatibility. UserIdentity was originally
+# added to OAuthClient but has now been moved to Invenio-Accounts. Importing it
+# here, means previous imports won't break.
+from invenio_accounts.models import User, UserIdentity
 from invenio_db import db
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import backref
@@ -239,23 +242,6 @@ class RemoteToken(db.Model, Timestamp):
             )
             db.session.add(token)
         return token
-
-
-class UserIdentity(db.Model, Timestamp):
-    """Represent a UserIdentity record."""
-
-    __tablename__ = 'oauthclient_useridentity'
-
-    id = db.Column(db.String(255), primary_key=True, nullable=False)
-    method = db.Column(db.String(255), primary_key=True, nullable=False)
-    id_user = db.Column(db.Integer(),
-                        db.ForeignKey(User.id), nullable=False)
-
-    user = db.relationship(User, backref='external_identifiers')
-
-    __table_args__ = (
-        db.Index('useridentity_id_user_method', id_user, method, unique=True),
-    )
 
 
 __all__ = ('RemoteAccount', 'RemoteToken', 'UserIdentity')

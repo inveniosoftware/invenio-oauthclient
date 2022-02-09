@@ -132,6 +132,14 @@ def base_app(request):
         EMAIL_BACKEND='flask_email.backends.locmem.Mail',
         SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI',
                                           'sqlite://'),
+        # Alembic runs all migrations in a single transaction, and in
+        # oauthclient the useridentity table can be in state where it's created
+        # and then deleted in the same transaction. On PostgreSQL which
+        # supports transactional DDL therefore fails if we don't run each
+        # migration in its own migration.
+        ALEMBIC_CONTEXT={
+            'transaction_per_migration': True,
+        },
         SERVER_NAME='localhost',
         DEBUG=False,
         SECRET_KEY='TEST',

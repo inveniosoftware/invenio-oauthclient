@@ -142,7 +142,7 @@ same keys as Remote application in addition to:
 - ``disconnect_redirect_url`` - URL path to redirect your SPA after logging
   out.
 - ``signup_redirect_url`` - URL path to redirect your SPA to sign up a user.
-- ``error_redirect_url`` - URL path to redirect your SPA when an error occurred.
+- ``error_redirect_url`` - URL path to redirect your SPA when an error occurred
 
 
 .. code-block:: python
