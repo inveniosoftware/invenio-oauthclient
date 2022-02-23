@@ -1,15 +1,15 @@
 # Translations template for invenio-oauthclient.
-# Copyright (C) 2021 CERN
-# Copyright (C) 2021 Graz University of Technology.
+# Copyright (C) 2022 CERN
 # This file is distributed under the same license as the invenio-oauthclient
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-oauthclient 1.5.1\n"
+"Project-Id-Version: invenio-oauthclient 1.5.4\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
-"POT-Creation-Date: 2021-06-10 13:58+0200\n"
+"POT-Creation-Date: 2022-02-23 12:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,44 +18,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: invenio_oauthclient/admin.py:51
+#: invenio_oauthclient/admin.py:52
 msgid "ID"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:52 invenio_oauthclient/admin.py:112
+#: invenio_oauthclient/admin.py:53
 msgid "User ID"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:53
+#: invenio_oauthclient/admin.py:54
 msgid "Client ID"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:82
+#: invenio_oauthclient/admin.py:83
 msgid "ID Remote Account"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:111
-msgid "Email"
-msgstr ""
-
-#: invenio_oauthclient/admin.py:119 invenio_oauthclient/admin.py:126
-#: invenio_oauthclient/admin.py:133
+#: invenio_oauthclient/admin.py:90 invenio_oauthclient/admin.py:98
 msgid "User Management"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:120
+#: invenio_oauthclient/admin.py:91
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:14
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:14
 #: invenio_oauthclient/views/settings.py:47
 msgid "Linked accounts"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:127
+#: invenio_oauthclient/admin.py:99
 msgid "Linked account tokens"
-msgstr ""
-
-#: invenio_oauthclient/admin.py:134
-msgid "Linked account identities"
 msgstr ""
 
 #: invenio_oauthclient/contrib/cern.py:429
