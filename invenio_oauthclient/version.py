@@ -12,4 +12,4 @@ This file is imported by ``invenio_oauthclient.__init__``,
 and parsed by ``setup.py``.
 """
 
-__version__ = '1.5.4'
+__version__ = '2.0.0.dev0'
