@@ -8,7 +8,9 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 # Usage:
-#   env DB=postgresql ./run-tests.sh
+#   env DB=postgresql ./run-tests.sh [cli-options] [<specific_module_test.py>]
+#   Eg:
+#   ./run-tests.sh -x tests/test_contrib_gitlab.py
 
 # Quit on errors
 set -o errexit
@@ -25,6 +27,6 @@ trap cleanup EXIT
 python -m check_manifest --ignore ".*-requirements.txt"
 python -m sphinx.cmd.build -qnN docs docs/_build/html
 eval "$(docker-services-cli up --db ${DB:-postgresql} --env)"
-python -m pytest
+python -m pytest $@
 tests_exit_code=$?
 exit "$tests_exit_code"
