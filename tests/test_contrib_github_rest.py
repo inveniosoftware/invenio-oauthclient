@@ -190,7 +190,6 @@ def test_authorized_signup_username_already_exists(
                         state=_get_state()))
             assert resp.status_code == 302
             assert resp.location == (
-                'http://localhost' +
                 url_for('invenio_oauthclient.rest_signup', remote_app='github')
             )
 

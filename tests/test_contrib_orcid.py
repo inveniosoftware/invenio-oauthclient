@@ -80,7 +80,6 @@ def test_authorized_signup(app_with_userprofiles, example_orcid, orcid_bio):
                     state=get_state('orcid')))
         assert resp.status_code == 302
         assert resp.location == (
-            'http://localhost' +
             url_for('invenio_oauthclient.signup', remote_app='orcid')
         )
 
@@ -171,9 +170,7 @@ def test_authorized_reject(app, example_orcid):
                     error_description='User denied access',
                     state=get_state('orcid')))
         assert resp.status_code in (301, 302)
-        assert resp.location == (
-            'http://localhost/'
-        )
+        assert resp.location == '/'
         # Check message flash
         assert session['_flashes'][0][0] == 'info'
 

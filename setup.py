@@ -38,14 +38,14 @@ extras_require = {
         'uritemplate.py>=0.2.0,<2.0',
     ],
     'mysql': [
-        'invenio-db[mysql,versioning]>=1.0.11',
+        'invenio-db[mysql,versioning]>=1.0.14',
     ],
     'orcid': [],
     'postgresql': [
-        'invenio-db[postgresql,versioning]>=1.0.11',
+        'invenio-db[postgresql,versioning]>=1.0.14',
     ],
     'sqlite': [
-        'invenio-db[versioning]>=1.0.11',
+        'invenio-db[versioning]>=1.0.14',
     ],
     'tests': tests_require,
 }
@@ -63,8 +63,8 @@ setup_requires = [
 install_requires = [
     'blinker>=1.4',
     'Flask-OAuthlib>=0.9.6',
-    'invenio-accounts>=2.0.0.dev2',
-    'invenio-base>=1.2.5',
+    'invenio-accounts>=2.0.0.dev10',
+    'invenio-base>=1.2.11',
     'invenio-i18n>=1.3.1',
     'invenio-mail>=1.0.2',
     'invenio-theme>=1.3.12',

@@ -122,7 +122,7 @@ def test_account_setup(app, example_cern, models_fixture):
             remote_app='cern', code='test',
             state=get_state('cern')))
         assert resp.status_code == 302
-        assert resp.location == ('http://localhost/account/settings/'
+        assert resp.location == ('/account/settings/'
                                  'linkedaccounts/')
         assert len(g.identity.provides) == 7
 
@@ -182,7 +182,7 @@ def test_authorized_reject(app):
                     error_description='User denied access',
                     state=get_state('cern')))
         assert resp.status_code in (301, 302)
-        assert resp.location == 'http://localhost/'
+        assert resp.location == '/'
         # Check message flash
         assert session['_flashes'][0][0] == 'info'
 

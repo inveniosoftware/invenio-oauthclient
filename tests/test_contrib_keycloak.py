@@ -90,8 +90,7 @@ def test_authorized_signup_valid_user(app_with_userprofiles,
         # note: because we provided an e-mail address in 'info_handler',
         #       the user does not need to sign up
         assert resp.status_code == 302
-        assert resp.location == ("http://localhost/"
-                                 "account/settings/linkedaccounts/")
+        assert resp.location == "/account/settings/linkedaccounts/"
 
         # check that the user exists
         user = User.query.filter_by(email=example_keycloak["email"]).one()
@@ -164,9 +163,8 @@ def test_authorized_reject(app, example_keycloak_token):
                 state=get_state("keycloak")
             )
         )
-
         assert resp.status_code in (301, 302)
-        assert resp.location == "http://localhost/"
+        assert resp.location == "/"
 
         # check message flash
         assert session["_flashes"][0][0] == "info"
