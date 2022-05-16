@@ -201,6 +201,7 @@ def test_authorized_signup_username_already_exists(
                     'password': '123456',
                     'profile.username': 'pippo2',
                     'profile.full_name': 'pluto',
+                    'profile.affiliations': 'CERN'
                 }
             )
             assert resp.status_code == 200

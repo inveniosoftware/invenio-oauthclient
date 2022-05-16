@@ -282,7 +282,6 @@ def _account_info(remote, resp):
         )
 
     email = resource["email"]
-    person_id = resource.get("cern_person_id")
     external_id = resource["cern_upn"]
     nice = resource["preferred_username"]
     name = resource["name"]
@@ -363,7 +362,6 @@ def account_setup(remote, token, resp):
     resource = get_resource(remote, resp)
 
     with db.session.begin_nested():
-        person_id = resource.get("cern_person_id")
         external_id = resource.get("cern_upn")
 
         # Set CERN person ID in extra_data.

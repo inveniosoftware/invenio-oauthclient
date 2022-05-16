@@ -147,6 +147,7 @@ def base_app(request):
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SECURITY_PASSWORD_HASH='plaintext',
         SECURITY_PASSWORD_SCHEMES=['plaintext'],
+        SECURITY_PASSWORD_SINGLE_HASH=None,
         APP_ALLOWED_HOSTS=['localhost'],
         APP_THEME=['semantic-ui'],
         THEME_ICONS={
@@ -488,10 +489,12 @@ def user(app_with_userprofiles):
     """Create users."""
     with db.session.begin_nested():
         datastore = app_with_userprofiles.extensions['security'].datastore
-        user1 = datastore.create_user(email='info@inveniosoftware.org',
-                                      password='tester', active=True)
-        profile = UserProfile(username='mynick', user=user1)
-        db.session.add(profile)
+        user1 = datastore.create_user(
+            email='info@inveniosoftware.org',
+            password='tester',
+            active=True,
+            username='mynick',
+        )
     db.session.commit()
     return user1
 
@@ -501,10 +504,12 @@ def user_rest(app_rest_with_userprofiles):
     """Create users."""
     with db.session.begin_nested():
         datastore = app_rest_with_userprofiles.extensions['security'].datastore
-        user1 = datastore.create_user(email='info@inveniosoftware.org',
-                                      password='tester', active=True)
-        profile = UserProfile(username='mynick', user=user1)
-        db.session.add(profile)
+        user1 = datastore.create_user(
+            email='info@inveniosoftware.org',
+            password='tester',
+            active=True,
+            username='mynick',
+        )
     db.session.commit()
     return user1
 
@@ -515,8 +520,7 @@ def form_test_data():
     return dict(
                 email='test@tester.com',
                 profile=dict(
-                    full_name='Test Tester',
-                    username='test123',
+                    full_name='Test Tester', username='test123',
                 ),
             )
 
