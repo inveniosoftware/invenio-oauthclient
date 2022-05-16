@@ -190,41 +190,42 @@ def test_dummy_handler(remote_name, base_app):
 
 
 @pytest.mark.parametrize('remote_name', REMOTE_APPS)
-def test_response_handler(remote_name, app_rest):
+def test_response_handler(remote_name, base_app):
     """Test response handler."""
 
     def mock_response_handler(remote, url, payload):
         return remote.name
     # Force usage of dummy handlers
-    app_rest.config['OAUTHCLIENT_REST_REMOTE_APPS'][remote_name][
+    base_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][remote_name][
         'response_handler'] = mock_response_handler
 
     # Initialize InvenioOAuth
-    FlaskOAuth(app_rest)
-    InvenioOAuthClientREST(app_rest)
-    app_rest.register_blueprint(rest_blueprint)
+    FlaskOAuth(base_app)
+    InvenioOAuthClientREST(base_app)
+    base_app.register_blueprint(rest_blueprint)
 
     # Try to sign-up client
-    response = app_rest.test_client().get(
+    response = base_app.test_client().get(
         url_for('invenio_oauthclient.rest_signup', remote_app=remote_name)
     )
     assert remote_name in str(response.data)
 
 
 @pytest.mark.parametrize('remote', REMOTE_APPS, indirect=["remote"])
-def test_response_handler_with_postmessage(remote, app_rest, models_fixture):
+def test_response_handler_with_postmessage(remote, base_app):
     """Test response handler with postmessage."""
 
     # Force usage of dummy handlers
-    app_rest.config['OAUTHCLIENT_REST_REMOTE_APPS'][remote.name][
+    base_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][remote.name][
         'response_handler'] = response_handler_postmessage
 
     # Initialize InvenioOAuth
-    FlaskOAuth(app_rest)
-    InvenioOAuthClientREST(app_rest)
-    app_rest.register_blueprint(rest_blueprint)
+    FlaskOAuth(base_app)
+    InvenioOAuthClientREST(base_app)
+    # The `rest_blueprint` is already registered indirectly by the
+    # `remote` fixture
 
-    datastore = app_rest.extensions['invenio-accounts'].datastore
+    datastore = base_app.extensions['invenio-accounts'].datastore
     existing_email = 'existing@inveniosoftware.org'
     user = datastore.find_user(email=existing_email)
     # Already authenticated

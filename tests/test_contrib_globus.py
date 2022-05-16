@@ -76,8 +76,7 @@ def test_authorized_signup_valid_user(app, example_globus):
                     remote_app='globus', code='test',
                     state=_get_state()))
         assert resp.status_code == 302
-        assert resp.location == ('http://localhost/account/settings/' +
-                                 'linkedaccounts/')
+        assert resp.location == '/account/settings/linkedaccounts/'
 
         # Assert database state (Sign-up complete)
         user = User.query.filter_by(email='carberry@inveniosoftware.org').one()
@@ -120,10 +119,7 @@ def test_authorized_signup_valid_user(app, example_globus):
                     remote_app='globus', code='test',
                     state=_get_state()))
         assert resp.status_code == 302
-        assert resp.location == (
-            'http://localhost/' +
-            'account/settings/linkedaccounts/'
-        )
+        assert resp.location == '/account/settings/linkedaccounts/'
 
         # check that exist only one account
         user = User.query.filter_by(email='carberry@inveniosoftware.org').one()
@@ -140,9 +136,7 @@ def test_authorized_reject(app):
                     error_description='User denied access',
                     state=_get_state()))
         assert resp.status_code in (301, 302)
-        assert resp.location == (
-            'http://localhost/'
-        )
+        assert resp.location == '/'
         # Check message flash
         assert session['_flashes'][0][0] == 'info'
 

@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2015-2022 CERN.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Handlers for customizing oauthclient endpoints."""
 
+import json
 from functools import partial, wraps
 
 from flask import abort, current_app, jsonify, make_response, redirect, \
@@ -244,7 +245,8 @@ def signup_handler(remote, *args, **kwargs):
         remote.name]
     try:
         form = create_csrf_disabled_registrationform(remote)
-        form = fill_form(form, request.json or {})
+        json_data = {} if not request.data else json.loads(request.data)
+        form = fill_form(form, json_data)
         next_url = base_signup_handler(remote, form, *args, **kwargs)
         if form.is_submitted():
             response_payload = dict(
