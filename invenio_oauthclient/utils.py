@@ -17,7 +17,6 @@ from invenio_accounts.utils import register_user
 from invenio_db import db
 from invenio_db.utils import rebuild_encrypted_properties
 from itsdangerous import TimedJSONWebSignatureSerializer
-from sqlalchemy.exc import IntegrityError
 from uritools import uricompose, urisplit
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string
@@ -155,6 +154,20 @@ def remove_csrf_tokens(user_data):
             remove_csrf_tokens(value)
 
 
+def remove_none_values(user_data):
+    """Remove None values from the user data."""
+    del_keys = []
+    for key, value in list(user_data.items()):
+        if isinstance(value, dict):
+            remove_none_values(value)
+            if value == {}:
+                del_keys.append(key)
+        if value is None:
+            del_keys.append(key)
+    for key in del_keys:
+        del user_data[key]
+
+
 def oauth_register(form, user_info=None, precedence_mask=None):
     """Register user if possible.
 
@@ -163,15 +176,21 @@ def oauth_register(form, user_info=None, precedence_mask=None):
     :returns: A :class:`invenio_accounts.models.User` instance.
     """
     if form.validate():
-        data = form.to_dict()
+        form_data = form.data
 
         # let relevant information from the OAuth service's user info
         # have precedence over the values specified by the user
         if user_info:
             default_mask = {"email": True}
+            # act on form data so the `profile` is updated correctly
             filter_user_info(user_info, precedence_mask or default_mask)
-            patch_dictionary(data, user_info)
+            patch_dictionary(form_data, user_info)
 
+        # re-populate the form after appyling the precedence mask and
+        # convert the form data to user model's data
+        data = fill_form(form, form_data).to_dict()
+        # see https://github.com/inveniosoftware/invenio-oauthclient/issues/275
+        remove_none_values(data)
         # remove the CSRF tokens to avoid unexpected keyword arguments
         remove_csrf_tokens(data)
         user = register_user(**data)

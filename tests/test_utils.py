@@ -228,9 +228,7 @@ def test_patch_dictionary():
     """Test the dictionary patch function."""
     orig_dict = {
         "email": "user@inveniosoftware.org",
-        "profile": {
-            "username": "user"
-        },
+        "username": "user",
     }
 
     # patch some existing properties, add new ones, and leave some as is
@@ -244,8 +242,8 @@ def test_patch_dictionary():
 
     expected = {
         "email": "admin@inveniosoftware.org",
+        "username": "user",
         "profile": {
-            "username": "user",
             "full_name": "Test User",
         },
         "extra": [1, 2, 3],

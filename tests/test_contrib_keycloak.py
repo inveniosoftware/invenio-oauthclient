@@ -96,7 +96,7 @@ def test_authorized_signup_valid_user(app_with_userprofiles,
         user = User.query.filter_by(email=example_keycloak["email"]).one()
         assert user is not None
         assert user.email == example_keycloak["email"]
-        assert user.profile.full_name == "Max Moser"
+        assert user.user_profile["full_name"] == "Max Moser"
         assert user.active
 
         # check that the user has a linked Keycloak account

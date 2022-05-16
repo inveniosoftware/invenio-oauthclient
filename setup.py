@@ -18,7 +18,7 @@ history = open('CHANGES.rst').read()
 
 tests_require = [
     'httpretty>=0.8.14',
-    'invenio-userprofiles>=1.0.0',
+    'invenio-userprofiles>=2.0.0.dev3',
     'mock>=1.3.0',
     'oauthlib>=1.1.2,<3.0.0',
     'pytest-invenio>=1.4.2',

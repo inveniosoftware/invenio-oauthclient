@@ -245,8 +245,8 @@ def signup_handler(remote, *args, **kwargs):
         remote.name]
     try:
         form = create_csrf_disabled_registrationform(remote)
-        json_data = {} if not request.data else json.loads(request.data)
-        form = fill_form(form, json_data)
+        data = request.form.to_dict()
+        form = fill_form(form, data)
         next_url = base_signup_handler(remote, form, *args, **kwargs)
         if form.is_submitted():
             response_payload = dict(
