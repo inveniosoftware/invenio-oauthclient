@@ -20,38 +20,21 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-          python-version: [3.6, 3.7, 3.8]
+          python-version: [3.7, 3.8, 3.9]
           requirements-level: [min, pypi]
-          db-service: [postgresql9, postgresql11, mysql5, mysql8]
+          db-service: [postgresql11, mysql8]
 
           exclude:
-          - python-version: 3.8
+          - python-version: 3.9
             requirements-level: min
 
-          - db-service: postgresql11
-            python-version: 3.6
-
-          - db-service: mysql8
-            python-version: 3.6
-
           include:
-          - db-service: postgresql9
-            DB: postgresql
-            POSTGRESQL_VERSION: POSTGRESQL_9_LATEST
-            SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://invenio:invenio@localhost:5432/invenio"
-            EXTRAS: "all,postgresql"
 
           - db-service: postgresql11
             DB: postgresql
             POSTGRESQL_VERSION: POSTGRESQL_11_LATEST
             SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://invenio:invenio@localhost:5432/invenio"
             EXTRAS: "all,postgresql"
-
-          - db-service: mysql5
-            DB: mysql
-            MYSQL_VERSION: MYSQL_5_LATEST
-            SQLALCHEMY_DATABASE_URI: "mysql+pymysql://invenio:invenio@localhost:3306/invenio"
-            EXTRAS: "all,mysql"
 
           - db-service: mysql8
             DB: mysql
