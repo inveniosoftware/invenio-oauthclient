@@ -145,7 +145,7 @@ def signup_handler(remote, *args, **kwargs):
     try:
         form = create_registrationform(request.form, oauth_remote_app=remote)
         next_url = base_signup_handler(remote, form, *args, **kwargs)
-        if form.is_submitted():
+        if form.is_submitted() and not form.errors:
             if next_url:
                 return redirect(next_url)
             else:
