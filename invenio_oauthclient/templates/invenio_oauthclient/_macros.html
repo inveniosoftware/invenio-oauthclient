@@ -18,22 +18,6 @@
 {% endmacro %}
 
 
-{% macro form_errors(form) %}
-  {%- if form.errors %}
-  <div class="alert alert-danger alert-dismissible text-left" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-label="{{ _('Close') }}">
-      <span aria-hidden="true">&times;</span>
-    </button>
-    {%- for field, errors in form.errors.items() %}
-      {%- for error in errors %}
-        <p>{{error}}</p>
-      {%- endfor %}
-    {%- endfor %}
-  </div>
-  {%- endif %}
-{% endmacro %}
-
-
 {% macro oauth_button(name, next=None) %}
   <a class="btn btn-default btn-lg btn-block"
      href="{{url_for('invenio_oauthclient.login', remote_app=name, next=next or request.referrer)}}">

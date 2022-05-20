@@ -14,10 +14,30 @@
   </div>
 {% endmacro %}
 
+{% macro render_field_errors(errors) %}
+  {% if errors is not mapping %}
+  <div class="ui negative message" role="alert">
+    {%- for error in errors %}
+        <p>{{error}}</p>
+    {%- endfor %}
+  </div>
+  {%- else %}
+  <div class="ui negative message" role="alert">
+    {%- for field, inner_errors in errors.items() %}
+      {%- for error in inner_errors %}
+        <p>{{error}}</p>
+      {%- endfor %}
+    {%- endfor %}
+  </div>
+  {%- endif %}
+{% endmacro %}
+
 {% macro render_field(field, icon="", placeholder='', autofocus=False) %}
-  <div class="field {% if field.errors %} error{% endif %}">
+  {%- if field.errors %}
+    {{ render_field_errors(field.errors) }}
+  {%- endif %}
+  <div class="field ">
     {%- if field.widget.input_type == 'hidden' %}
-      {{ field() }}
     {%- elif field.widget.input_type == 'checkbox' %}
       {{ render_checkbox(field, label=_(field.label.text | string)) }}
     {%- else %}
@@ -29,28 +49,7 @@
       {%- endif%}
     {%- endif%}
   </div>
-  {%- if field.errors %}
-    <div class="ui pointing red basic label">
-      {%- for error in field.errors %}
-      <p>{{error}}</p>
-      {%- endfor %}
-    </div>
-  {%- endif %}
 {% endmacro %}
-
-
-{% macro form_errors(form) %}
-  {%- if form.errors %}
-  <div class="ui negative message" role="alert">
-    {%- for field, errors in form.errors.items() %}
-      {%- for error in errors %}
-        <p>{{error}}</p>
-      {%- endfor %}
-    {%- endfor %}
-  </div>
-  {%- endif %}
-{% endmacro %}
-
 
 {% macro oauth_button(name, next=None) %}
 <div class="field">

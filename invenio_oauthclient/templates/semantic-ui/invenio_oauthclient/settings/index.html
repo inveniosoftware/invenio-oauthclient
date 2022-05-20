@@ -9,8 +9,6 @@
 
 {%- extends config.OAUTHCLIENT_SETTINGS_TEMPLATE %}
 
-{% from "invenio_oauthclient/_macros.html" import render_field, form_errors %}
-
 {% set panel_title = _("Linked accounts") %}
 {% set panel_icon = "linkify icon" %}
 {% set num_linked_services = services|selectattr("account")|list|length %}
