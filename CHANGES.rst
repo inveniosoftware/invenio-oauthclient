@@ -8,9 +8,10 @@
 Changes
 =======
 
-Version 1.6.0 (released TBD)
+Version 2.0.0 (released 2022-05-24)
 
 - Moved UserIdentity to Invenio-Accounts.
+- Fixes to signup error handling.
 
 Version 1.5.4 (released 2021-10-18)
 

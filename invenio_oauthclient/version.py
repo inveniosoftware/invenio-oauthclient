@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015-2021 CERN.
+# Copyright (C) 2015-2022 CERN.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -12,4 +12,4 @@ This file is imported by ``invenio_oauthclient.__init__``,
 and parsed by ``setup.py``.
 """
 
-__version__ = '2.0.0.dev1'
+__version__ = '2.0.0'
