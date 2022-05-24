@@ -38,6 +38,7 @@
   {%- endif %}
   <div class="field ">
     {%- if field.widget.input_type == 'hidden' %}
+      {{ field() }}
     {%- elif field.widget.input_type == 'checkbox' %}
       {{ render_checkbox(field, label=_(field.label.text | string)) }}
     {%- else %}
