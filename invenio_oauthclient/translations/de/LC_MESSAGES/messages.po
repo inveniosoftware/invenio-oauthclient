@@ -8,21 +8,21 @@
 # Alizee Pace <alizee.pace@gmail.com>, 2016
 # Tibor Simko <tibor.simko@cern.ch>, 2021
 # Mojib Wali <mojib.wali@tugraz.at>, 2021
-# chriz_uniba <christina.zeller@uni-bamberg.de>, 2021
+# chriz_uniba <christina.zeller@uni-bamberg.de>, 2022
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-oauthclient 1.5.4\n"
+"Project-Id-Version: invenio-oauthclient 2.0.0\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
-"POT-Creation-Date: 2022-02-23 12:50+0100\n"
+"POT-Creation-Date: 2022-05-27 09:58+0200\n"
 "PO-Revision-Date: 2016-08-18 15:19+0000\n"
-"Last-Translator: chriz_uniba <christina.zeller@uni-bamberg.de>, 2021\n"
+"Last-Translator: chriz_uniba <christina.zeller@uni-bamberg.de>, 2022\n"
 "Language-Team: German (https://www.transifex.com/inveniosoftware/teams/23537/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.1\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
@@ -32,7 +32,7 @@ msgstr "ID"
 
 #: invenio_oauthclient/admin.py:53
 msgid "User ID"
-msgstr "Benutzer-ID"
+msgstr "BenutzerIn-ID"
 
 #: invenio_oauthclient/admin.py:54
 msgid "Client ID"
@@ -40,25 +40,25 @@ msgstr "Client-ID"
 
 #: invenio_oauthclient/admin.py:83
 msgid "ID Remote Account"
-msgstr "ID externes Konto"
+msgstr "ID des externen Kontos"
 
 #: invenio_oauthclient/admin.py:90 invenio_oauthclient/admin.py:98
 msgid "User Management"
-msgstr "Benutzerverwaltung"
+msgstr "BenutzerInverwaltung"
 
 #: invenio_oauthclient/admin.py:91
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:14
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:14
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:12
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:12
 #: invenio_oauthclient/views/settings.py:47
 msgid "Linked accounts"
 msgstr "Verknüpfte Konten"
 
 #: invenio_oauthclient/admin.py:99
 msgid "Linked account tokens"
-msgstr "Verknüpfte Konto-Tokens"
+msgstr "Verknüpfte Konto-Token"
 
 #: invenio_oauthclient/contrib/cern.py:429
-#: invenio_oauthclient/contrib/cern_openid.py:306
+#: invenio_oauthclient/contrib/cern_openid.py:305
 msgid "CERN account not allowed."
 msgstr "CERN-Konto nicht erlaubt."
 
@@ -74,11 +74,7 @@ msgstr "Sie haben die Authentifizierungsanfrage abgelehnt."
 msgid "Authorization with remote service failed."
 msgstr "Autorisierung mit externem Dienst fehlgeschlagen."
 
-#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:24
-msgid "Close"
-msgstr "Schließen"
-
-#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:41
+#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:25
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/_macros.html:60
 #, python-format
 msgid "Sign in with %(title)s"
@@ -100,7 +96,7 @@ msgid ""
 "Fill in your details to complete your registration. You only have to do this"
 " once."
 msgstr ""
-"Füllen Sie bitte Ihren Daten ein, um Ihre Registrierung abzuschließen. Dies "
+"Füllen Sie bitte Ihren Daten ein, um die Registrierung abzuschließen. Dies "
 "ist nur einmalig nötig."
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:33
@@ -108,8 +104,8 @@ msgstr ""
 msgid "Complete registration"
 msgstr "Registrierung abschließen"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:22
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:22
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:20
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:20
 #, python-format
 msgid ""
 "Tired of entering password for %(sitename)s every time you sign in? Set up "
@@ -118,13 +114,13 @@ msgstr ""
 "Wollen Sie nicht jedes Mal beim Einloggen auf %(sitename)s Ihr Passwort "
 "eingeben? Verwenden Sie Single-Sign-On mit einem der folgenden Diensten:"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:33
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:34
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:32
 msgid "Disconnect"
 msgstr "Trennen"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:35
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:36
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:33
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:34
 msgid "Connect"
 msgstr "Verbinden"
 
