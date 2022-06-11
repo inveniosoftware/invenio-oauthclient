@@ -71,11 +71,9 @@ from invenio_db import db
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.handlers.rest import response_handler
-from invenio_oauthclient.handlers.utils import \
-    require_more_than_one_external_account
+from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
-from invenio_oauthclient.utils import oauth_link_external_id, \
-    oauth_unlink_external_id
+from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_external_id
 
 
 class GlobusOAuthSettingsHelper(OAuthSettingsHelper):
@@ -83,8 +81,14 @@ class GlobusOAuthSettingsHelper(OAuthSettingsHelper):
 
     external_method = "globus"
 
-    def __init__(self, title=None, description=None, base_url=None,
-                 app_key=None, precedence_mask=None):
+    def __init__(
+        self,
+        title=None,
+        description=None,
+        base_url=None,
+        app_key=None,
+        precedence_mask=None,
+    ):
         """Constructor."""
         super().__init__(
             title or "Globus",
@@ -98,35 +102,35 @@ class GlobusOAuthSettingsHelper(OAuthSettingsHelper):
     def get_handlers(self):
         """Return Globus auth handlers."""
         return dict(
-            authorized_handler='invenio_oauthclient.handlers'
-                               ':authorized_signup_handler',
-            disconnect_handler='invenio_oauthclient.contrib.globus'
-                               ':disconnect_handler',
+            authorized_handler="invenio_oauthclient.handlers"
+            ":authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.globus"
+            ":disconnect_handler",
             signup_handler=dict(
-                info='invenio_oauthclient.contrib.globus:account_info',
-                setup='invenio_oauthclient.contrib.globus:account_setup',
-                view='invenio_oauthclient.handlers:signup_handler',
-            )
+                info="invenio_oauthclient.contrib.globus:account_info",
+                setup="invenio_oauthclient.contrib.globus:account_setup",
+                view="invenio_oauthclient.handlers:signup_handler",
+            ),
         )
 
     def get_rest_handlers(self):
         """Return Globus auth REST handlers."""
         return dict(
-            authorized_handler='invenio_oauthclient.handlers.rest'
-                               ':authorized_signup_handler',
-            disconnect_handler='invenio_oauthclient.contrib.globus'
-                               ':disconnect_rest_handler',
+            authorized_handler="invenio_oauthclient.handlers.rest"
+            ":authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.globus"
+            ":disconnect_rest_handler",
             signup_handler=dict(
-                info='invenio_oauthclient.contrib.globus:account_info',
-                setup='invenio_oauthclient.contrib.globus:account_setup',
-                view='invenio_oauthclient.handlers.rest:signup_handler',
+                info="invenio_oauthclient.contrib.globus:account_info",
+                setup="invenio_oauthclient.contrib.globus:account_setup",
+                view="invenio_oauthclient.handlers.rest:signup_handler",
             ),
-            response_handler='invenio_oauthclient.handlers.rest'
-                             ':default_remote_response_handler',
-            authorized_redirect_url='/',
-            disconnect_redirect_url='/',
-            signup_redirect_url='/',
-            error_redirect_url='/'
+            response_handler="invenio_oauthclient.handlers.rest"
+            ":default_remote_response_handler",
+            authorized_redirect_url="/",
+            disconnect_redirect_url="/",
+            signup_redirect_url="/",
+            error_redirect_url="/",
         )
 
     @property
@@ -156,10 +160,10 @@ REMOTE_REST_APP = _globus_app.remote_rest_app
 
 def get_dict_from_response(response):
     """Check for errors in the response and return the resulting JSON."""
-    if getattr(response, '_resp') and response._resp.code > 400:
+    if getattr(response, "_resp") and response._resp.code > 400:
         raise OAuthResponseError(
-                'Application mis-configuration in Globus', None, response
-            )
+            "Application mis-configuration in Globus", None, response
+        )
 
     return response.data
 
@@ -172,9 +176,9 @@ def get_user_info(remote):
     """
     response = remote.get(_globus_app.user_info_url)
     user_info = get_dict_from_response(response)
-    response.data['username'] = response.data['preferred_username']
-    if '@' in response.data['username']:
-        user_info['username'], _ = response.data['username'].split('@')
+    response.data["username"] = response.data["preferred_username"]
+    if "@" in response.data["username"]:
+        user_info["username"], _ = response.data["username"].split("@")
     return user_info
 
 
@@ -186,14 +190,15 @@ def get_user_id(remote, email):
     https://docs.globus.org/api/auth/reference/
     """
     try:
-        url = '{}?usernames={}'.format(_globus_app.user_identity_url, email)
+        url = "{}?usernames={}".format(_globus_app.user_identity_url, email)
         user_id = get_dict_from_response(remote.get(url))
-        return user_id['identities'][0]['id']
+        return user_id["identities"][0]["id"]
     except KeyError:
         # If we got here the response was successful but the data was invalid.
         # It's likely the URL is wrong but possible the API has changed.
-        raise OAuthResponseError('Failed to fetch user id, likely server '
-                                 'mis-configuration', None, remote)
+        raise OAuthResponseError(
+            "Failed to fetch user id, likely server " "mis-configuration", None, remote
+        )
 
 
 def account_info(remote, resp):
@@ -226,15 +231,12 @@ def account_info(remote, resp):
     info = get_user_info(remote)
 
     return {
-        'user': {
-            'email': info['email'],
-            'profile': {
-                'username': info['username'],
-                'full_name': info['name']
-            },
+        "user": {
+            "email": info["email"],
+            "profile": {"username": info["username"], "full_name": info["name"]},
         },
-        'external_id': get_user_id(remote, info['preferred_username']),
-        'external_method': _globus_app.external_method
+        "external_id": get_user_id(remote, info["preferred_username"]),
+        "external_method": _globus_app.external_method,
     }
 
 
@@ -246,18 +248,15 @@ def account_setup(remote, token, resp):
     :param resp: The response.
     """
     info = get_user_info(remote)
-    user_id = get_user_id(remote, info['preferred_username'])
+    user_id = get_user_id(remote, info["preferred_username"])
     with db.session.begin_nested():
 
-        token.remote_account.extra_data = {
-            'login': info['username'],
-            'id': user_id}
+        token.remote_account.extra_data = {"login": info["username"], "id": user_id}
 
         # Create user <-> external id link.
         oauth_link_external_id(
-            token.remote_account.user, dict(
-                id=user_id,
-                method=_globus_app.external_method)
+            token.remote_account.user,
+            dict(id=user_id, method=_globus_app.external_method),
         )
 
 
@@ -271,14 +270,19 @@ def _disconnect(remote, *args, **kwargs):
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
 
-    remote_account = RemoteAccount.get(user_id=current_user.get_id(),
-                                       client_id=remote.consumer_key)
-    external_ids = [i.id for i in current_user.external_identifiers
-                    if i.method == _globus_app.external_method]
+    remote_account = RemoteAccount.get(
+        user_id=current_user.get_id(), client_id=remote.consumer_key
+    )
+    external_ids = [
+        i.id
+        for i in current_user.external_identifiers
+        if i.method == _globus_app.external_method
+    ]
 
     if external_ids:
-        oauth_unlink_external_id(dict(id=external_ids[0],
-                                      method=_globus_app.external_method))
+        oauth_unlink_external_id(
+            dict(id=external_ids[0], method=_globus_app.external_method)
+        )
 
     if remote_account:
         with db.session.begin_nested():
@@ -292,7 +296,7 @@ def disconnect_handler(remote, *args, **kwargs):
     :returns: The HTML response.
     """
     _disconnect(remote, *args, **kwargs)
-    return redirect(url_for('invenio_oauthclient_settings.index'))
+    return redirect(url_for("invenio_oauthclient_settings.index"))
 
 
 def disconnect_rest_handler(remote, *args, **kwargs):
@@ -302,6 +306,7 @@ def disconnect_rest_handler(remote, *args, **kwargs):
     :returns: The HTML response.
     """
     _disconnect(remote, *args, **kwargs)
-    redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
-        remote.name]['disconnect_redirect_url']
+    redirect_url = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][remote.name][
+        "disconnect_redirect_url"
+    ]
     return response_handler(remote, redirect_url)

@@ -81,24 +81,27 @@ from invenio_accounts.views import blueprint as blueprint_user
 from invenio_db import InvenioDB
 from invenio_mail import InvenioMail as Mail
 from invenio_userprofiles import InvenioUserProfiles
-from invenio_userprofiles.views import \
-    blueprint_api_init as blueprint_userprofile_api_init
-from invenio_userprofiles.views import \
-    blueprint_ui_init as blueprint_userprofile_ui_init
+from invenio_userprofiles.views import (
+    blueprint_api_init as blueprint_userprofile_api_init,
+)
+from invenio_userprofiles.views import (
+    blueprint_ui_init as blueprint_userprofile_ui_init,
+)
 
 from invenio_oauthclient import InvenioOAuthClientREST
 from invenio_oauthclient.contrib import orcid
 from invenio_oauthclient.views.client import rest_blueprint as blueprint_client
 
 from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
+
 monkey_patch_werkzeug()  # noqa isort:skip
 
 from flask_oauthlib.client import OAuth as FlaskOAuth  # noqa isort:skip
 
 # [ Configure application credentials ]
 ORCID_APP_CREDENTIALS = dict(
-    consumer_key=os.environ.get('ORCID_APP_CREDENTIALS_KEY'),
-    consumer_secret=os.environ.get('ORCID_APP_CREDENTIALS_SECRET'),
+    consumer_key=os.environ.get("ORCID_APP_CREDENTIALS_KEY"),
+    consumer_secret=os.environ.get("ORCID_APP_CREDENTIALS_SECRET"),
 )
 
 # Create Flask application
@@ -107,24 +110,20 @@ app = Flask(__name__)
 app.config.update(
     SQLALCHEMY_ECHO=False,
     SQLALCHEMY_DATABASE_URI=os.environ.get(
-        'SQLALCHEMY_DATABASE_URI', 'sqlite:///orcid_app_rest.db'
+        "SQLALCHEMY_DATABASE_URI", "sqlite:///orcid_app_rest.db"
     ),
     OAUTHCLIENT_REST_REMOTE_APPS=dict(
         orcid=orcid.REMOTE_SANDBOX_REST_APP,
     ),
     ORCID_APP_CREDENTIALS=ORCID_APP_CREDENTIALS,
     DEBUG=True,
-    SECRET_KEY='TEST',
-    SECURITY_PASSWORD_SALT='security-password-salt',
+    SECRET_KEY="TEST",
+    SECURITY_PASSWORD_SALT="security-password-salt",
     SECURITY_LOGIN_WITHOUT_CONFIRMATION=False,
     USERPROFILES_EXTEND_SECURITY_FORMS=True,
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
-    APP_THEME=['semantic-ui'],
-    THEME_ICONS={
-      'semantic-ui': dict(
-            link='linkify icon'
-      )
-    }
+    APP_THEME=["semantic-ui"],
+    THEME_ICONS={"semantic-ui": dict(link="linkify icon")},
 )
 
 Babel(app)
@@ -142,16 +141,15 @@ app.register_blueprint(blueprint_userprofile_api_init)
 app.register_blueprint(blueprint_userprofile_ui_init)
 
 
-@app.route('/')
+@app.route("/")
 def index():
     """Homepage."""
-    return 'Home page (without any restrictions)'
+    return "Home page (without any restrictions)"
 
 
-@app.route('/orcid')
+@app.route("/orcid")
 def orcid():
     """Try to print user email or redirect to login with orcid."""
     if not current_user.is_authenticated:
-        return redirect(url_for('invenio_oauthclient.rest_login',
-                                remote_app='orcid'))
-    return 'hello {}'.format(current_user.email)
+        return redirect(url_for("invenio_oauthclient.rest_login", remote_app="orcid"))
+    return "hello {}".format(current_user.email)

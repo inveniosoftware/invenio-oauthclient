@@ -81,8 +81,7 @@ from invenio_accounts.views import blueprint as blueprint_user
 from invenio_db import InvenioDB
 from invenio_mail import InvenioMail
 from invenio_userprofiles import InvenioUserProfiles
-from invenio_userprofiles.views import \
-    blueprint_ui_init as blueprint_userprofile_init
+from invenio_userprofiles.views import blueprint_ui_init as blueprint_userprofile_init
 
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.contrib import github
@@ -90,14 +89,15 @@ from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 
 from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
+
 monkey_patch_werkzeug()  # noqa isort:skip
 
 from flask_oauthlib.client import OAuth as FlaskOAuth  # noqa isort:skip
 
 # [ Configure application credentials ]
 GITHUB_APP_CREDENTIALS = dict(
-    consumer_key=os.environ.get('GITHUB_APP_CREDENTIALS_KEY'),
-    consumer_secret=os.environ.get('GITHUB_APP_CREDENTIALS_SECRET'),
+    consumer_key=os.environ.get("GITHUB_APP_CREDENTIALS_KEY"),
+    consumer_secret=os.environ.get("GITHUB_APP_CREDENTIALS_SECRET"),
 )
 
 # Create Flask application
@@ -105,26 +105,22 @@ app = Flask(__name__)
 
 app.config.update(
     SQLALCHEMY_DATABASE_URI=os.environ.get(
-        'SQLALCHEMY_DATABASE_URI', 'sqlite:///github_app.db'
+        "SQLALCHEMY_DATABASE_URI", "sqlite:///github_app.db"
     ),
     OAUTHCLIENT_REMOTE_APPS=dict(
         github=github.REMOTE_APP,
     ),
     GITHUB_APP_CREDENTIALS=GITHUB_APP_CREDENTIALS,
     DEBUG=True,
-    SECRET_KEY='TEST',
+    SECRET_KEY="TEST",
     SQLALCHEMY_ECHO=False,
-    SECURITY_PASSWORD_SALT='security-password-salt',
+    SECURITY_PASSWORD_SALT="security-password-salt",
     MAIL_SUPPRESS_SEND=True,
     TESTING=True,
     USERPROFILES_EXTEND_SECURITY_FORMS=True,
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
-    APP_THEME=['semantic-ui'],
-    THEME_ICONS={
-      'semantic-ui': dict(
-            link='linkify icon'
-      )
-    }
+    APP_THEME=["semantic-ui"],
+    THEME_ICONS={"semantic-ui": dict(link="linkify icon")},
 )
 
 Babel(app)
@@ -142,16 +138,15 @@ app.register_blueprint(blueprint_settings)
 app.register_blueprint(blueprint_userprofile_init)
 
 
-@app.route('/')
+@app.route("/")
 def index():
     """Homepage."""
-    return 'Home page (without any restrictions)'
+    return "Home page (without any restrictions)"
 
 
-@app.route('/github')
+@app.route("/github")
 def github():
     """Try to print user email or redirect to login with github."""
     if not current_user.is_authenticated:
-        return redirect(url_for('invenio_oauthclient.login',
-                                remote_app='github'))
-    return 'hello {}'.format(current_user.email)
+        return redirect(url_for("invenio_oauthclient.login", remote_app="github"))
+    return "hello {}".format(current_user.email)

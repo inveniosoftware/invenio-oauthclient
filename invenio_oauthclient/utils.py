@@ -23,15 +23,15 @@ from werkzeug.utils import import_string
 
 from .models import RemoteAccount, RemoteToken, UserIdentity
 
-_security = LocalProxy(lambda: current_app.extensions['security'])
+_security = LocalProxy(lambda: current_app.extensions["security"])
 
 _datastore = LocalProxy(lambda: _security.datastore)
 
 
 serializer = LocalProxy(
     lambda: TimedJSONWebSignatureSerializer(
-        current_app.config['SECRET_KEY'],
-        expires_in=current_app.config['OAUTHCLIENT_STATE_EXPIRES'],
+        current_app.config["SECRET_KEY"],
+        expires_in=current_app.config["OAUTHCLIENT_STATE_EXPIRES"],
     )
 )
 
@@ -43,9 +43,10 @@ def _commit(response=None):
 
 def _get_external_id(account_info):
     """Get external id from account info."""
-    if all(k in account_info for k in ('external_id', 'external_method')):
-        return dict(id=account_info['external_id'],
-                    method=account_info['external_method'])
+    if all(k in account_info for k in ("external_id", "external_method")):
+        return dict(
+            id=account_info["external_id"], method=account_info["external_method"]
+        )
     return None
 
 
@@ -69,11 +70,10 @@ def oauth_get_user(client_id, account_info=None, access_token=None):
     if account_info:
         external_id = _get_external_id(account_info)
         if external_id:
-            user = UserIdentity.get_user(
-                external_id['method'], external_id['id'])
+            user = UserIdentity.get_user(external_id["method"], external_id["id"])
             if user:
                 return user
-        email = account_info.get('user', {}).get('email')
+        email = account_info.get("user", {}).get("email")
         if email:
             return User.query.filter_by(email=email).one_or_none()
     return None
@@ -208,7 +208,7 @@ def oauth_link_external_id(user, external_id=None):
         exists a link.
     """
     # Backward compatibility. Use UserIdentity directly instead of this method.
-    UserIdentity.create(user, external_id['method'], external_id['id'])
+    UserIdentity.create(user, external_id["method"], external_id["id"])
 
 
 def oauth_unlink_external_id(external_id):
@@ -216,17 +216,16 @@ def oauth_unlink_external_id(external_id):
 
     :param external_id: The external id associated with the user.
     """
-    UserIdentity.delete_by_external_id(
-        external_id['method'], external_id['id'])
+    UserIdentity.delete_by_external_id(external_id["method"], external_id["id"])
 
 
-def get_safe_redirect_target(arg='next'):
+def get_safe_redirect_target(arg="next"):
     """Get URL to redirect to and ensure that it is local.
 
     :param arg: URL argument.
     :returns: The redirect target or ``None``.
     """
-    allowed_hosts = current_app.config.get('APP_ALLOWED_HOSTS') or []
+    allowed_hosts = current_app.config.get("APP_ALLOWED_HOSTS") or []
     for target in request.args.get(arg), request.referrer:
         if target:
             redirect_uri = urisplit(target)
@@ -236,7 +235,7 @@ def get_safe_redirect_target(arg='next'):
                 return uricompose(
                     path=redirect_uri.getpath(),
                     query=redirect_uri.getquery(),
-                    fragment=redirect_uri.getfragment()
+                    fragment=redirect_uri.getfragment(),
                 )
     return None
 
@@ -259,10 +258,12 @@ def load_or_import_from_config(key, app=None, default=None):
 
 def _create_registrationform(*args, **kwargs):
     """Default registration form after external auth success."""
+
     class RegistrationForm(_security.confirm_register_form):
         password = None
         recaptcha = None
         submit = None  # defined in the template
+
     return RegistrationForm(*args, **kwargs)
 
 
@@ -302,8 +303,8 @@ def rebuild_access_tokens(old_key):
 
     :param old_key: the old SECRET_KEY.
     """
-    current_app.logger.info('rebuilding RemoteToken.access_token...')
-    rebuild_encrypted_properties(old_key, RemoteToken, ['access_token'])
+    current_app.logger.info("rebuilding RemoteToken.access_token...")
+    rebuild_encrypted_properties(old_key, RemoteToken, ["access_token"])
 
 
 def _get_csrf_disabled_param():
@@ -314,7 +315,6 @@ def _get_csrf_disabled_param():
     """
     import flask_wtf
     from pkg_resources import parse_version
-    supports_meta = parse_version(flask_wtf.__version__) >= parse_version(
-        "0.14.0")
-    return dict(meta={'csrf': False}) if supports_meta else \
-        dict(csrf_enabled=False)
+
+    supports_meta = parse_version(flask_wtf.__version__) >= parse_version("0.14.0")
+    return dict(meta={"csrf": False}) if supports_meta else dict(csrf_enabled=False)

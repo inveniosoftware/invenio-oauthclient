@@ -9,6 +9,7 @@
 """Models for storing access tokens and links between users and remote apps."""
 
 from flask import current_app
+
 # UserIdentity imported for backward compatibility. UserIdentity was originally
 # added to OAuthClient but has now been moved to Invenio-Accounts. Importing it
 # here, means previous imports won't break.
@@ -21,33 +22,23 @@ from sqlalchemy_utils import EncryptedType, JSONType, Timestamp
 
 def _secret_key():
     """Return secret key from current application."""
-    return current_app.config.get('SECRET_KEY')
+    return current_app.config.get("SECRET_KEY")
 
 
 class RemoteAccount(db.Model, Timestamp):
     """Storage for remote linked accounts."""
 
-    __tablename__ = 'oauthclient_remoteaccount'
+    __tablename__ = "oauthclient_remoteaccount"
 
-    __table_args__ = (
-        db.UniqueConstraint('user_id', 'client_id'),
-    )
+    __table_args__ = (db.UniqueConstraint("user_id", "client_id"),)
 
     #
     # Fields
     #
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
-        autoincrement=True
-    )
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     """Primary key."""
 
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey(User.id),
-        nullable=False
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
     """Local user linked with a remote app via the access token."""
 
     client_id = db.Column(db.String(255), nullable=False)
@@ -59,7 +50,7 @@ class RemoteAccount(db.Model, Timestamp):
     #
     # Relationships properties
     #
-    user = db.relationship(User, backref='remote_accounts')
+    user = db.relationship(User, backref="remote_accounts")
     """SQLAlchemy relationship to user."""
 
     @classmethod
@@ -87,9 +78,7 @@ class RemoteAccount(db.Model, Timestamp):
         """
         with db.session.begin_nested():
             account = cls(
-                user_id=user_id,
-                client_id=client_id,
-                extra_data=extra_data or dict()
+                user_id=user_id, client_id=client_id, extra_data=extra_data or dict()
             )
             db.session.add(account)
         return account
@@ -101,13 +90,13 @@ class RemoteAccount(db.Model, Timestamp):
 
     def __repr__(self):
         """String representation for model."""
-        return 'Remote Account <id={0.id}, user_id={0.user.id}>'.format(self)
+        return "Remote Account <id={0.id}, user_id={0.user.id}>".format(self)
 
 
 class RemoteToken(db.Model, Timestamp):
     """Storage for the access tokens for linked accounts."""
 
-    __tablename__ = 'oauthclient_remotetoken'
+    __tablename__ = "oauthclient_remotetoken"
 
     #
     # Fields
@@ -115,16 +104,14 @@ class RemoteToken(db.Model, Timestamp):
     id_remote_account = db.Column(
         db.Integer,
         db.ForeignKey(
-            RemoteAccount.id, name='fk_oauthclient_remote_token_remote_account'
+            RemoteAccount.id, name="fk_oauthclient_remote_token_remote_account"
         ),
         nullable=False,
-        primary_key=True
+        primary_key=True,
     )
     """Foreign key to account."""
 
-    token_type = db.Column(
-        db.String(40), default='', nullable=False, primary_key=True
-    )
+    token_type = db.Column(db.String(40), default="", nullable=False, primary_key=True)
     """Type of token."""
 
     access_token = db.Column(
@@ -132,22 +119,23 @@ class RemoteToken(db.Model, Timestamp):
     )
     """Access token to remote application."""
 
-    secret = db.Column(db.Text(), default='', nullable=False)
+    secret = db.Column(db.Text(), default="", nullable=False)
     """Used only by OAuth 1."""
 
     #
     # Relationships properties
     #
     remote_account = db.relationship(
-        RemoteAccount,
-        backref=backref('remote_tokens', cascade='all, delete-orphan')
+        RemoteAccount, backref=backref("remote_tokens", cascade="all, delete-orphan")
     )
     """SQLAlchemy relationship to RemoteAccount objects."""
 
     def __repr__(self):
         """String representation for model."""
-        return ('Remote Token <token_type={0.token_type} '
-                'access_token=****{1}>'.format(self, self.access_token[-4:]))
+        return (
+            "Remote Token <token_type={0.token_type} "
+            "access_token=****{1}>".format(self, self.access_token[-4:])
+        )
 
     def token(self):
         """Get token as expected by Flask-OAuthlib."""
@@ -166,7 +154,7 @@ class RemoteToken(db.Model, Timestamp):
                 db.session.add(self)
 
     @classmethod
-    def get(cls, user_id, client_id, token_type='', access_token=None):
+    def get(cls, user_id, client_id, token_type="", access_token=None):
         """Get RemoteToken for user.
 
         :param user_id: The user id.
@@ -186,12 +174,10 @@ class RemoteToken(db.Model, Timestamp):
         if access_token:
             args.append(RemoteToken.access_token == access_token)
 
-        return cls.query.options(
-            db.joinedload('remote_account')
-        ).filter(*args).first()
+        return cls.query.options(db.joinedload("remote_account")).filter(*args).first()
 
     @classmethod
-    def get_by_token(cls, client_id, access_token, token_type=''):
+    def get_by_token(cls, client_id, access_token, token_type=""):
         """Get RemoteAccount object for token.
 
         :param client_id: The client id.
@@ -199,16 +185,19 @@ class RemoteToken(db.Model, Timestamp):
         :param token_type: The token type. (Default: ``''``)
         :returns: A :class:`invenio_oauthclient.models.RemoteToken` instance.
         """
-        return cls.query.options(db.joinedload('remote_account')).filter(
-            RemoteAccount.id == RemoteToken.id_remote_account,
-            RemoteAccount.client_id == client_id,
-            RemoteToken.token_type == token_type,
-            RemoteToken.access_token == access_token,
-        ).first()
+        return (
+            cls.query.options(db.joinedload("remote_account"))
+            .filter(
+                RemoteAccount.id == RemoteToken.id_remote_account,
+                RemoteAccount.client_id == client_id,
+                RemoteToken.token_type == token_type,
+                RemoteToken.access_token == access_token,
+            )
+            .first()
+        )
 
     @classmethod
-    def create(cls, user_id, client_id, token, secret,
-               token_type='', extra_data=None):
+    def create(cls, user_id, client_id, token, secret, token_type="", extra_data=None):
         """Create a new access token.
 
         .. note:: Creates RemoteAccount as well if it does not exists.
@@ -244,4 +233,4 @@ class RemoteToken(db.Model, Timestamp):
         return token
 
 
-__all__ = ('RemoteAccount', 'RemoteToken', 'UserIdentity')
+__all__ = ("RemoteAccount", "RemoteToken", "UserIdentity")

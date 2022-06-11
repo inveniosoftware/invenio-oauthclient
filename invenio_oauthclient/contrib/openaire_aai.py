@@ -75,18 +75,22 @@ from invenio_db import db
 
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 from invenio_oauthclient.handlers.rest import response_handler
-from invenio_oauthclient.handlers.utils import \
-    require_more_than_one_external_account
+from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
-from invenio_oauthclient.utils import oauth_link_external_id, \
-    oauth_unlink_external_id
+from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_external_id
 
 
 class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
     """Default configuration for OpenAIRE OAuth provider."""
 
-    def __init__(self, title=None, description=None, base_url=None,
-                 app_key=None, precedence_mask=None):
+    def __init__(
+        self,
+        title=None,
+        description=None,
+        base_url=None,
+        app_key=None,
+        precedence_mask=None,
+    ):
         """Constructor."""
         base_url = base_url or "https://aai.openaire.eu"
         super().__init__(
@@ -109,35 +113,35 @@ class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
     def get_handlers(self):
         """Return OpenAIRE auth handlers."""
         return dict(
-            authorized_handler='invenio_oauthclient.handlers'
-                               ':authorized_signup_handler',
-            disconnect_handler='invenio_oauthclient.contrib.openaire_aai'
-                               ':disconnect_handler',
+            authorized_handler="invenio_oauthclient.handlers"
+            ":authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.openaire_aai"
+            ":disconnect_handler",
             signup_handler=dict(
-                info='invenio_oauthclient.contrib.openaire_aai:account_info',
-                setup='invenio_oauthclient.contrib.openaire_aai:account_setup',
-                view='invenio_oauthclient.handlers:signup_handler',
-            )
+                info="invenio_oauthclient.contrib.openaire_aai:account_info",
+                setup="invenio_oauthclient.contrib.openaire_aai:account_setup",
+                view="invenio_oauthclient.handlers:signup_handler",
+            ),
         )
 
     def get_rest_handlers(self):
         """Return OpenAIRE auth REST handlers."""
         return dict(
-            authorized_handler='invenio_oauthclient.handlers.rest'
-                               ':authorized_signup_handler',
-            disconnect_handler='invenio_oauthclient.contrib.openaire_aai'
-                               ':disconnect_rest_handler',
+            authorized_handler="invenio_oauthclient.handlers.rest"
+            ":authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.openaire_aai"
+            ":disconnect_rest_handler",
             signup_handler=dict(
-                info='invenio_oauthclient.contrib.openaire_aai:account_info',
-                setup='invenio_oauthclient.contrib.openaire_aai:account_setup',
-                view='invenio_oauthclient.handlers.rest:signup_handler',
+                info="invenio_oauthclient.contrib.openaire_aai:account_info",
+                setup="invenio_oauthclient.contrib.openaire_aai:account_setup",
+                view="invenio_oauthclient.handlers.rest:signup_handler",
             ),
-            response_handler='invenio_oauthclient.handlers.rest'
-                             ':default_remote_response_handler',
-            authorized_redirect_url='/',
-            disconnect_redirect_url='/',
-            signup_redirect_url='/',
-            error_redirect_url='/'
+            response_handler="invenio_oauthclient.handlers.rest"
+            ":default_remote_response_handler",
+            authorized_redirect_url="/",
+            disconnect_redirect_url="/",
+            signup_redirect_url="/",
+            error_redirect_url="/",
         )
 
 
@@ -167,10 +171,18 @@ OAUTHCLIENT_OPENAIRE_AAI_JWT_DECODE_PARAMS = dict(
         verify_aud=False,
     ),
     algorithms=[
-        "HS256", "HS384", "HS512",
-        "RS256", "RS384", "RS512", "ES256",
-        "ES384", "ES512",
-        "PS256", "PS384", "PS512",
+        "HS256",
+        "HS384",
+        "HS512",
+        "RS256",
+        "RS384",
+        "RS512",
+        "ES256",
+        "ES384",
+        "ES512",
+        "PS256",
+        "PS384",
+        "PS512",
     ],
 )
 """OpenAIRE AAI JWT decoding parameters."""
@@ -198,16 +210,16 @@ def account_info(remote, resp):
     :param resp: The response.
     :returns: A dictionary with the user information.
     """
-    user_info_url = f'{remote.base_url}/oidc/userinfo'
+    user_info_url = f"{remote.base_url}/oidc/userinfo"
     user_info = remote.get(user_info_url).data
     return {
-        'external_id': user_info['sub'],
-        'external_method': 'openaire_aai',
-        'user': {
-            'profile': {
-                'full_name': user_info.get('name'),
+        "external_id": user_info["sub"],
+        "external_method": "openaire_aai",
+        "user": {
+            "profile": {
+                "full_name": user_info.get("name"),
             },
-            'email': user_info.get('email'),
+            "email": user_info.get("email"),
         },
     }
 
@@ -221,15 +233,16 @@ def _disconnect(remote, *args, **kwargs):
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
 
-    remote_account = RemoteAccount.get(user_id=current_user.get_id(),
-                                       client_id=remote.consumer_key)
-    external_method = 'openaire_aai'
-    external_ids = [i.id for i in current_user.external_identifiers
-                    if i.method == external_method]
+    remote_account = RemoteAccount.get(
+        user_id=current_user.get_id(), client_id=remote.consumer_key
+    )
+    external_method = "openaire_aai"
+    external_ids = [
+        i.id for i in current_user.external_identifiers if i.method == external_method
+    ]
 
     if external_ids:
-        oauth_unlink_external_id(dict(id=external_ids[0],
-                                      method=external_method))
+        oauth_unlink_external_id(dict(id=external_ids[0], method=external_method))
     if remote_account:
         with db.session.begin_nested():
             remote_account.delete()
@@ -241,7 +254,7 @@ def disconnect_handler(remote, *args, **kwargs):
     :param remote: The remote application.
     """
     _disconnect(remote, *args, **kwargs)
-    return redirect(url_for('invenio_oauthclient_settings.index'))
+    return redirect(url_for("invenio_oauthclient_settings.index"))
 
 
 def disconnect_rest_handler(remote, *args, **kwargs):
@@ -250,8 +263,9 @@ def disconnect_rest_handler(remote, *args, **kwargs):
     :param remote: The remote application.
     """
     _disconnect(remote, *args, **kwargs)
-    redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
-        remote.name]['disconnect_redirect_url']
+    redirect_url = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][remote.name][
+        "disconnect_redirect_url"
+    ]
     return response_handler(remote, redirect_url)
 
 
@@ -262,17 +276,19 @@ def account_setup(remote, token, resp):
     :param token: The token value.
     :param resp: The response.
     """
-    user_info = jwt.decode(resp['id_token'], **current_app.config.get(
-        'OAUTHCLIENT_OPENAIRE_AAI_JWT_DECODE_PARAMS',
-        OAUTHCLIENT_OPENAIRE_AAI_JWT_DECODE_PARAMS
-    ))
-    openaire_id = user_info['sub']
+    user_info = jwt.decode(
+        resp["id_token"],
+        **current_app.config.get(
+            "OAUTHCLIENT_OPENAIRE_AAI_JWT_DECODE_PARAMS",
+            OAUTHCLIENT_OPENAIRE_AAI_JWT_DECODE_PARAMS,
+        ),
+    )
+    openaire_id = user_info["sub"]
     with db.session.begin_nested():
         user = token.remote_account.user
 
         # Set extra data so that we mark that the setup is done.
-        token.remote_account.extra_data = {'id': openaire_id}
+        token.remote_account.extra_data = {"id": openaire_id}
 
         # Create user <-> external id link.
-        oauth_link_external_id(
-            user, {'id': openaire_id, 'method': 'openaire_aai'})
+        oauth_link_external_id(user, {"id": openaire_id, "method": "openaire_aai"})

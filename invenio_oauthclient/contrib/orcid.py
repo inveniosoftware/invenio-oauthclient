@@ -77,19 +77,24 @@ from invenio_db import db
 
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 from invenio_oauthclient.handlers.rest import response_handler
-from invenio_oauthclient.handlers.utils import \
-    require_more_than_one_external_account
+from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
-from invenio_oauthclient.utils import oauth_link_external_id, \
-    oauth_unlink_external_id
+from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_external_id
 
 
 class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
     """Default configuration for ORCID OAuth provider."""
 
-    def __init__(self, title=None, description=None, base_url=None,
-                 app_key=None, access_token_url=None, authorize_url=None,
-                 precedence_mask=None):
+    def __init__(
+        self,
+        title=None,
+        description=None,
+        base_url=None,
+        app_key=None,
+        access_token_url=None,
+        authorize_url=None,
+        precedence_mask=None,
+    ):
         """Constructor."""
         access_token_url = access_token_url or "https://orcid.org/oauth/token"
         authorize_url = authorize_url or "https://orcid.org/oauth/authorize"
@@ -102,8 +107,7 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
             description or "Connecting Research and Researchers.",
             base_url or "https://pub.orcid.org/v1.2/",
             app_key or "ORCID_APP_CREDENTIALS",
-            request_token_params={"scope": "/authenticate",
-                                  "show_login": "true"},
+            request_token_params={"scope": "/authenticate", "show_login": "true"},
             access_token_url=access_token_url,
             authorize_url=authorize_url,
             content_type="application/json",
@@ -113,35 +117,35 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
     def get_handlers(self):
         """Return ORCID auth handlers."""
         return dict(
-            authorized_handler='invenio_oauthclient.handlers'
-                               ':authorized_signup_handler',
-            disconnect_handler='invenio_oauthclient.contrib.orcid'
-                               ':disconnect_handler',
+            authorized_handler="invenio_oauthclient.handlers"
+            ":authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.orcid"
+            ":disconnect_handler",
             signup_handler=dict(
-                info='invenio_oauthclient.contrib.orcid:account_info',
-                setup='invenio_oauthclient.contrib.orcid:account_setup',
-                view='invenio_oauthclient.handlers:signup_handler',
-            )
+                info="invenio_oauthclient.contrib.orcid:account_info",
+                setup="invenio_oauthclient.contrib.orcid:account_setup",
+                view="invenio_oauthclient.handlers:signup_handler",
+            ),
         )
 
     def get_rest_handlers(self):
         """Return ORCID auth REST handlers."""
         return dict(
-            authorized_handler='invenio_oauthclient.handlers.rest'
-                               ':authorized_signup_handler',
-            disconnect_handler='invenio_oauthclient.contrib.orcid'
-                               ':disconnect_rest_handler',
+            authorized_handler="invenio_oauthclient.handlers.rest"
+            ":authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.orcid"
+            ":disconnect_rest_handler",
             signup_handler=dict(
-                info='invenio_oauthclient.contrib.orcid:account_info',
-                setup='invenio_oauthclient.contrib.orcid:account_setup',
-                view='invenio_oauthclient.handlers.rest:signup_handler',
+                info="invenio_oauthclient.contrib.orcid:account_info",
+                setup="invenio_oauthclient.contrib.orcid:account_setup",
+                view="invenio_oauthclient.handlers.rest:signup_handler",
             ),
-            response_handler='invenio_oauthclient.handlers.rest'
-                             ':default_remote_response_handler',
-            authorized_redirect_url='/',
-            disconnect_redirect_url='/',
-            signup_redirect_url='/',
-            error_redirect_url='/'
+            response_handler="invenio_oauthclient.handlers.rest"
+            ":default_remote_response_handler",
+            authorized_redirect_url="/",
+            disconnect_redirect_url="/",
+            signup_redirect_url="/",
+            error_redirect_url="/",
         )
 
 
@@ -155,8 +159,7 @@ REMOTE_REST_APP = _orcid_app.remote_rest_app
 """ORCID Remote REST Application."""
 
 _orcid_member_app = ORCIDOAuthSettingsHelper(
-    base_url='https://api.orcid.org/',
-    access_token_url='https://orcid.org/oauth/token'
+    base_url="https://api.orcid.org/", access_token_url="https://orcid.org/oauth/token"
 )
 REMOTE_MEMBER_APP = _orcid_member_app.remote_app
 """ORCID Remote Application with member API."""
@@ -165,9 +168,9 @@ REMOTE_MEMBER_APP = _orcid_member_app.remote_app
 # SANDBOX
 
 _orcid_sandbox_app = ORCIDOAuthSettingsHelper(
-    base_url='https://pub.sandbox.orcid.org/',
-    access_token_url='https://sandbox.orcid.org/oauth/token',
-    authorize_url='https://sandbox.orcid.org/oauth/authorize#show_login',
+    base_url="https://pub.sandbox.orcid.org/",
+    access_token_url="https://sandbox.orcid.org/oauth/token",
+    authorize_url="https://sandbox.orcid.org/oauth/authorize#show_login",
 )
 REMOTE_SANDBOX_APP = _orcid_sandbox_app.remote_app
 """ORCID Sandbox Remote Application with public API."""
@@ -176,9 +179,9 @@ REMOTE_SANDBOX_REST_APP = _orcid_sandbox_app.remote_rest_app
 """ORCID Sandbox Remote Application with public API."""
 
 _orcid_sandbox_member_app = ORCIDOAuthSettingsHelper(
-    base_url='https://api.sandbox.orcid.org/',
-    access_token_url='https://sandbox.orcid.org/oauth/token',
-    authorize_url='https://sandbox.orcid.org/oauth/authorize#show_login',
+    base_url="https://api.sandbox.orcid.org/",
+    access_token_url="https://sandbox.orcid.org/oauth/token",
+    authorize_url="https://sandbox.orcid.org/oauth/authorize#show_login",
 )
 REMOTE_SANDBOX_MEMBER_APP = _orcid_sandbox_member_app.remote_app
 """ORCID sandbox member API."""
@@ -205,14 +208,14 @@ def account_info(remote, resp):
     :param resp: The response.
     :returns: A dictionary with the user information.
     """
-    orcid = resp.get('orcid')
+    orcid = resp.get("orcid")
 
     return {
-        'external_id': orcid,
-        'external_method': 'orcid',
-        'user': {
-            'profile': {
-                'full_name': resp.get('name'),
+        "external_id": orcid,
+        "external_method": "orcid",
+        "user": {
+            "profile": {
+                "full_name": resp.get("name"),
             },
         },
     }
@@ -227,12 +230,13 @@ def _disconnect(remote, *args, **kwargs):
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
 
-    account = RemoteAccount.get(user_id=current_user.get_id(),
-                                client_id=remote.consumer_key)
-    orcid = account.extra_data.get('orcid')
+    account = RemoteAccount.get(
+        user_id=current_user.get_id(), client_id=remote.consumer_key
+    )
+    orcid = account.extra_data.get("orcid")
 
     if orcid:
-        oauth_unlink_external_id({'id': orcid, 'method': 'orcid'})
+        oauth_unlink_external_id({"id": orcid, "method": "orcid"})
     if account:
         with db.session.begin_nested():
             account.delete()
@@ -244,7 +248,7 @@ def disconnect_handler(remote, *args, **kwargs):
     :param remote: The remote application.
     """
     _disconnect(remote, *args, **kwargs)
-    return redirect(url_for('invenio_oauthclient_settings.index'))
+    return redirect(url_for("invenio_oauthclient_settings.index"))
 
 
 def disconnect_rest_handler(remote, *args, **kwargs):
@@ -253,8 +257,9 @@ def disconnect_rest_handler(remote, *args, **kwargs):
     :param remote: The remote application.
     """
     _disconnect(remote, *args, **kwargs)
-    redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
-        remote.name]['disconnect_redirect_url']
+    redirect_url = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][remote.name][
+        "disconnect_redirect_url"
+    ]
     return response_handler(remote, redirect_url)
 
 
@@ -267,16 +272,16 @@ def account_setup(remote, token, resp):
     """
     with db.session.begin_nested():
         # Retrieve ORCID from response.
-        orcid = resp.get('orcid')
-        full_name = resp.get('name')
+        orcid = resp.get("orcid")
+        full_name = resp.get("name")
 
         # Set ORCID in extra_data.
         token.remote_account.extra_data = {
-            'orcid': orcid,
-            'full_name': full_name,
+            "orcid": orcid,
+            "full_name": full_name,
         }
 
         user = token.remote_account.user
 
         # Create user <-> external id link.
-        oauth_link_external_id(user, {'id': orcid, 'method': 'orcid'})
+        oauth_link_external_id(user, {"id": orcid, "method": "orcid"})

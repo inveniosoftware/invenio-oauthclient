@@ -100,14 +100,15 @@ from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 
 from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
+
 monkey_patch_werkzeug()  # noqa isort:skip
 
 from flask_oauthlib.client import OAuth as FlaskOAuth  # noqa isort:skip
 
 # [ Configure application credentials ]
 CERN_APP_CREDENTIALS = dict(
-    consumer_key=os.environ.get('CERN_APP_CREDENTIALS_KEY'),
-    consumer_secret=os.environ.get('CERN_APP_CREDENTIALS_SECRET'),
+    consumer_key=os.environ.get("CERN_APP_CREDENTIALS_KEY"),
+    consumer_secret=os.environ.get("CERN_APP_CREDENTIALS_SECRET"),
 )
 
 # Create Flask application
@@ -115,23 +116,17 @@ app = Flask(__name__)
 
 app.config.update(
     SQLALCHEMY_DATABASE_URI=os.environ.get(
-        'SQLALCHEMY_DATABASE_URI', 'sqlite:///cern_app.db'
+        "SQLALCHEMY_DATABASE_URI", "sqlite:///cern_app.db"
     ),
-    OAUTHCLIENT_REMOTE_APPS=dict(
-        cern=cern.REMOTE_APP
-    ),
+    OAUTHCLIENT_REMOTE_APPS=dict(cern=cern.REMOTE_APP),
     CERN_APP_CREDENTIALS=CERN_APP_CREDENTIALS,
     DEBUG=True,
-    SECRET_KEY='TEST',
-    SECURITY_PASSWORD_SALT='security-password-salt',
+    SECRET_KEY="TEST",
+    SECURITY_PASSWORD_SALT="security-password-salt",
     SECURITY_SEND_REGISTER_EMAIL=False,
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
-    APP_THEME=['semantic-ui'],
-    THEME_ICONS={
-      'semantic-ui': dict(
-            link='linkify icon'
-      )
-    }
+    APP_THEME=["semantic-ui"],
+    THEME_ICONS={"semantic-ui": dict(link="linkify icon")},
 )
 
 Babel(app)
@@ -144,20 +139,19 @@ InvenioOAuthClient(app)
 app.register_blueprint(blueprint_user)
 app.register_blueprint(blueprint_client)
 app.register_blueprint(blueprint_settings)
-principal = app.extensions['security'].principal
+principal = app.extensions["security"].principal
 
 
-@app.route('/')
+@app.route("/")
 def index():
     """Homepage."""
-    return 'Home page (without any restrictions)'
+    return "Home page (without any restrictions)"
 
 
-@app.route('/cern')
+@app.route("/cern")
 def cern():
     """Home page: try to print user email or redirect to login with cern."""
     if not current_user.is_authenticated:
-        return redirect(url_for('invenio_oauthclient.login',
-                                remote_app='cern'))
+        return redirect(url_for("invenio_oauthclient.login", remote_app="cern"))
 
-    return 'hello {}'.format(current_user.email)
+    return "hello {}".format(current_user.email)

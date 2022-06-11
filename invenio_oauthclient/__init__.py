@@ -11,11 +11,11 @@
 from .ext import InvenioOAuthClient, InvenioOAuthClientREST
 from .proxies import current_oauthclient
 
-__version__ = '2.0.0'
+__version__ = "2.0.0"
 
 __all__ = (
-    '__version__',
-    'current_oauthclient',
-    'InvenioOAuthClient',
-    'InvenioOAuthClientREST'
+    "__version__",
+    "current_oauthclient",
+    "InvenioOAuthClient",
+    "InvenioOAuthClientREST",
 )

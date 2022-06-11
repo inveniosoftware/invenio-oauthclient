@@ -21,18 +21,18 @@ def test_token_setter(app, remote):
 
     # OAuth1
     resp_oauth1 = {
-        'name': 'Josiah Carberry',
-        'expires_in': 3599,
-        'oauth_token': 'test_access_token',
-        'oauth_token_secret': 'test_refresh_token',
-        'scope': '/authenticate',
-        'token_type': 'bearer',
+        "name": "Josiah Carberry",
+        "expires_in": 3599,
+        "oauth_token": "test_access_token",
+        "oauth_token_secret": "test_refresh_token",
+        "scope": "/authenticate",
+        "token_type": "bearer",
     }
     assert not response_token_setter(remote, resp_oauth1)
 
     # Bad request
     resp_bad = {
-        'invalid': 'invalid',
+        "invalid": "invalid",
     }
     with pytest.raises(OAuthResponseError):
         response_token_setter(remote, resp_bad)
@@ -40,15 +40,15 @@ def test_token_setter(app, remote):
 
 def test_token_getter(remote, models_fixture, app):
     """Test token getter on response from OAuth server."""
-    datastore = app.extensions['invenio-accounts'].datastore
-    existing_email = 'existing@inveniosoftware.org'
+    datastore = app.extensions["invenio-accounts"].datastore
+    existing_email = "existing@inveniosoftware.org"
     user = datastore.find_user(email=existing_email)
 
     # Missing RemoteToken
-    oauth_authenticate('dev', user)
+    oauth_authenticate("dev", user)
     assert not token_getter(remote)
 
     # Populated RemoteToken
-    RemoteToken.create(user.id, 'testkey', 'mytoken', 'mysecret')
-    oauth_authenticate('dev', user)
-    assert token_getter(remote) == ('mytoken', 'mysecret')
+    RemoteToken.create(user.id, "testkey", "mytoken", "mysecret")
+    oauth_authenticate("dev", user)
+    assert token_getter(remote) == ("mytoken", "mysecret")

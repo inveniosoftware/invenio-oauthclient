@@ -23,27 +23,22 @@ from invenio_accounts import InvenioAccounts
 from invenio_db import InvenioDB, db
 from invenio_userprofiles import InvenioUserProfiles, UserProfile
 from invenio_userprofiles.views import blueprint_ui_init
-from sqlalchemy_utils.functions import create_database, database_exists, \
-    drop_database
+from sqlalchemy_utils.functions import create_database, database_exists, drop_database
 
 from invenio_oauthclient import InvenioOAuthClient, InvenioOAuthClientREST
 from invenio_oauthclient.contrib.cern import REMOTE_APP as CERN_REMOTE_APP
-from invenio_oauthclient.contrib.cern import \
-    REMOTE_REST_APP as CERN_REMOTE_REST_APP
-from invenio_oauthclient.contrib.cern_openid import \
-    REMOTE_APP as CERN_OPENID_REMOTE_APP
-from invenio_oauthclient.contrib.cern_openid import \
-    REMOTE_REST_APP as CERN_OPENID_REMOTE_REST_APP
+from invenio_oauthclient.contrib.cern import REMOTE_REST_APP as CERN_REMOTE_REST_APP
+from invenio_oauthclient.contrib.cern_openid import REMOTE_APP as CERN_OPENID_REMOTE_APP
+from invenio_oauthclient.contrib.cern_openid import (
+    REMOTE_REST_APP as CERN_OPENID_REMOTE_REST_APP,
+)
 from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
-from invenio_oauthclient.contrib.github import \
-    REMOTE_REST_APP as GITHUB_REMOTE_REST_APP
+from invenio_oauthclient.contrib.github import REMOTE_REST_APP as GITHUB_REMOTE_REST_APP
 from invenio_oauthclient.contrib.globus import REMOTE_APP as GLOBUS_REMOTE_APP
-from invenio_oauthclient.contrib.globus import \
-    REMOTE_REST_APP as GLOBUS_REMOTE_REST_APP
+from invenio_oauthclient.contrib.globus import REMOTE_REST_APP as GLOBUS_REMOTE_REST_APP
 from invenio_oauthclient.contrib.keycloak import KeycloakSettingsHelper
 from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
-from invenio_oauthclient.contrib.orcid import \
-    REMOTE_REST_APP as ORCID_REMOTE_REST_APP
+from invenio_oauthclient.contrib.orcid import REMOTE_REST_APP as ORCID_REMOTE_REST_APP
 from invenio_oauthclient.utils import _create_registrationform
 from invenio_oauthclient.views.client import blueprint as blueprint_client
 from invenio_oauthclient.views.client import rest_blueprint
@@ -66,18 +61,19 @@ def base_app(request):
     # allow HTTP for keycloak tests, and create the KEYCLOAK_REMOTE_APP
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
     base_url, realm = "http://localhost:8080", "test"
-    helper = KeycloakSettingsHelper(title="Keycloak", description="",
-                                    base_url=base_url, realm=realm)
+    helper = KeycloakSettingsHelper(
+        title="Keycloak", description="", base_url=base_url, realm=realm
+    )
     KEYCLOAK_REMOTE_APP = helper.remote_app
 
     instance_path = tempfile.mkdtemp()
-    base_app = Flask('testapp')
+    base_app = Flask("testapp")
     base_app.config.update(
         ACCOUNTS_LOCAL_LOGIN_ENABLED=True,
         TESTING=True,
         WTF_CSRF_ENABLED=False,
         LOGIN_DISABLED=False,
-        CACHE_TYPE='simple',
+        CACHE_TYPE="simple",
         OAUTHCLIENT_SIGNUP_FORM=_create_registrationform,
         OAUTHCLIENT_REMOTE_APPS=dict(
             cern=CERN_REMOTE_APP,
@@ -96,28 +92,28 @@ def base_app(request):
         ),
         OAUTHCLIENT_STATE_EXPIRES=300,
         GITHUB_APP_CREDENTIALS=dict(
-            consumer_key='github_key_changeme',
-            consumer_secret='github_secret_changeme',
+            consumer_key="github_key_changeme",
+            consumer_secret="github_secret_changeme",
         ),
         ORCID_APP_CREDENTIALS=dict(
-            consumer_key='orcid_key_changeme',
-            consumer_secret='orcid_secret_changeme',
+            consumer_key="orcid_key_changeme",
+            consumer_secret="orcid_secret_changeme",
         ),
         CERN_APP_CREDENTIALS=dict(
-            consumer_key='cern_key_changeme',
-            consumer_secret='cern_secret_changeme',
+            consumer_key="cern_key_changeme",
+            consumer_secret="cern_secret_changeme",
         ),
         CERN_APP_OPENID_CREDENTIALS=dict(
-            consumer_key='cern_key_changeme',
-            consumer_secret='cern_secret_changeme',
+            consumer_key="cern_key_changeme",
+            consumer_secret="cern_secret_changeme",
         ),
         GLOBUS_APP_CREDENTIALS=dict(
-            consumer_key='globus_key_changeme',
-            consumer_secret='globus_secret_changeme',
+            consumer_key="globus_key_changeme",
+            consumer_secret="globus_secret_changeme",
         ),
         TEST_APP_CREDENTIALS=dict(
-            consumer_key='test_key_changeme',
-            consumer_secret='test_secret_changeme',
+            consumer_key="test_key_changeme",
+            consumer_secret="test_secret_changeme",
         ),
         OAUTHCLIENT_KEYCLOAK_USER_INFO_URL=helper.user_info_url,
         OAUTHCLIENT_KEYCLOAK_REALM_URL=helper.realm_url,
@@ -129,32 +125,27 @@ def base_app(request):
             consumer_secret="keycloak_secret_changeme",
         ),
         # use local memory mailbox
-        EMAIL_BACKEND='flask_email.backends.locmem.Mail',
-        SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI',
-                                          'sqlite://'),
+        EMAIL_BACKEND="flask_email.backends.locmem.Mail",
+        SQLALCHEMY_DATABASE_URI=os.getenv("SQLALCHEMY_DATABASE_URI", "sqlite://"),
         # Alembic runs all migrations in a single transaction, and in
         # oauthclient the useridentity table can be in state where it's created
         # and then deleted in the same transaction. On PostgreSQL which
         # supports transactional DDL therefore fails if we don't run each
         # migration in its own migration.
         ALEMBIC_CONTEXT={
-            'transaction_per_migration': True,
+            "transaction_per_migration": True,
         },
-        SERVER_NAME='localhost',
+        SERVER_NAME="localhost",
         DEBUG=False,
-        SECRET_KEY='TEST',
+        SECRET_KEY="TEST",
         SECURITY_DEPRECATED_PASSWORD_SCHEMES=[],
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        SECURITY_PASSWORD_HASH='plaintext',
-        SECURITY_PASSWORD_SCHEMES=['plaintext'],
+        SECURITY_PASSWORD_HASH="plaintext",
+        SECURITY_PASSWORD_SCHEMES=["plaintext"],
         SECURITY_PASSWORD_SINGLE_HASH=None,
-        APP_ALLOWED_HOSTS=['localhost'],
-        APP_THEME=['semantic-ui'],
-        THEME_ICONS={
-            'semantic-ui': dict(
-                link='linkify icon'
-            )
-        }
+        APP_ALLOWED_HOSTS=["localhost"],
+        APP_THEME=["semantic-ui"],
+        THEME_ICONS={"semantic-ui": dict(link="linkify icon")},
     )
     FlaskMenu(base_app)
     Babel(base_app)
@@ -163,15 +154,16 @@ def base_app(request):
     InvenioAccounts(base_app)
 
     with base_app.app_context():
-        if str(db.engine.url) != 'sqlite://' and \
-           not database_exists(str(db.engine.url)):
+        if str(db.engine.url) != "sqlite://" and not database_exists(
+            str(db.engine.url)
+        ):
             create_database(str(db.engine.url))
         db.create_all()
 
     def teardown():
         with base_app.app_context():
             db.session.close()
-            if str(db.engine.url) != 'sqlite://':
+            if str(db.engine.url) != "sqlite://":
                 drop_database(str(db.engine.url))
             shutil.rmtree(instance_path)
             db.engine.dispose()
@@ -266,21 +258,15 @@ def app_with_userprofiles_csrf(app):
 def models_fixture(base_app):
     """Flask app with example data used to test models."""
     with base_app.app_context():
-        datastore = base_app.extensions['security'].datastore
+        datastore = base_app.extensions["security"].datastore
         datastore.create_user(
-            email='existing@inveniosoftware.org',
-            password='tester',
-            active=True
+            email="existing@inveniosoftware.org", password="tester", active=True
         )
         datastore.create_user(
-            email='test2@inveniosoftware.org',
-            password='tester',
-            active=True
+            email="test2@inveniosoftware.org", password="tester", active=True
         )
         datastore.create_user(
-            email='test3@inveniosoftware.org',
-            password='tester',
-            active=True
+            email="test3@inveniosoftware.org", password="tester", active=True
         )
         datastore.commit()
 
@@ -288,16 +274,17 @@ def models_fixture(base_app):
 @pytest.fixture
 def params():
     """Fixture for remote app params."""
+
     def params(x):
         return dict(
-            request_token_params={'scope': ''},
-            base_url='https://foo.bar/',
+            request_token_params={"scope": ""},
+            base_url="https://foo.bar/",
             request_token_url=None,
-            access_token_url='https://foo.bar/oauth/access_token',
-            authorize_url='https://foo.bar/oauth/authorize',
+            access_token_url="https://foo.bar/oauth/access_token",
+            authorize_url="https://foo.bar/oauth/authorize",
             consumer_key=x,
-            consumer_secret='testsecret',
-            app_key="TEST_APP_CREDENTIALS"
+            consumer_secret="testsecret",
+            app_key="TEST_APP_CREDENTIALS",
         )
 
     return params
@@ -306,36 +293,40 @@ def params():
 @pytest.fixture
 def remote():
     """Fixture for remote app."""
-    return type('test_remote', (), dict(
-        name='example_remote',
-        request_token_params={'scope': ''},
-        base_url='https://foo.bar/',
-        request_token_url=None,
-        access_token_url='https://foo.bar/oauth/access_token',
-        authorize_url='https://foo.bar/oauth/authorize',
-        consumer_key='testkey',
-        consumer_secret='testsecret',
-    ))()
+    return type(
+        "test_remote",
+        (),
+        dict(
+            name="example_remote",
+            request_token_params={"scope": ""},
+            base_url="https://foo.bar/",
+            request_token_url=None,
+            access_token_url="https://foo.bar/oauth/access_token",
+            authorize_url="https://foo.bar/oauth/authorize",
+            consumer_key="testkey",
+            consumer_secret="testsecret",
+        ),
+    )()
 
 
 @pytest.fixture
 def views_fixture(base_app, params, models_fixture):
     """Flask application with example data used to test views."""
-    base_app.config['OAUTHCLIENT_REMOTE_APPS'].update(
+    base_app.config["OAUTHCLIENT_REMOTE_APPS"].update(
         dict(
             test=dict(
-                authorized_handler=lambda *args, **kwargs: 'TEST',
-                params=params('testid'),
-                title='MyLinkedTestAccount',
+                authorized_handler=lambda *args, **kwargs: "TEST",
+                params=params("testid"),
+                title="MyLinkedTestAccount",
             ),
             test_invalid=dict(
-                authorized_handler=lambda *args, **kwargs: 'TEST',
-                params=params('test_invalidid'),
-                title='Test Invalid',
+                authorized_handler=lambda *args, **kwargs: "TEST",
+                params=params("test_invalidid"),
+                title="Test Invalid",
             ),
             full=dict(
-                params=params('fullid'),
-                title='Full',
+                params=params("fullid"),
+                title="Full",
             ),
         )
     )
@@ -346,33 +337,33 @@ def views_fixture(base_app, params, models_fixture):
 @pytest.fixture
 def views_fixture_rest(base_app, params, models_fixture):
     """Flask application with example data used to test views."""
-    base_app.config['OAUTHCLIENT_REST_REMOTE_APPS'].update(
+    base_app.config["OAUTHCLIENT_REST_REMOTE_APPS"].update(
         dict(
             test=dict(
-                authorized_handler=lambda *args, **kwargs: 'TEST',
-                authorized_redirect_url='/',
-                disconnect_redirect_url='/',
-                signup_redirect_url='/',
-                error_redirect_url='/',
-                params=params('testid'),
-                title='MyLinkedTestAccount',
+                authorized_handler=lambda *args, **kwargs: "TEST",
+                authorized_redirect_url="/",
+                disconnect_redirect_url="/",
+                signup_redirect_url="/",
+                error_redirect_url="/",
+                params=params("testid"),
+                title="MyLinkedTestAccount",
             ),
             test_invalid=dict(
-                authorized_handler=lambda *args, **kwargs: 'TEST',
-                authorized_redirect_url='/',
-                disconnect_redirect_url='/',
-                signup_redirect_url='/',
-                error_redirect_url='/',
-                params=params('test_invalidid'),
-                title='Test Invalid',
+                authorized_handler=lambda *args, **kwargs: "TEST",
+                authorized_redirect_url="/",
+                disconnect_redirect_url="/",
+                signup_redirect_url="/",
+                error_redirect_url="/",
+                params=params("test_invalidid"),
+                title="Test Invalid",
             ),
             full=dict(
-                params=params('fullid'),
-                authorized_redirect_url='/',
-                disconnect_redirect_url='/',
-                signup_redirect_url='/',
-                error_redirect_url='/',
-                title='Full',
+                params=params("fullid"),
+                authorized_redirect_url="/",
+                disconnect_redirect_url="/",
+                signup_redirect_url="/",
+                error_redirect_url="/",
+                title="Full",
             ),
         )
     )
@@ -382,103 +373,105 @@ def views_fixture_rest(base_app, params, models_fixture):
 def example_github(request):
     """ORCID example data."""
     return {
-        'name': 'Josiah Carberry',
-        'expires_in': 3599,
-        'access_token': 'test_access_token',
-        'refresh_token': 'test_refresh_token',
-        'scope': '/authenticate',
-        'token_type': 'bearer',
+        "name": "Josiah Carberry",
+        "expires_in": 3599,
+        "access_token": "test_access_token",
+        "refresh_token": "test_refresh_token",
+        "scope": "/authenticate",
+        "token_type": "bearer",
     }
 
 
 @pytest.fixture
 def example_globus(request):
     """Globus example data."""
-    return {
-                'identity_provider_display_name': 'Globus ID',
-                'sub': '1142af3a-fea4-4df9-afe2-865ccd68bfdb',
-                'preferred_username': 'carberry@inveniosoftware.org',
-                'identity_provider': '41143743-f3c8-4d60-bbdb-eeecaba85bd9',
-                'organization': 'Globus',
-                'email': 'carberry@inveniosoftware.org',
-                'name': 'Josiah Carberry'
-            }, {
-                'expires_in': 3599,
-                'resource_server': 'auth.globus.org',
-                'state': 'test_state',
-                'access_token': 'test_access_token',
-                'id_token': 'header.test-oidc-token.pub-key',
-                'other_tokens': [],
-                'scope': 'profile openid email',
-                'token_type': 'Bearer',
-            }, {
-                'identities': [
-                    {
-                        'username': 'carberry@inveniosoftware.org',
-                        'status': 'used',
-                        'name': 'Josiah Carberry',
-                        'email': 'carberry@inveniosoftware.org',
-                        'identity_provider':
-                            '927d7238-f917-4eb2-9ace-c523fa9ba34e',
-                        'organization': 'Globus',
-                        'id': '3b843349-4d4d-4ef3-916d-2a465f9740a9'
-                    }
-                ]
-    }
+    return (
+        {
+            "identity_provider_display_name": "Globus ID",
+            "sub": "1142af3a-fea4-4df9-afe2-865ccd68bfdb",
+            "preferred_username": "carberry@inveniosoftware.org",
+            "identity_provider": "41143743-f3c8-4d60-bbdb-eeecaba85bd9",
+            "organization": "Globus",
+            "email": "carberry@inveniosoftware.org",
+            "name": "Josiah Carberry",
+        },
+        {
+            "expires_in": 3599,
+            "resource_server": "auth.globus.org",
+            "state": "test_state",
+            "access_token": "test_access_token",
+            "id_token": "header.test-oidc-token.pub-key",
+            "other_tokens": [],
+            "scope": "profile openid email",
+            "token_type": "Bearer",
+        },
+        {
+            "identities": [
+                {
+                    "username": "carberry@inveniosoftware.org",
+                    "status": "used",
+                    "name": "Josiah Carberry",
+                    "email": "carberry@inveniosoftware.org",
+                    "identity_provider": "927d7238-f917-4eb2-9ace-c523fa9ba34e",
+                    "organization": "Globus",
+                    "id": "3b843349-4d4d-4ef3-916d-2a465f9740a9",
+                }
+            ]
+        },
+    )
 
 
 @pytest.fixture
 def example_orcid(request):
     """ORCID example data."""
     return {
-               'name': 'Josiah Carberry',
-               'expires_in': 3599,
-               'orcid': '0000-0002-1825-0097',
-               'access_token': 'test_access_token',
-               'refresh_token': 'test_refresh_token',
-               'scope': '/authenticate',
-               'token_type': 'bearer'
-           }, dict(external_id='0000-0002-1825-0097',
-                   external_method='orcid',
-                   user=dict(
-                       profile=dict(
-                           full_name='Josiah Carberry'
-                       )
-                   )
-                   )
+        "name": "Josiah Carberry",
+        "expires_in": 3599,
+        "orcid": "0000-0002-1825-0097",
+        "access_token": "test_access_token",
+        "refresh_token": "test_refresh_token",
+        "scope": "/authenticate",
+        "token_type": "bearer",
+    }, dict(
+        external_id="0000-0002-1825-0097",
+        external_method="orcid",
+        user=dict(profile=dict(full_name="Josiah Carberry")),
+    )
 
 
 @pytest.fixture()
 def example_cern(request):
     """CERN example data."""
-    file_path = os.path.join(os.path.dirname(__file__),
-                             'data/oauth_response_content.json')
+    file_path = os.path.join(
+        os.path.dirname(__file__), "data/oauth_response_content.json"
+    )
     with open(file_path) as response_file:
         json_data = response_file.read()
 
-    return OAuthResponse(
-        resp=None,
-        content=json_data,
-        content_type='application/json'
-    ), dict(
-        access_token='test_access_token',
-        token_type='bearer',
-        expires_in=1199,
-        refresh_token='test_refresh_token'
-    ), dict(
-        user=dict(
-            email='test.account@cern.ch',
-            profile=dict(username='taccount', full_name='Test Account'),
+    return (
+        OAuthResponse(resp=None, content=json_data, content_type="application/json"),
+        dict(
+            access_token="test_access_token",
+            token_type="bearer",
+            expires_in=1199,
+            refresh_token="test_refresh_token",
         ),
-        external_id='123456', external_method='cern',
-        active=True
+        dict(
+            user=dict(
+                email="test.account@cern.ch",
+                profile=dict(username="taccount", full_name="Test Account"),
+            ),
+            external_id="123456",
+            external_method="cern",
+            active=True,
+        ),
     )
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def orcid_bio():
     """ORCID response fixture."""
-    file_path = os.path.join(os.path.dirname(__file__), 'data/orcid_bio.json')
+    file_path = os.path.join(os.path.dirname(__file__), "data/orcid_bio.json")
     with open(file_path) as response_file:
         data = json.load(response_file)
     return data
@@ -488,12 +481,12 @@ def orcid_bio():
 def user(app_with_userprofiles):
     """Create users."""
     with db.session.begin_nested():
-        datastore = app_with_userprofiles.extensions['security'].datastore
+        datastore = app_with_userprofiles.extensions["security"].datastore
         user1 = datastore.create_user(
-            email='info@inveniosoftware.org',
-            password='tester',
+            email="info@inveniosoftware.org",
+            password="tester",
             active=True,
-            username='mynick',
+            username="mynick",
         )
     db.session.commit()
     return user1
@@ -503,12 +496,12 @@ def user(app_with_userprofiles):
 def user_rest(app_rest_with_userprofiles):
     """Create users."""
     with db.session.begin_nested():
-        datastore = app_rest_with_userprofiles.extensions['security'].datastore
+        datastore = app_rest_with_userprofiles.extensions["security"].datastore
         user1 = datastore.create_user(
-            email='info@inveniosoftware.org',
-            password='tester',
+            email="info@inveniosoftware.org",
+            password="tester",
             active=True,
-            username='mynick',
+            username="mynick",
         )
     db.session.commit()
     return user1
@@ -518,19 +511,19 @@ def user_rest(app_rest_with_userprofiles):
 def form_test_data():
     """Test data to fill a registration form."""
     return dict(
-                email='test@tester.com',
-                profile=dict(
-                    full_name='Test Tester', username='test123',
-                ),
-            )
+        email="test@tester.com",
+        profile=dict(
+            full_name="Test Tester",
+            username="test123",
+        ),
+    )
 
 
 @pytest.fixture()
 def example_keycloak_token():
     """Keycloak example data."""
     file_path = os.path.join(
-        os.path.dirname(__file__),
-        'data/keycloak_token_response.json'
+        os.path.dirname(__file__), "data/keycloak_token_response.json"
     )
 
     with open(file_path) as token_file:
@@ -543,8 +536,7 @@ def example_keycloak_token():
 def example_keycloak_userinfo():
     """Keycloak example user info response."""
     file_path = os.path.join(
-        os.path.dirname(__file__),
-        'data/keycloak_userinfo_response.json'
+        os.path.dirname(__file__), "data/keycloak_userinfo_response.json"
     )
 
     with open(file_path) as response_file:
@@ -560,10 +552,7 @@ def example_keycloak_userinfo():
 @pytest.fixture()
 def example_keycloak_realm_info():
     """Keycloak example realm info."""
-    file_path = os.path.join(
-        os.path.dirname(__file__),
-        'data/keycloak_realm_info.json'
-    )
+    file_path = os.path.join(os.path.dirname(__file__), "data/keycloak_realm_info.json")
 
     with open(file_path) as info_file:
         realm_info = json.load(info_file)
@@ -574,10 +563,12 @@ def example_keycloak_realm_info():
 @pytest.fixture()
 def example_keycloak_public_key():
     """Keycloak example public key."""
-    return ("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyZ5aoSIieF5vWOg4O8xTR"
-            "lwWgs032Fuv7kvSXVLbE1XW+wlagD2asZ27U18A290RE3aK8zW4Bhtj8Zad/Xy1gA"
-            "XYuuHNriNELBTm+WuJyA67bYvBB0QAKSIlDmbjc6btcgFJAyq0vNd0riwvsQJw5so"
-            "RNT1eyrz12Z+yzCnSB5kO16ur2tzCxts+hkiUmznKcaPXDcbaJIUfyGMmSZLDk924"
-            "GDFwOhLG01wcegmxUf48WqCQSfjzwudhubhJTSnNyhx8ndKUXKa3eGsV6Lub/u2di"
-            "FZ+3rJGEbEKFUbFNPTJfslXh+mnH89/ZM8mZDb4V8YNX1lafSeJdvC7nnvvyQIDAQ"
-            "AB")
+    return (
+        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyZ5aoSIieF5vWOg4O8xTR"
+        "lwWgs032Fuv7kvSXVLbE1XW+wlagD2asZ27U18A290RE3aK8zW4Bhtj8Zad/Xy1gA"
+        "XYuuHNriNELBTm+WuJyA67bYvBB0QAKSIlDmbjc6btcgFJAyq0vNd0riwvsQJw5so"
+        "RNT1eyrz12Z+yzCnSB5kO16ur2tzCxts+hkiUmznKcaPXDcbaJIUfyGMmSZLDk924"
+        "GDFwOhLG01wcegmxUf48WqCQSfjzwudhubhJTSnNyhx8ndKUXKa3eGsV6Lub/u2di"
+        "FZ+3rJGEbEKFUbFNPTJfslXh+mnH89/ZM8mZDb4V8YNX1lafSeJdvC7nnvvyQIDAQ"
+        "AB"
+    )

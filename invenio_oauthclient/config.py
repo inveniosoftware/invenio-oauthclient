@@ -300,7 +300,7 @@ from .views.client import auto_redirect_login
 OAUTHCLIENT_REMOTE_APPS = {}
 """Configuration of remote applications."""
 
-OAUTHCLIENT_SESSION_KEY_PREFIX = 'oauth_token'
+OAUTHCLIENT_SESSION_KEY_PREFIX = "oauth_token"
 """Session key prefix used when storing the access token for a remote app."""
 
 OAUTHCLIENT_STATE_EXPIRES = 300
@@ -312,13 +312,13 @@ OAUTHCLIENT_STATE_ENABLED = True
 OAUTHCLIENT_SIGNUP_FORM = _create_registrationform
 """Function called to render the sign up form after authorization succeeded."""
 
-OAUTHCLIENT_SIGNUP_TEMPLATE = 'invenio_oauthclient/signup.html'
+OAUTHCLIENT_SIGNUP_TEMPLATE = "invenio_oauthclient/signup.html"
 """Template for the signup page."""
 
 OAUTHCLIENT_REST_REMOTE_APPS = {}
 """Configuration of remote rest applications."""
 
-OAUTHCLIENT_REST_DEFAULT_ERROR_REDIRECT_URL = '/'
+OAUTHCLIENT_REST_DEFAULT_ERROR_REDIRECT_URL = "/"
 """Configuration of default error redirect URL."""
 
 OAUTHCLIENT_REST_DEFAULT_RESPONSE_HANDLER = None

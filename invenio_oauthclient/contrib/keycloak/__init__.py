@@ -86,8 +86,12 @@ document, where we focus on configuring Invenio.
    Linked accounts: https://localhost:5000/account/settings/linkedaccounts/
 """
 
-from .handlers import disconnect_handler, disconnect_rest_handler, \
-    info_handler, setup_handler
+from .handlers import (
+    disconnect_handler,
+    disconnect_rest_handler,
+    info_handler,
+    setup_handler,
+)
 from .settings import KeycloakSettingsHelper
 
 __all__ = (

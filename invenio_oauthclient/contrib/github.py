@@ -76,24 +76,31 @@ from invenio_db import db
 
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 from invenio_oauthclient.errors import OAuthResponseError
-from invenio_oauthclient.handlers import authorized_signup_handler, \
-    oauth_error_handler
-from invenio_oauthclient.handlers.rest import \
-    authorized_signup_handler as authorized_signup_rest_handler
-from invenio_oauthclient.handlers.rest import \
-    oauth_resp_remote_error_handler, response_handler
-from invenio_oauthclient.handlers.utils import \
-    require_more_than_one_external_account
+from invenio_oauthclient.handlers import authorized_signup_handler, oauth_error_handler
+from invenio_oauthclient.handlers.rest import (
+    authorized_signup_handler as authorized_signup_rest_handler,
+)
+from invenio_oauthclient.handlers.rest import (
+    oauth_resp_remote_error_handler,
+    response_handler,
+)
+from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
-from invenio_oauthclient.utils import oauth_link_external_id, \
-    oauth_unlink_external_id
+from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_external_id
 
 
 class GitHubOAuthSettingsHelper(OAuthSettingsHelper):
     """Default configuration for GitHub OAuth provider."""
 
-    def __init__(self, title=None, description=None, base_url=None,
-                 app_key=None, icon=None, precedence_mask=None):
+    def __init__(
+        self,
+        title=None,
+        description=None,
+        base_url=None,
+        app_key=None,
+        icon=None,
+        precedence_mask=None,
+    ):
         """Constructor."""
         super().__init__(
             title or "GitHub",
@@ -110,35 +117,35 @@ class GitHubOAuthSettingsHelper(OAuthSettingsHelper):
     def get_handlers(self):
         """Return GitHub auth handlers."""
         return dict(
-            authorized_handler='invenio_oauthclient.handlers'
-                               ':authorized_signup_handler',
-            disconnect_handler='invenio_oauthclient.contrib.github'
-                               ':disconnect_handler',
+            authorized_handler="invenio_oauthclient.handlers"
+            ":authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.github"
+            ":disconnect_handler",
             signup_handler=dict(
-                info='invenio_oauthclient.contrib.github:account_info',
-                setup='invenio_oauthclient.contrib.github:account_setup',
-                view='invenio_oauthclient.handlers:signup_handler',
-            )
+                info="invenio_oauthclient.contrib.github:account_info",
+                setup="invenio_oauthclient.contrib.github:account_setup",
+                view="invenio_oauthclient.handlers:signup_handler",
+            ),
         )
 
     def get_rest_handlers(self):
         """Return GitHub auth REST handlers."""
         return dict(
-            authorized_handler='invenio_oauthclient.handlers.rest'
-                               ':authorized_signup_handler',
-            disconnect_handler='invenio_oauthclient.contrib.github'
-                               ':disconnect_rest_handler',
+            authorized_handler="invenio_oauthclient.handlers.rest"
+            ":authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.github"
+            ":disconnect_rest_handler",
             signup_handler=dict(
-                info='invenio_oauthclient.contrib.github:account_info',
-                setup='invenio_oauthclient.contrib.github:account_setup',
-                view='invenio_oauthclient.handlers.rest:signup_handler',
+                info="invenio_oauthclient.contrib.github:account_info",
+                setup="invenio_oauthclient.contrib.github:account_setup",
+                view="invenio_oauthclient.handlers.rest:signup_handler",
             ),
-            response_handler='invenio_oauthclient.handlers.rest'
-                             ':default_remote_response_handler',
-            authorized_redirect_url='/',
-            disconnect_redirect_url='/',
-            signup_redirect_url='/',
-            error_redirect_url='/'
+            response_handler="invenio_oauthclient.handlers.rest"
+            ":default_remote_response_handler",
+            authorized_redirect_url="/",
+            disconnect_redirect_url="/",
+            signup_redirect_url="/",
+            error_redirect_url="/",
         )
 
 
@@ -153,8 +160,7 @@ REMOTE_REST_APP = _github_app.remote_rest_app
 
 def _extract_email(gh):
     """Get user email from github."""
-    return next(
-        (x.email for x in gh.emails() if x.verified and x.primary), None)
+    return next((x.email for x in gh.emails() if x.verified and x.primary), None)
 
 
 def account_info(remote, resp):
@@ -184,7 +190,7 @@ def account_info(remote, resp):
     :param resp: The response.
     :returns: A dictionary with the user information.
     """
-    gh = github3.login(token=resp['access_token'])
+    gh = github3.login(token=resp["access_token"])
     me = gh.me()
     return dict(
         user=dict(
@@ -195,7 +201,7 @@ def account_info(remote, resp):
             ),
         ),
         external_id=str(me.id),
-        external_method='github'
+        external_method="github",
     )
 
 
@@ -206,17 +212,15 @@ def account_setup(remote, token, resp):
     :param token: The token value.
     :param resp: The response.
     """
-    gh = github3.login(token=resp['access_token'])
+    gh = github3.login(token=resp["access_token"])
     with db.session.begin_nested():
         me = gh.me()
 
-        token.remote_account.extra_data = {'login': me.login, 'id': me.id}
+        token.remote_account.extra_data = {"login": me.login, "id": me.id}
 
         # Create user <-> external id link.
         oauth_link_external_id(
-            token.remote_account.user, dict(
-                id=str(me.id),
-                method='github')
+            token.remote_account.user, dict(id=str(me.id), method="github")
         )
 
 
@@ -227,16 +231,14 @@ def authorized(resp, remote):
     :param resp: The response.
     :param remote: The remote application.
     """
-    if resp and 'error' in resp:
-        if resp['error'] == 'bad_verification_code':
+    if resp and "error" in resp:
+        if resp["error"] == "bad_verification_code":
             # See https://developer.github.com/v3/oauth/#bad-verification-code
             # which recommends starting auth flow again.
-            return redirect(url_for('invenio_oauthclient.login',
-                                    remote_app='github'))
-        elif resp['error'] in ['incorrect_client_credentials',
-                               'redirect_uri_mismatch']:
+            return redirect(url_for("invenio_oauthclient.login", remote_app="github"))
+        elif resp["error"] in ["incorrect_client_credentials", "redirect_uri_mismatch"]:
             raise OAuthResponseError(
-                'Application mis-configuration in GitHub', remote, resp
+                "Application mis-configuration in GitHub", remote, resp
             )
 
     return authorized_signup_handler(resp, remote)
@@ -249,16 +251,16 @@ def authorized_rest(resp, remote):
     :param resp: The response.
     :param remote: The remote application.
     """
-    if resp and 'error' in resp:
-        if resp['error'] == 'bad_verification_code':
+    if resp and "error" in resp:
+        if resp["error"] == "bad_verification_code":
             # See https://developer.github.com/v3/oauth/#bad-verification-code
             # which recommends starting auth flow again.
-            return redirect(url_for('invenio_oauthclient.rest_login',
-                                    remote_app='github'))
-        elif resp['error'] in ['incorrect_client_credentials',
-                               'redirect_uri_mismatch']:
+            return redirect(
+                url_for("invenio_oauthclient.rest_login", remote_app="github")
+            )
+        elif resp["error"] in ["incorrect_client_credentials", "redirect_uri_mismatch"]:
             raise OAuthResponseError(
-                'Application mis-configuration in GitHub', remote, resp
+                "Application mis-configuration in GitHub", remote, resp
             )
 
     return authorized_signup_rest_handler(resp, remote)
@@ -274,15 +276,16 @@ def _disconnect(remote, *args, **kwargs):
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
 
-    remote_account = RemoteAccount.get(user_id=current_user.get_id(),
-                                       client_id=remote.consumer_key)
-    external_method = 'github'
-    external_ids = [i.id for i in current_user.external_identifiers
-                    if i.method == external_method]
+    remote_account = RemoteAccount.get(
+        user_id=current_user.get_id(), client_id=remote.consumer_key
+    )
+    external_method = "github"
+    external_ids = [
+        i.id for i in current_user.external_identifiers if i.method == external_method
+    ]
 
     if external_ids:
-        oauth_unlink_external_id(dict(id=external_ids[0],
-                                      method=external_method))
+        oauth_unlink_external_id(dict(id=external_ids[0], method=external_method))
     if remote_account:
         with db.session.begin_nested():
             remote_account.delete()
@@ -295,7 +298,7 @@ def disconnect_handler(remote, *args, **kwargs):
     :returns: The HTML response.
     """
     _disconnect(remote, *args, **kwargs)
-    return redirect(url_for('invenio_oauthclient_settings.index'))
+    return redirect(url_for("invenio_oauthclient_settings.index"))
 
 
 def disconnect_rest_handler(remote, *args, **kwargs):
@@ -305,6 +308,7 @@ def disconnect_rest_handler(remote, *args, **kwargs):
     :returns: The HTML response.
     """
     _disconnect(remote, *args, **kwargs)
-    redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
-        remote.name]['disconnect_redirect_url']
+    redirect_url = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][remote.name][
+        "disconnect_redirect_url"
+    ]
     return response_handler(remote, redirect_url)

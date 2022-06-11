@@ -26,9 +26,12 @@ def _generate_config_prefix(remote):
     """Validate the app name so that it can be used in config vars."""
     app_name = remote.name
     if not is_app_name_valid(app_name):
-        raise OAuthError(f"Invalid app name {app_name}. "
-                         "It should only contain letters, numbers, dashes "
-                         "and underscores", remote)
+        raise OAuthError(
+            f"Invalid app name {app_name}. "
+            "It should only contain letters, numbers, dashes "
+            "and underscores",
+            remote,
+        )
     return f"OAUTHCLIENT_{app_name.upper()}"
 
 
@@ -37,9 +40,9 @@ def _format_public_key(public_key):
     public_key = public_key.strip()
 
     if not public_key.startswith("-----BEGIN PUBLIC KEY-----"):
-        public_key = "-----BEGIN PUBLIC KEY-----\n" + \
-                     public_key + \
-                     "\n-----END PUBLIC KEY-----"
+        public_key = (
+            "-----BEGIN PUBLIC KEY-----\n" + public_key + "\n-----END PUBLIC KEY-----"
+        )
 
     return public_key
 
@@ -50,9 +53,7 @@ def get_public_key(remote, realm_url):
     return certs_resp["public_key"]
 
 
-def get_user_info(remote, resp_token,
-                  fallback_to_endpoint=True,
-                  options=dict()):
+def get_user_info(remote, resp_token, fallback_to_endpoint=True, options=dict()):
     """Get the user information from Keycloak.
 
     :param remote: The OAuthClient remote app
@@ -74,14 +75,8 @@ def get_user_info(remote, resp_token,
             options = {}
 
         # consult the config whether to check the target audience
-        should_verify_aud = current_app.config.get(
-            f"{config_prefix}_VERIFY_AUD",
-            False
-        )
-        expected_aud = current_app.config.get(
-            f"{config_prefix}_AUD",
-            None
-        )
+        should_verify_aud = current_app.config.get(f"{config_prefix}_VERIFY_AUD", False)
+        expected_aud = current_app.config.get(f"{config_prefix}_AUD", None)
 
         if should_verify_aud and (expected_aud is not None):
             options.update({"verify_aud": True})
@@ -90,8 +85,7 @@ def get_user_info(remote, resp_token,
 
         # consult the config whether to check signature expiration
         should_verify_expiration = current_app.config.get(
-            f"{config_prefix}_VERIFY_EXP",
-            False
+            f"{config_prefix}_VERIFY_EXP", False
         )
 
         if should_verify_expiration:
@@ -99,18 +93,16 @@ def get_user_info(remote, resp_token,
         else:
             options.update({"verify_exp": False})
 
-        user_info = jwt.decode(token,
-                               key=pubkey,
-                               algorithms=[alg],
-                               audience=expected_aud,
-                               options=options)
+        user_info = jwt.decode(
+            token, key=pubkey, algorithms=[alg], audience=expected_aud, options=options
+        )
 
     except Exception as e:
         if not fallback_to_endpoint:
             raise OAuthKeycloakUserInfoError(
                 "Error while fetching user information: {}".format(e),
                 remote,
-                resp_token
+                resp_token,
             )
 
         # as a fallback, we can still contact Keycloak's userinfo endpoint
