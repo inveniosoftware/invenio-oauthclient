@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of Invenio.
+# Copyright (C) 2020 CERN.
+# Copyright (C) 2022 Graz University of Technology.
+#
+# Invenio is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+
 name: CI
 
 on:
@@ -21,32 +30,26 @@ jobs:
     strategy:
       matrix:
           python-version: [3.7, 3.8, 3.9]
-          requirements-level: [min, pypi]
+          requirements-level: [pypi]
           db-service: [postgresql13, mysql8]
 
-          exclude:
-          - python-version: 3.9
-            requirements-level: min
-
           include:
-
           - db-service: postgresql13
             DB: postgresql
-            POSTGRESQL_VERSION: POSTGRESQL_11_LATEST
+            POSTGRESQL_VERSION: POSTGRESQL_13_LATEST
             SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://invenio:invenio@localhost:5432/invenio"
-            EXTRAS: "all,postgresql"
 
           - db-service: mysql8
             DB: mysql
             MYSQL_VERSION: MYSQL_8_LATEST
             SQLALCHEMY_DATABASE_URI: "mysql+pymysql://invenio:invenio@localhost:3306/invenio"
-            EXTRAS: "all,mysql"
 
     env:
       SQLALCHEMY_DATABASE_URI: ${{matrix.SQLALCHEMY_DATABASE_URI}}
       POSTGRESQL_VERSION: ${{matrix.POSTGRESQL_VERSION}}
       MYSQL_VERSION: ${{matrix.MYSQL_VERSION}}
       DB: ${{ matrix.DB }}
+      EXTRAS: tests
 
     steps:
       - name: Checkout
@@ -60,7 +63,7 @@ jobs:
       - name: Generate dependencies
         run: |
           pip install wheel requirements-builder
-          requirements-builder -e ${{ matrix.EXTRAS }} ${{ matrix.requirements-file }} --level=${{ matrix.requirements-level }} setup.py > .${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt
+          requirements-builder -e "$EXTRAS" ${{ matrix.requirements-file }} --level=${{ matrix.requirements-level }} setup.py > .${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt
 
       - name: Cache pip
         uses: actions/cache@v2
@@ -71,7 +74,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r .${{matrix.requirements-level}}-${{ matrix.python-version }}-requirements.txt
-          pip install .[${{ matrix.EXTRAS }}]
+          pip install .[$EXTRAS]
           pip freeze
           docker --version
           docker-compose --version
