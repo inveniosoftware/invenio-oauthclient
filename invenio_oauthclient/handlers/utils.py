@@ -16,8 +16,7 @@ from flask_login import current_user
 from invenio_db import db
 from werkzeug.utils import import_string
 
-from ..errors import OAuthClientError, OAuthRejectedRequestError, \
-    OAuthResponseError
+from ..errors import OAuthClientError, OAuthRejectedRequestError, OAuthResponseError
 from ..models import RemoteAccount, RemoteToken
 from ..proxies import current_oauthclient
 
@@ -31,9 +30,7 @@ def get_session_next_url(remote_app):
     :param remote_app: The remote application.
     :returns: The redirect URL.
     """
-    return session.get(
-        '%s_%s' % (token_session_key(remote_app), 'next_url')
-    )
+    return session.get("%s_%s" % (token_session_key(remote_app), "next_url"))
 
 
 def set_session_next_url(remote_app, url):
@@ -42,8 +39,7 @@ def set_session_next_url(remote_app, url):
     :param remote_app: The remote application.
     :param url: the redirect URL.
     """
-    session['%s_%s' % (token_session_key(remote_app), 'next_url')] = \
-        url
+    session["%s_%s" % (token_session_key(remote_app), "next_url")] = url
 
 
 def token_session_key(remote_app):
@@ -52,8 +48,7 @@ def token_session_key(remote_app):
     :param remote_app: The remote application.
     :returns: The session key.
     """
-    return '%s_%s' % (current_app.config['OAUTHCLIENT_SESSION_KEY_PREFIX'],
-                      remote_app)
+    return "%s_%s" % (current_app.config["OAUTHCLIENT_SESSION_KEY_PREFIX"], remote_app)
 
 
 def response_token_setter(remote, resp):
@@ -68,21 +63,23 @@ def response_token_setter(remote, resp):
     :returns: The token.
     """
     if resp is None:
-        raise OAuthRejectedRequestError('User rejected request.', remote, resp)
+        raise OAuthRejectedRequestError("User rejected request.", remote, resp)
     else:
-        if 'access_token' in resp:
+        if "access_token" in resp:
             return oauth2_token_setter(remote, resp)
-        elif 'oauth_token' in resp and 'oauth_token_secret' in resp:
+        elif "oauth_token" in resp and "oauth_token_secret" in resp:
             return oauth1_token_setter(remote, resp)
-        elif 'error' in resp:
+        elif "error" in resp:
             # Only OAuth2 specifies how to send error messages
             raise OAuthClientError(
-                'Authorization with remote service failed.', remote, resp,
+                "Authorization with remote service failed.",
+                remote,
+                resp,
             )
-    raise OAuthResponseError('Bad OAuth authorized request', remote, resp)
+    raise OAuthResponseError("Bad OAuth authorized request", remote, resp)
 
 
-def oauth1_token_setter(remote, resp, token_type='', extra_data=None):
+def oauth1_token_setter(remote, resp, token_type="", extra_data=None):
     """Set an OAuth1 token.
 
     :param remote: The remote application.
@@ -93,14 +90,14 @@ def oauth1_token_setter(remote, resp, token_type='', extra_data=None):
     """
     return token_setter(
         remote,
-        resp['oauth_token'],
-        secret=resp['oauth_token_secret'],
+        resp["oauth_token"],
+        secret=resp["oauth_token_secret"],
         extra_data=extra_data,
         token_type=token_type,
     )
 
 
-def oauth2_token_setter(remote, resp, token_type='', extra_data=None):
+def oauth2_token_setter(remote, resp, token_type="", extra_data=None):
     """Set an OAuth2 token.
 
     The refresh_token can be used to obtain a new access_token after
@@ -116,15 +113,14 @@ def oauth2_token_setter(remote, resp, token_type='', extra_data=None):
     """
     return token_setter(
         remote,
-        resp['access_token'],
-        secret='',
+        resp["access_token"],
+        secret="",
         token_type=token_type,
         extra_data=extra_data,
     )
 
 
-def token_setter(remote, token, secret='', token_type='', extra_data=None,
-                 user=None):
+def token_setter(remote, token, secret="", token_type="", extra_data=None, user=None):
     """Set token for user.
 
     :param remote: The remote application.
@@ -152,14 +148,13 @@ def token_setter(remote, token, secret='', token_type='', extra_data=None,
             t.update_token(token, secret)
         else:
             t = RemoteToken.create(
-                uid, cid, token, secret,
-                token_type=token_type, extra_data=extra_data
+                uid, cid, token, secret, token_type=token_type, extra_data=extra_data
             )
         return t
     return None
 
 
-def token_getter(remote, token=''):
+def token_getter(remote, token=""):
     """Retrieve OAuth access token.
 
     Used by flask-oauthlib to get the access token when making requests.
@@ -189,7 +184,7 @@ def token_getter(remote, token=''):
     return session.get(session_key, None)
 
 
-def token_delete(remote, token=''):
+def token_delete(remote, token=""):
     """Remove OAuth access tokens from session.
 
     :param remote: The remote application.
@@ -226,6 +221,7 @@ def make_handler(f, remote, with_response=True):
             return f(args[0], remote, *args[1:], **kwargs)
         else:
             return f(remote, *args, **kwargs)
+
     return inner
 
 
@@ -241,10 +237,12 @@ def authorized_handler(f, authorized_response):
     it's has to be wrapped with handler which will be executed
     at the proper time.
     """
+
     @wraps(f)
     def decorated(*args, **kwargs):
         data = authorized_response()
         return f(*((data,) + args), **kwargs)
+
     return decorated
 
 
@@ -256,6 +254,7 @@ def require_more_than_one_external_account(f):
     This decorator is useful for disconnect handlers, to prevent users from
     disconnecting their last potential means of authentication.
     """
+
     @wraps(f)
     def decorated(*args, **kwargs):
         if current_user.is_anonymous:
@@ -268,9 +267,7 @@ def require_more_than_one_external_account(f):
         local_login_possible = local_login_enabled and password_set
 
         remote_apps = current_app.config["OAUTHCLIENT_REMOTE_APPS"]
-        accounts = RemoteAccount.query.filter_by(
-            user_id=current_user.get_id()
-        ).all()
+        accounts = RemoteAccount.query.filter_by(user_id=current_user.get_id()).all()
 
         # find out all of the linked external accounts for the user
         # that are currently configured and not hidden
@@ -279,13 +276,10 @@ def require_more_than_one_external_account(f):
         for name, remote_app in remote_apps.items():
             if not remote_app.get("hide", False):
                 consumer_keys.add(name)  # backcompat with v1.5.4
-                remote_app_config = current_app.config[
-                    remote_app["params"]["app_key"]
-                ]
+                remote_app_config = current_app.config[remote_app["params"]["app_key"]]
                 consumer_keys.add(remote_app_config["consumer_key"])
 
-        linked_accounts = [
-            acc for acc in accounts if acc.client_id in consumer_keys]
+        linked_accounts = [acc for acc in accounts if acc.client_id in consumer_keys]
 
         # execute the function only if local login is possible, or
         # there's more than one linked external account

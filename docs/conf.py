@@ -16,38 +16,38 @@ from invenio_oauthclient import __version__
 # needs_sphinx = '1.0'
 
 # Do not warn on external images.
-suppress_warnings = ['image.nonlocal_uri']
+suppress_warnings = ["image.nonlocal_uri"]
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.coverage',
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.viewcode',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = 'invenio-oauthclient'
-copyright = '2015, CERN'
-author = 'CERN'
-description = 'Invenio module that provides OAuth web authorization support.'
+project = "invenio-oauthclient"
+copyright = "2015, CERN"
+author = "CERN"
+description = "Invenio module that provides OAuth web authorization support."
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -91,7 +91,7 @@ exclude_patterns = []
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -104,21 +104,19 @@ todo_include_todos = False
 
 
 # -- Options for HTML output ----------------------------------------------
-html_theme = 'alabaster'
+html_theme = "alabaster"
 
 html_theme_options = {
-    'description': description,
-    'github_user': 'inveniosoftware',
-    'github_repo': 'invenio-oauthclient',
-    'github_button': False,
-    'github_banner': True,
-    'show_powered_by': False,
-    'extra_nav_links': {
-        'invenio-oauthclient@GitHub':
-            'https://github.com/inveniosoftware/invenio-oauthclient',
-        'invenio-oauthclient@PyPI':
-            'https://pypi.python.org/pypi/invenio-oauthclient/',
-    }
+    "description": description,
+    "github_user": "inveniosoftware",
+    "github_repo": "invenio-oauthclient",
+    "github_button": False,
+    "github_banner": True,
+    "show_powered_by": False,
+    "extra_nav_links": {
+        "invenio-oauthclient@GitHub": "https://github.com/inveniosoftware/invenio-oauthclient",
+        "invenio-oauthclient@PyPI": "https://pypi.python.org/pypi/invenio-oauthclient/",
+    },
 }
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -168,12 +166,12 @@ html_theme_options = {
 
 # Custom sidebar templates, maps document names to template names.
 html_sidebars = {
-    '**': [
-        'about.html',
-        'navigation.html',
-        'relations.html',
-        'searchbox.html',
-        'donate.html',
+    "**": [
+        "about.html",
+        "navigation.html",
+        "relations.html",
+        "searchbox.html",
+        "donate.html",
     ]
 }
 
@@ -222,20 +220,17 @@ html_sidebars = {
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'invenio-oauthclient_namedoc'
+htmlhelp_basename = "invenio-oauthclient_namedoc"
 
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     # 'preamble': '',
-
     # Latex figure (float) alignment
     # 'figure_align': 'htbp',
 }
@@ -244,9 +239,13 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'invenio-oauthclient.tex',
-     'invenio-oauthclient Documentation',
-     'CERN', 'manual'),
+    (
+        master_doc,
+        "invenio-oauthclient.tex",
+        "invenio-oauthclient Documentation",
+        "CERN",
+        "manual",
+    ),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -275,8 +274,13 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'invenio-oauthclient', 'invenio-oauthclient Documentation',
-     [author], 1)
+    (
+        master_doc,
+        "invenio-oauthclient",
+        "invenio-oauthclient Documentation",
+        [author],
+        1,
+    )
 ]
 
 # If true, show URL addresses after external links.
@@ -289,8 +293,15 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'invenio-oauthclient', 'invenio-oauthclient Documentation',
-     author, 'invenio-oauthclient', description, 'Miscellaneous'),
+    (
+        master_doc,
+        "invenio-oauthclient",
+        "invenio-oauthclient Documentation",
+        author,
+        "invenio-oauthclient",
+        description,
+        "Miscellaneous",
+    ),
 ]
 
 # Documents to append as an appendix to all manuals.
@@ -308,11 +319,9 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'https://docs.python.org/': None,
-    'invenio-accounts': (
-        'https://invenio-accounts.readthedocs.io/en/latest/', None
-    ),
+    "https://docs.python.org/": None,
+    "invenio-accounts": ("https://invenio-accounts.readthedocs.io/en/latest/", None),
 }
 
 # Autodoc configuraton.
-autoclass_content = 'both'
+autoclass_content = "both"

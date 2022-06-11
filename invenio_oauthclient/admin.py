@@ -25,33 +25,37 @@ class RemoteAccountView(ModelView):
     can_view_details = True
 
     column_list = (
-        'id',
-        'user_id',
-        'client_id',
-        'extra_data',
-        'remote_tokens',
+        "id",
+        "user_id",
+        "client_id",
+        "extra_data",
+        "remote_tokens",
     )
 
     remote_account_columns = (
-        'id',
-        'user_id',
-        'client_id',
-        'extra_data',
+        "id",
+        "user_id",
+        "client_id",
+        "extra_data",
     )
 
     column_searchable_list = column_sortable_list = remote_account_columns
 
-    column_filters = ('id', 'user_id', 'client_id', )
+    column_filters = (
+        "id",
+        "user_id",
+        "client_id",
+    )
 
-    column_default_sort = ('id', True)
+    column_default_sort = ("id", True)
 
     column_display_all_relations = True
     inline_models = (RemoteToken,)
 
     column_labels = {
-        'id': _('ID'),
-        'user_id': _('User ID'),
-        'client_id': _('Client ID'),
+        "id": _("ID"),
+        "user_id": _("User ID"),
+        "client_id": _("Client ID"),
     }
 
 
@@ -61,43 +65,44 @@ class RemoteTokenView(ModelView):
     can_view_details = True
 
     column_list = (
-        'id_remote_account',
-        'token_type',
+        "id_remote_account",
+        "token_type",
     )
 
-    column_searchable_list = \
-        column_sortable_list = \
-        column_list
+    column_searchable_list = column_sortable_list = column_list
 
     column_filters = (
-        'id_remote_account',
-        'token_type',
+        "id_remote_account",
+        "token_type",
     )
 
     form_columns = (
-        'remote_account',
-        'token_type',
+        "remote_account",
+        "token_type",
     )
 
     column_labels = {
-        'id_remote_account': _('ID Remote Account'),
+        "id_remote_account": _("ID Remote Account"),
     }
 
 
 remote_account_adminview = {
-    'model': RemoteAccount,
-    'modelview': RemoteAccountView,
-    'category': _('User Management'),
-    'name': _('Linked accounts'),
+    "model": RemoteAccount,
+    "modelview": RemoteAccountView,
+    "category": _("User Management"),
+    "name": _("Linked accounts"),
 }
 
 
 remote_token_adminview = {
-    'model': RemoteToken,
-    'modelview': RemoteTokenView,
-    'category': _('User Management'),
-    'name': _('Linked account tokens'),
+    "model": RemoteToken,
+    "modelview": RemoteTokenView,
+    "category": _("User Management"),
+    "name": _("Linked account tokens"),
 }
 
-__all__ = ('remote_account_adminview', 'remote_token_adminview',
-           'user_identity_adminview')
+__all__ = (
+    "remote_account_adminview",
+    "remote_token_adminview",
+    "user_identity_adminview",
+)

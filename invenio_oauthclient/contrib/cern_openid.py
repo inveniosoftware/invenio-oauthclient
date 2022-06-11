@@ -69,19 +69,22 @@ from datetime import datetime, timedelta
 from flask import Blueprint, current_app, flash, g, redirect, session, url_for
 from flask_babelex import gettext as _
 from flask_login import current_user
-from flask_principal import AnonymousIdentity, RoleNeed, UserNeed, \
-    identity_changed, identity_loaded
+from flask_principal import (
+    AnonymousIdentity,
+    RoleNeed,
+    UserNeed,
+    identity_changed,
+    identity_loaded,
+)
 from invenio_db import db
 from jwt import decode
 
 from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
 from invenio_oauthclient.handlers.rest import response_handler
-from invenio_oauthclient.handlers.utils import \
-    require_more_than_one_external_account
+from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.proxies import current_oauthclient
-from invenio_oauthclient.utils import oauth_link_external_id, \
-    oauth_unlink_external_id
+from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_external_id
 
 OAUTHCLIENT_CERN_OPENID_REFRESH_TIMEDELTA = timedelta(minutes=-5)
 """Default interval for refreshing CERN extra data (e.g. groups).
@@ -100,15 +103,15 @@ BASE_APP = dict(
     description="Connecting to CERN Organization.",
     icon="",
     logout_url="https://auth.cern.ch/auth/realms/cern/protocol/"
-               "openid-connect/logout",
+    "openid-connect/logout",
     params=dict(
         base_url="https://auth.cern.ch/auth/realms/cern",
         request_token_url=None,
         access_token_url="https://auth.cern.ch/auth/realms/cern/protocol/"
-                         "openid-connect/token",
+        "openid-connect/token",
         access_token_method="POST",
         authorize_url="https://auth.cern.ch/auth/realms/cern/protocol/"
-                      "openid-connect/auth",
+        "openid-connect/auth",
         app_key="CERN_APP_OPENID_CREDENTIALS",
         content_type="application/json",
     ),
@@ -117,10 +120,9 @@ BASE_APP = dict(
 REMOTE_APP = dict(BASE_APP)
 REMOTE_APP.update(
     dict(
-        authorized_handler="invenio_oauthclient.handlers"
-                           ":authorized_signup_handler",
+        authorized_handler="invenio_oauthclient.handlers" ":authorized_signup_handler",
         disconnect_handler="invenio_oauthclient.contrib.cern_openid"
-                           ":disconnect_handler",
+        ":disconnect_handler",
         signup_handler=dict(
             info="invenio_oauthclient.contrib.cern_openid:account_info",
             setup="invenio_oauthclient.contrib.cern_openid:account_setup",
@@ -134,9 +136,9 @@ REMOTE_REST_APP = dict(BASE_APP)
 REMOTE_REST_APP.update(
     dict(
         authorized_handler="invenio_oauthclient.handlers.rest"
-                           ":authorized_signup_handler",
+        ":authorized_signup_handler",
         disconnect_handler="invenio_oauthclient.contrib.cern_openid"
-                           ":disconnect_rest_handler",
+        ":disconnect_rest_handler",
         signup_handler=dict(
             info="invenio_oauthclient.contrib.cern_openid:account_info_rest",
             setup="invenio_oauthclient.contrib.cern_openid:account_setup",
@@ -162,7 +164,7 @@ OAUTHCLIENT_CERN_OPENID_JWT_TOKEN_DECODE_PARAMS = dict(
         verify_signature=False,
         verify_aud=False,
     ),
-    algorithms=["HS256", "RS256"]
+    algorithms=["HS256", "RS256"],
 )
 
 cern_oauth_blueprint = Blueprint("cern_openid_oauth", __name__)
@@ -198,17 +200,13 @@ def account_roles_and_extra_data(account, resource, refresh_timedelta=None):
         "OAUTHCLIENT_CERN_OPENID_EXTRA_DATA_SERIALIZER", fetch_extra_data
     )(resource)
 
-    account.extra_data.update(
-        roles=roles, updated=updated.isoformat(), **extra_data
-    )
+    account.extra_data.update(roles=roles, updated=updated.isoformat(), **extra_data)
     return roles
 
 
 def extend_identity(identity, roles):
     """Extend identity with roles based on CERN groups."""
-    provides = set(
-        [UserNeed(current_user.email)] + [RoleNeed(name) for name in roles]
-    )
+    provides = set([UserNeed(current_user.email)] + [RoleNeed(name) for name in roles])
     identity.provides |= provides
     key = current_app.config.get(
         "OAUTHCLIENT_CERN_OPENID_SESSION_KEY",
@@ -274,9 +272,7 @@ def _account_info(remote, resp):
     cern_roles = resource.get("cern_roles")
     if cern_roles is None or not set(cern_roles).issubset(valid_roles):
         raise OAuthCERNRejectedAccountError(
-            "User roles {0} are not one of {1}".format(
-                cern_roles, valid_roles
-            ),
+            "User roles {0} are not one of {1}".format(cern_roles, valid_roles),
             remote,
             resp,
         )
@@ -287,9 +283,7 @@ def _account_info(remote, resp):
     name = resource["name"]
 
     return dict(
-        user=dict(
-            email=email.lower(), profile=dict(username=nice, full_name=name)
-        ),
+        user=dict(email=email.lower(), profile=dict(username=nice, full_name=name)),
         external_id=external_id,
         external_method="cern_openid",
         active=True,
@@ -351,9 +345,9 @@ def disconnect_handler(remote, *args, **kwargs):
 def disconnect_rest_handler(remote, *args, **kwargs):
     """Handle unlinking of remote account."""
     _disconnect(remote, *args, **kwargs)
-    redirect_url = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][
-        remote.name
-    ]["disconnect_redirect_url"]
+    redirect_url = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][remote.name][
+        "disconnect_redirect_url"
+    ]
     return response_handler(remote, redirect_url)
 
 
@@ -373,8 +367,7 @@ def account_setup(remote, token, resp):
         user = token.remote_account.user
 
         # Create user <-> external id link.
-        oauth_link_external_id(
-            user, dict(id=external_id, method="cern_openid"))
+        oauth_link_external_id(user, dict(id=external_id, method="cern_openid"))
 
 
 @identity_changed.connect
@@ -392,12 +385,11 @@ def on_identity_changed(sender, identity):
         # signal coming from another remote app
         return
 
-    logged_in_via_token = hasattr(current_user, 'login_via_oauth2') \
-        and getattr(current_user, 'login_via_oauth2')
+    logged_in_via_token = hasattr(current_user, "login_via_oauth2") and getattr(
+        current_user, "login_via_oauth2"
+    )
 
-    client_id = current_app.config["CERN_APP_OPENID_CREDENTIALS"][
-        "consumer_key"
-    ]
+    client_id = current_app.config["CERN_APP_OPENID_CREDENTIALS"]["consumer_key"]
     remote_account = RemoteAccount.get(
         user_id=current_user.get_id(), client_id=client_id
     )

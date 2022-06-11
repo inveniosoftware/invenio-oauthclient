@@ -140,140 +140,143 @@ from datetime import datetime, timedelta
 from flask import Blueprint, current_app, flash, g, redirect, session, url_for
 from flask_babelex import gettext as _
 from flask_login import current_user
-from flask_principal import AnonymousIdentity, RoleNeed, UserNeed, \
-    identity_changed, identity_loaded
+from flask_principal import (
+    AnonymousIdentity,
+    RoleNeed,
+    UserNeed,
+    identity_changed,
+    identity_loaded,
+)
 from invenio_db import db
 
 from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
 from invenio_oauthclient.handlers.rest import response_handler
-from invenio_oauthclient.handlers.utils import \
-    require_more_than_one_external_account
+from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.proxies import current_oauthclient
-from invenio_oauthclient.utils import oauth_link_external_id, \
-    oauth_unlink_external_id
+from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_external_id
 
 OAUTHCLIENT_CERN_HIDDEN_GROUPS = (
-    'All Exchange People',
-    'CERN Users',
-    'cern-computing-postmasters',
-    'cern-nice2000-postmasters',
-    'CMF FrontEnd Users',
-    'CMF_NSC_259_NSU',
-    'Domain Users',
-    'GP Apply Favorites Redirection',
-    'GP Apply NoAdmin',
-    'info-terminalservices',
-    'info-terminalservices-members',
-    'IT Web IT',
-    'NICE Deny Enforce Password-protected Screensaver',
-    'NICE Enforce Password-protected Screensaver',
-    'NICE LightWeight Authentication WS Users',
-    'NICE MyDocuments Redirection (New)',
-    'NICE Profile Redirection',
-    'NICE Terminal Services Users',
-    'NICE Users',
-    'NICE VPN Users',
+    "All Exchange People",
+    "CERN Users",
+    "cern-computing-postmasters",
+    "cern-nice2000-postmasters",
+    "CMF FrontEnd Users",
+    "CMF_NSC_259_NSU",
+    "Domain Users",
+    "GP Apply Favorites Redirection",
+    "GP Apply NoAdmin",
+    "info-terminalservices",
+    "info-terminalservices-members",
+    "IT Web IT",
+    "NICE Deny Enforce Password-protected Screensaver",
+    "NICE Enforce Password-protected Screensaver",
+    "NICE LightWeight Authentication WS Users",
+    "NICE MyDocuments Redirection (New)",
+    "NICE Profile Redirection",
+    "NICE Terminal Services Users",
+    "NICE Users",
+    "NICE VPN Users",
 )
 """Tunable list of groups to be hidden."""
 
 OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE = (
-    re.compile(r'Users by Letter [A-Z]'),
-    re.compile(r'building-[\d]+'),
-    re.compile(r'Users by Home CERNHOME[A-Z]'),
+    re.compile(r"Users by Letter [A-Z]"),
+    re.compile(r"building-[\d]+"),
+    re.compile(r"Users by Home CERNHOME[A-Z]"),
 )
 """Tunable list of regexps of groups to be hidden."""
 
 OAUTHCLIENT_CERN_REFRESH_TIMEDELTA = timedelta(minutes=-5)
 """Default interval for refreshing CERN extra data (e.g. groups)."""
 
-OAUTHCLIENT_CERN_SESSION_KEY = 'identity.cern_provides'
+OAUTHCLIENT_CERN_SESSION_KEY = "identity.cern_provides"
 """Name of session key where CERN roles are stored."""
 
-OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES = [
-    'CERN Registered',
-    'CERN Shared'
-]
+OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES = ["CERN Registered", "CERN Shared"]
 """Cern oauth identityClass values that are allowed to be used."""
 
 BASE_APP = dict(
-    title='CERN',
-    description='Connecting to CERN Organization.',
-    icon='',
-    logout_url='https://login.cern.ch/adfs/ls/?wa=wsignout1.0',
+    title="CERN",
+    description="Connecting to CERN Organization.",
+    icon="",
+    logout_url="https://login.cern.ch/adfs/ls/?wa=wsignout1.0",
     params=dict(
-        base_url='https://oauth.web.cern.ch/',
+        base_url="https://oauth.web.cern.ch/",
         request_token_url=None,
-        access_token_url='https://oauth.web.cern.ch/OAuth/Token',
-        access_token_method='POST',
-        authorize_url='https://oauth.web.cern.ch/OAuth/Authorize',
-        app_key='CERN_APP_CREDENTIALS',
-        content_type='application/json',
-        request_token_params={'scope': 'Name Email Bio Groups',
-                              'show_login': 'true'}
-    )
+        access_token_url="https://oauth.web.cern.ch/OAuth/Token",
+        access_token_method="POST",
+        authorize_url="https://oauth.web.cern.ch/OAuth/Authorize",
+        app_key="CERN_APP_CREDENTIALS",
+        content_type="application/json",
+        request_token_params={"scope": "Name Email Bio Groups", "show_login": "true"},
+    ),
 )
 
 REMOTE_APP = dict(BASE_APP)
-REMOTE_APP.update(dict(
-    authorized_handler='invenio_oauthclient.handlers'
-                       ':authorized_signup_handler',
-    disconnect_handler='invenio_oauthclient.contrib.cern'
-                       ':disconnect_handler',
-    signup_handler=dict(
-        info='invenio_oauthclient.contrib.cern:account_info',
-        setup='invenio_oauthclient.contrib.cern:account_setup',
-        view='invenio_oauthclient.handlers:signup_handler',
+REMOTE_APP.update(
+    dict(
+        authorized_handler="invenio_oauthclient.handlers" ":authorized_signup_handler",
+        disconnect_handler="invenio_oauthclient.contrib.cern" ":disconnect_handler",
+        signup_handler=dict(
+            info="invenio_oauthclient.contrib.cern:account_info",
+            setup="invenio_oauthclient.contrib.cern:account_setup",
+            view="invenio_oauthclient.handlers:signup_handler",
+        ),
     )
-))
+)
 """CERN Remote Application."""
 
 REMOTE_REST_APP = dict(BASE_APP)
-REMOTE_REST_APP.update(dict(
-    authorized_handler='invenio_oauthclient.handlers.rest'
-                       ':authorized_signup_handler',
-    disconnect_handler='invenio_oauthclient.contrib.cern'
-                       ':disconnect_rest_handler',
-    signup_handler=dict(
-        info='invenio_oauthclient.contrib.cern:account_info_rest',
-        setup='invenio_oauthclient.contrib.cern:account_setup',
-        view='invenio_oauthclient.handlers.rest:signup_handler',
-    ),
-    response_handler=(
-        'invenio_oauthclient.handlers.rest:default_remote_response_handler'
-    ),
-    authorized_redirect_url='/',
-    disconnect_redirect_url='/',
-    signup_redirect_url='/',
-    error_redirect_url='/'
-))
+REMOTE_REST_APP.update(
+    dict(
+        authorized_handler="invenio_oauthclient.handlers.rest"
+        ":authorized_signup_handler",
+        disconnect_handler="invenio_oauthclient.contrib.cern"
+        ":disconnect_rest_handler",
+        signup_handler=dict(
+            info="invenio_oauthclient.contrib.cern:account_info_rest",
+            setup="invenio_oauthclient.contrib.cern:account_setup",
+            view="invenio_oauthclient.handlers.rest:signup_handler",
+        ),
+        response_handler=(
+            "invenio_oauthclient.handlers.rest:default_remote_response_handler"
+        ),
+        authorized_redirect_url="/",
+        disconnect_redirect_url="/",
+        signup_redirect_url="/",
+        error_redirect_url="/",
+    )
+)
 """CERN Remote REST Application."""
 
 
 REMOTE_SANDBOX_APP = copy.deepcopy(REMOTE_APP)
 """CERN Sandbox Remote Application."""
 
-REMOTE_SANDBOX_APP['params'].update(dict(
-    base_url='https://test-oauth.web.cern.ch/',
-    access_token_url='https://test-oauth.web.cern.ch/OAuth/Token',
-    authorize_url='https://test-oauth.web.cern.ch/OAuth/Authorize',
-))
+REMOTE_SANDBOX_APP["params"].update(
+    dict(
+        base_url="https://test-oauth.web.cern.ch/",
+        access_token_url="https://test-oauth.web.cern.ch/OAuth/Token",
+        authorize_url="https://test-oauth.web.cern.ch/OAuth/Authorize",
+    )
+)
 
-REMOTE_APP_RESOURCE_API_URL = 'https://oauthresource.web.cern.ch/api/Me'
-REMOTE_APP_RESOURCE_SCHEMA = 'http://schemas.xmlsoap.org/claims/'
+REMOTE_APP_RESOURCE_API_URL = "https://oauthresource.web.cern.ch/api/Me"
+REMOTE_APP_RESOURCE_SCHEMA = "http://schemas.xmlsoap.org/claims/"
 
-cern_oauth_blueprint = Blueprint('cern_oauth', __name__)
+cern_oauth_blueprint = Blueprint("cern_oauth", __name__)
 
 
-@cern_oauth_blueprint.route('/cern/logout')
+@cern_oauth_blueprint.route("/cern/logout")
 def logout():
     """CERN logout view."""
-    logout_url = REMOTE_APP['logout_url']
+    logout_url = REMOTE_APP["logout_url"]
 
-    apps = current_app.config.get('OAUTHCLIENT_REMOTE_APPS')
+    apps = current_app.config.get("OAUTHCLIENT_REMOTE_APPS")
     if apps:
-        cern_app = apps.get('cern', REMOTE_APP)
-        logout_url = cern_app['logout_url']
+        cern_app = apps.get("cern", REMOTE_APP)
+        logout_url = cern_app["logout_url"]
 
     return redirect(logout_url, code=302)
 
@@ -281,7 +284,7 @@ def logout():
 def find_remote_by_client_id(client_id):
     """Return a remote application based with given client ID."""
     for remote in current_oauthclient.oauth.remote_apps.values():
-        if remote.name == 'cern' and remote.consumer_key == client_id:
+        if remote.name == "cern" and remote.consumer_key == client_id:
             return remote
 
 
@@ -292,10 +295,11 @@ def fetch_groups(groups):
     :returns: A filtered list of groups.
     """
     hidden_groups = current_app.config.get(
-        'OAUTHCLIENT_CERN_HIDDEN_GROUPS', OAUTHCLIENT_CERN_HIDDEN_GROUPS)
+        "OAUTHCLIENT_CERN_HIDDEN_GROUPS", OAUTHCLIENT_CERN_HIDDEN_GROUPS
+    )
     hidden_groups_re = current_app.config.get(
-        'OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE',
-        OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE)
+        "OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE", OAUTHCLIENT_CERN_HIDDEN_GROUPS_RE
+    )
     groups = [group for group in groups if group not in hidden_groups]
     filter_groups = []
     for regexp in hidden_groups_re:
@@ -309,49 +313,42 @@ def fetch_groups(groups):
 
 def fetch_extra_data(resource):
     """Return a dict with extra data retrieved from cern oauth."""
-    person_id = resource.get('PersonID', [None])[0]
-    identity_class = resource.get('IdentityClass', [None])[0]
-    department = resource.get('Department', [None])[0]
+    person_id = resource.get("PersonID", [None])[0]
+    identity_class = resource.get("IdentityClass", [None])[0]
+    department = resource.get("Department", [None])[0]
 
     return dict(
-        person_id=person_id,
-        identity_class=identity_class,
-        department=department
+        person_id=person_id, identity_class=identity_class, department=department
     )
 
 
-def account_groups_and_extra_data(account, resource,
-                                  refresh_timedelta=None):
+def account_groups_and_extra_data(account, resource, refresh_timedelta=None):
     """Fetch account groups and extra data from resource if necessary."""
     updated = datetime.utcnow()
     modified_since = updated
     if refresh_timedelta is not None:
         modified_since += refresh_timedelta
     modified_since = modified_since.isoformat()
-    last_update = account.extra_data.get('updated', modified_since)
+    last_update = account.extra_data.get("updated", modified_since)
 
     if last_update > modified_since:
-        return account.extra_data.get('groups', [])
+        return account.extra_data.get("groups", [])
 
-    groups = fetch_groups(resource['Group'])
+    groups = fetch_groups(resource["Group"])
     extra_data = current_app.config.get(
-        'OAUTHCLIENT_CERN_EXTRA_DATA_SERIALIZER',
-        fetch_extra_data
+        "OAUTHCLIENT_CERN_EXTRA_DATA_SERIALIZER", fetch_extra_data
     )(resource)
 
-    account.extra_data.update(
-        groups=groups,
-        updated=updated.isoformat(),
-        **extra_data
-    )
+    account.extra_data.update(groups=groups, updated=updated.isoformat(), **extra_data)
     return groups
 
 
 def extend_identity(identity, groups):
     """Extend identity with roles based on CERN groups."""
-    provides = set([UserNeed(current_user.email)] + [
-        RoleNeed('{0}@cern.ch'.format(name)) for name in groups
-    ])
+    provides = set(
+        [UserNeed(current_user.email)]
+        + [RoleNeed("{0}@cern.ch".format(name)) for name in groups]
+    )
     identity.provides |= provides
     session[OAUTHCLIENT_CERN_SESSION_KEY] = provides
 
@@ -366,26 +363,26 @@ def disconnect_identity(identity):
 def get_dict_from_response(response):
     """Prepare new mapping with 'Value's groupped by 'Type'."""
     result = {}
-    if getattr(response, '_resp') and response._resp.code > 400:
+    if getattr(response, "_resp") and response._resp.code > 400:
         return result
 
     for i in response.data:
         # strip the schema from the key
-        k = i['Type'].replace(REMOTE_APP_RESOURCE_SCHEMA, '')
+        k = i["Type"].replace(REMOTE_APP_RESOURCE_SCHEMA, "")
         result.setdefault(k, list())
-        result[k].append(i['Value'])
+        result[k].append(i["Value"])
     return result
 
 
 def get_resource(remote):
     """Query CERN Resources to get user info and groups."""
-    cached_resource = session.pop('cern_resource', None)
+    cached_resource = session.pop("cern_resource", None)
     if cached_resource:
         return cached_resource
 
     response = remote.get(REMOTE_APP_RESOURCE_API_URL)
     dict_response = get_dict_from_response(response)
-    session['cern_resource'] = dict_response
+    session["cern_resource"] = dict_response
     return dict_response
 
 
@@ -395,28 +392,33 @@ def _account_info(remote, resp):
     resource = get_resource(remote)
 
     valid_identities = current_app.config.get(
-        'OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES',
-        OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES
+        "OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES",
+        OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES,
     )
-    identity_class = resource.get('IdentityClass', [None])[0]
+    identity_class = resource.get("IdentityClass", [None])[0]
     if identity_class is None or identity_class not in valid_identities:
         raise OAuthCERNRejectedAccountError(
-            'Identity class {0} is not one of [{1}]'.format(
-                identity_class, ''.join(valid_identities)), remote, resp, )
+            "Identity class {0} is not one of [{1}]".format(
+                identity_class, "".join(valid_identities)
+            ),
+            remote,
+            resp,
+        )
 
-    email = resource['EmailAddress'][0]
-    person_id = resource.get('PersonID', [None])
-    external_id = resource.get('uidNumber', person_id)[0]
-    nice = resource['CommonName'][0]
-    name = resource['DisplayName'][0]
+    email = resource["EmailAddress"][0]
+    person_id = resource.get("PersonID", [None])
+    external_id = resource.get("uidNumber", person_id)[0]
+    nice = resource["CommonName"][0]
+    name = resource["DisplayName"][0]
 
     return dict(
         user=dict(
             email=email.lower(),
             profile=dict(username=nice, full_name=name),
         ),
-        external_id=external_id, external_method='cern',
-        active=True
+        external_id=external_id,
+        external_method="cern",
+        active=True,
     )
 
 
@@ -426,8 +428,8 @@ def account_info(remote, resp):
         return _account_info(remote, resp)
     except OAuthCERNRejectedAccountError as e:
         current_app.logger.warning(e.message, exc_info=True)
-        flash(_('CERN account not allowed.'), category='danger')
-        return redirect('/')
+        flash(_("CERN account not allowed."), category="danger")
+        return redirect("/")
 
 
 def account_info_rest(remote, resp):
@@ -436,14 +438,13 @@ def account_info_rest(remote, resp):
         return _account_info(remote, resp)
     except OAuthCERNRejectedAccountError as e:
         current_app.logger.warning(e.message, exc_info=True)
-        remote_app_config = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
-            remote.name]
+        remote_app_config = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][
+            remote.name
+        ]
         return response_handler(
             remote,
-            remote_app_config['error_redirect_url'],
-            payload=dict(
-                message='CERN account not allowed.',
-                code=400)
+            remote_app_config["error_redirect_url"],
+            payload=dict(message="CERN account not allowed.", code=400),
         )
 
 
@@ -453,12 +454,13 @@ def _disconnect(remote, *args, **kwargs):
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
 
-    account = RemoteAccount.get(user_id=current_user.get_id(),
-                                client_id=remote.consumer_key)
-    external_id = account.extra_data.get('external_id')
+    account = RemoteAccount.get(
+        user_id=current_user.get_id(), client_id=remote.consumer_key
+    )
+    external_id = account.extra_data.get("external_id")
 
     if external_id:
-        oauth_unlink_external_id(dict(id=external_id, method='cern'))
+        oauth_unlink_external_id(dict(id=external_id, method="cern"))
     if account:
         with db.session.begin_nested():
             account.delete()
@@ -469,14 +471,15 @@ def _disconnect(remote, *args, **kwargs):
 def disconnect_handler(remote, *args, **kwargs):
     """Handle unlinking of remote account."""
     _disconnect(remote, *args, **kwargs)
-    return redirect(url_for('invenio_oauthclient_settings.index'))
+    return redirect(url_for("invenio_oauthclient_settings.index"))
 
 
 def disconnect_rest_handler(remote, *args, **kwargs):
     """Handle unlinking of remote account."""
     _disconnect(remote, *args, **kwargs)
-    redirect_url = current_app.config['OAUTHCLIENT_REST_REMOTE_APPS'][
-        remote.name]['disconnect_redirect_url']
+    redirect_url = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][remote.name][
+        "disconnect_redirect_url"
+    ]
     return response_handler(remote, redirect_url)
 
 
@@ -485,12 +488,12 @@ def account_setup(remote, token, resp):
     resource = get_resource(remote)
 
     with db.session.begin_nested():
-        person_id = resource.get('PersonID', [None])
-        external_id = resource.get('uidNumber', person_id)[0]
+        person_id = resource.get("PersonID", [None])
+        external_id = resource.get("uidNumber", person_id)[0]
 
         # Set CERN person ID in extra_data.
         token.remote_account.extra_data = {
-            'external_id': external_id,
+            "external_id": external_id,
         }
         groups = account_groups_and_extra_data(token.remote_account, resource)
         assert not isinstance(g.identity, AnonymousIdentity)
@@ -499,7 +502,7 @@ def account_setup(remote, token, resp):
         user = token.remote_account.user
 
         # Create user <-> external id link.
-        oauth_link_external_id(user, dict(id=external_id, method='cern'))
+        oauth_link_external_id(user, dict(id=external_id, method="cern"))
 
 
 @identity_changed.connect
@@ -517,7 +520,7 @@ def on_identity_changed(sender, identity):
         # signal coming from another remote app
         return
 
-    client_id = current_app.config['CERN_APP_CREDENTIALS']['consumer_key']
+    client_id = current_app.config["CERN_APP_CREDENTIALS"]["consumer_key"]
     account = RemoteAccount.get(
         user_id=current_user.get_id(),
         client_id=client_id,
@@ -526,13 +529,11 @@ def on_identity_changed(sender, identity):
     if account:
         resource = get_resource(remote)
         refresh = current_app.config.get(
-            'OAUTHCLIENT_CERN_REFRESH_TIMEDELTA',
-            OAUTHCLIENT_CERN_REFRESH_TIMEDELTA
+            "OAUTHCLIENT_CERN_REFRESH_TIMEDELTA", OAUTHCLIENT_CERN_REFRESH_TIMEDELTA
         )
 
         groups.extend(
-            account_groups_and_extra_data(account, resource,
-                                          refresh_timedelta=refresh)
+            account_groups_and_extra_data(account, resource, refresh_timedelta=refresh)
         )
 
     extend_identity(identity, groups)

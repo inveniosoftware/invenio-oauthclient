@@ -60,9 +60,9 @@ class OAuthClientError(OAuthResponseError):
                          ``error_uri`` and ``error_description``.
         """
         # Only OAuth2 specifies how to send error messages
-        self.code = response['error']
-        self.uri = response.get('error_uri', None)
-        self.description = response.get('error_description', None)
+        self.code = response["error"]
+        self.uri = response.get("error_uri", None)
+        self.description = response.get("error_description", None)
         super(OAuthClientError, self).__init__(
             self.description or message, remote, response
         )

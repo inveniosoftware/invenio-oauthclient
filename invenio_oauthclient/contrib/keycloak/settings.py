@@ -29,8 +29,9 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
     endpoint URLs.
     """
 
-    def __init__(self, title, description, base_url, realm, app_key=None,
-                 icon=None, **kwargs):
+    def __init__(
+        self, title, description, base_url, realm, app_key=None, icon=None, **kwargs
+    ):
         """The constructor takes two arguments.
 
         :param base_url: The base URL on which Keycloak is running
@@ -46,11 +47,17 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
         authorize_url = self.make_url(self._realm_url, "auth")
         self._user_info_url = self.make_url(self._realm_url, "userinfo")
 
-        super().__init__(title, description, base_url, app_key, icon=icon,
-                         request_token_params={"scope": "openid"},
-                         access_token_url=access_token_url,
-                         authorize_url=authorize_url,
-                         **kwargs)
+        super().__init__(
+            title,
+            description,
+            base_url,
+            app_key,
+            icon=icon,
+            request_token_params={"scope": "openid"},
+            access_token_url=access_token_url,
+            authorize_url=authorize_url,
+            **kwargs
+        )
 
     @property
     def user_info_url(self):
@@ -75,15 +82,13 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
         """Return a dict with the auth handlers."""
         return dict(
             authorized_handler="invenio_oauthclient.handlers"
-                               ":authorized_signup_handler",
+            ":authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.keycloak.handlers"
-                               ":disconnect_handler",
+            ":disconnect_handler",
             signup_handler=dict(
-                info="invenio_oauthclient.contrib.keycloak.handlers"
-                     ":info_handler",
-                setup="invenio_oauthclient.contrib.keycloak.handlers"
-                     ":setup_handler",
-                view="invenio_oauthclient.handlers:signup_handler"
+                info="invenio_oauthclient.contrib.keycloak.handlers" ":info_handler",
+                setup="invenio_oauthclient.contrib.keycloak.handlers" ":setup_handler",
+                view="invenio_oauthclient.handlers:signup_handler",
             ),
         )
 
@@ -91,24 +96,19 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
         """Return a dict with the auth REST handlers."""
         return dict(
             authorized_handler="invenio_oauthclient.handlers.rest"
-                               ":authorized_signup_handler",
+            ":authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.keycloak.handlers"
-                               ":disconnect_rest_handler",
+            ":disconnect_rest_handler",
             signup_handler=dict(
-                info="invenio_oauthclient.contrib.keycloak.handlers"
-                     ":info_handler",
-                setup="invenio_oauthclient.contrib.keycloak.handlers"
-                      ":setup_handler",
-                view="invenio_oauthclient.handlers.rest:signup_handler"
+                info="invenio_oauthclient.contrib.keycloak.handlers" ":info_handler",
+                setup="invenio_oauthclient.contrib.keycloak.handlers" ":setup_handler",
+                view="invenio_oauthclient.handlers.rest:signup_handler",
             ),
-
             response_handler=(
-                "invenio_oauthclient.handlers.rest"
-                ":default_remote_response_handler"
+                "invenio_oauthclient.handlers.rest" ":default_remote_response_handler"
             ),
-
             authorized_redirect_url="/",
             disconnect_redirect_url="/",
             signup_redirect_url="/",
-            error_redirect_url="/"
+            error_redirect_url="/",
         )

@@ -12,7 +12,7 @@ from blinker import Namespace
 
 _signals = Namespace()
 
-account_info_received = _signals.signal('oauthclient-account-info-received')
+account_info_received = _signals.signal("oauthclient-account-info-received")
 """Signal is sent after account info handler response.
 
 Example subscriber:
@@ -30,7 +30,7 @@ Example subscriber:
 
 """
 
-account_setup_received = _signals.signal('oauthclient-account-setup-received')
+account_setup_received = _signals.signal("oauthclient-account-setup-received")
 """Signal is sent after account info handler response.
 
 Example subscriber:
@@ -49,8 +49,7 @@ Example subscriber:
 """
 
 
-account_setup_committed = _signals.signal(
-    'oauthclient-account-setup-committed')
+account_setup_committed = _signals.signal("oauthclient-account-setup-committed")
 """Signal is sent after account setup has been committed to database.
 
 Example subscriber:
