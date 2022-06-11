@@ -22,7 +22,7 @@ jobs:
       matrix:
           python-version: [3.7, 3.8, 3.9]
           requirements-level: [min, pypi]
-          db-service: [postgresql11, mysql8]
+          db-service: [postgresql13, mysql8]
 
           exclude:
           - python-version: 3.9
@@ -30,7 +30,7 @@ jobs:
 
           include:
 
-          - db-service: postgresql11
+          - db-service: postgresql13
             DB: postgresql
             POSTGRESQL_VERSION: POSTGRESQL_11_LATEST
             SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://invenio:invenio@localhost:5432/invenio"
@@ -59,7 +59,7 @@ jobs:
 
       - name: Generate dependencies
         run: |
-          python -m pip install --upgrade pip setuptools py wheel requirements-builder
+          pip install wheel requirements-builder
           requirements-builder -e ${{ matrix.EXTRAS }} ${{ matrix.requirements-file }} --level=${{ matrix.requirements-level }} setup.py > .${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt
 
       - name: Cache pip

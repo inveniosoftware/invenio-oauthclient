@@ -10,7 +10,8 @@
 
 from .ext import InvenioOAuthClient, InvenioOAuthClientREST
 from .proxies import current_oauthclient
-from .version import __version__
+
+__version__ = '2.0.0'
 
 __all__ = (
     '__version__',
