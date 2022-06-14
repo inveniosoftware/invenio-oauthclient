@@ -216,8 +216,8 @@ BASE_APP = dict(
 REMOTE_APP = dict(BASE_APP)
 REMOTE_APP.update(
     dict(
-        authorized_handler="invenio_oauthclient.handlers" ":authorized_signup_handler",
-        disconnect_handler="invenio_oauthclient.contrib.cern" ":disconnect_handler",
+        authorized_handler="invenio_oauthclient.handlers:authorized_signup_handler",
+        disconnect_handler="invenio_oauthclient.contrib.cern:disconnect_handler",
         signup_handler=dict(
             info="invenio_oauthclient.contrib.cern:account_info",
             setup="invenio_oauthclient.contrib.cern:account_setup",

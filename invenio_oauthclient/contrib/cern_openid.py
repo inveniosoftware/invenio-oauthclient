@@ -120,9 +120,8 @@ BASE_APP = dict(
 REMOTE_APP = dict(BASE_APP)
 REMOTE_APP.update(
     dict(
-        authorized_handler="invenio_oauthclient.handlers" ":authorized_signup_handler",
-        disconnect_handler="invenio_oauthclient.contrib.cern_openid"
-        ":disconnect_handler",
+        authorized_handler="invenio_oauthclient.handlers:authorized_signup_handler",
+        disconnect_handler="invenio_oauthclient.contrib.cern_openid:disconnect_handler",
         signup_handler=dict(
             info="invenio_oauthclient.contrib.cern_openid:account_info",
             setup="invenio_oauthclient.contrib.cern_openid:account_setup",
@@ -135,10 +134,8 @@ REMOTE_APP.update(
 REMOTE_REST_APP = dict(BASE_APP)
 REMOTE_REST_APP.update(
     dict(
-        authorized_handler="invenio_oauthclient.handlers.rest"
-        ":authorized_signup_handler",
-        disconnect_handler="invenio_oauthclient.contrib.cern_openid"
-        ":disconnect_rest_handler",
+        authorized_handler="invenio_oauthclient.handlers.rest:authorized_signup_handler",
+        disconnect_handler="invenio_oauthclient.contrib.cern_openid:disconnect_rest_handler",
         signup_handler=dict(
             info="invenio_oauthclient.contrib.cern_openid:account_info_rest",
             setup="invenio_oauthclient.contrib.cern_openid:account_setup",

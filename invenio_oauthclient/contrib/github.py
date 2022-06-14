@@ -117,10 +117,8 @@ class GitHubOAuthSettingsHelper(OAuthSettingsHelper):
     def get_handlers(self):
         """Return GitHub auth handlers."""
         return dict(
-            authorized_handler="invenio_oauthclient.handlers"
-            ":authorized_signup_handler",
-            disconnect_handler="invenio_oauthclient.contrib.github"
-            ":disconnect_handler",
+            authorized_handler="invenio_oauthclient.handlers:authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.github:disconnect_handler",
             signup_handler=dict(
                 info="invenio_oauthclient.contrib.github:account_info",
                 setup="invenio_oauthclient.contrib.github:account_setup",

@@ -81,13 +81,11 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
     def get_handlers(self):
         """Return a dict with the auth handlers."""
         return dict(
-            authorized_handler="invenio_oauthclient.handlers"
-            ":authorized_signup_handler",
-            disconnect_handler="invenio_oauthclient.contrib.keycloak.handlers"
-            ":disconnect_handler",
+            authorized_handler="invenio_oauthclient.handlers:authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.keycloak.handlers:disconnect_handler",
             signup_handler=dict(
-                info="invenio_oauthclient.contrib.keycloak.handlers" ":info_handler",
-                setup="invenio_oauthclient.contrib.keycloak.handlers" ":setup_handler",
+                info="invenio_oauthclient.contrib.keycloak.handlers:info_handler",
+                setup="invenio_oauthclient.contrib.keycloak.handlers:setup_handler",
                 view="invenio_oauthclient.handlers:signup_handler",
             ),
         )
@@ -95,17 +93,15 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
     def get_rest_handlers(self):
         """Return a dict with the auth REST handlers."""
         return dict(
-            authorized_handler="invenio_oauthclient.handlers.rest"
-            ":authorized_signup_handler",
-            disconnect_handler="invenio_oauthclient.contrib.keycloak.handlers"
-            ":disconnect_rest_handler",
+            authorized_handler="invenio_oauthclient.handlers.rest:authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.keycloak.handlers:disconnect_rest_handler",
             signup_handler=dict(
-                info="invenio_oauthclient.contrib.keycloak.handlers" ":info_handler",
-                setup="invenio_oauthclient.contrib.keycloak.handlers" ":setup_handler",
+                info="invenio_oauthclient.contrib.keycloak.handlers:info_handler",
+                setup="invenio_oauthclient.contrib.keycloak.handlers:setup_handler",
                 view="invenio_oauthclient.handlers.rest:signup_handler",
             ),
             response_handler=(
-                "invenio_oauthclient.handlers.rest" ":default_remote_response_handler"
+                "invenio_oauthclient.handlers.rest:default_remote_response_handler"
             ),
             authorized_redirect_url="/",
             disconnect_redirect_url="/",
