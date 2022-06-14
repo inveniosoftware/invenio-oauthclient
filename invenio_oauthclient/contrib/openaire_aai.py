@@ -113,10 +113,8 @@ class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
     def get_handlers(self):
         """Return OpenAIRE auth handlers."""
         return dict(
-            authorized_handler="invenio_oauthclient.handlers"
-            ":authorized_signup_handler",
-            disconnect_handler="invenio_oauthclient.contrib.openaire_aai"
-            ":disconnect_handler",
+            authorized_handler="invenio_oauthclient.handlers:authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.openaire_aai:disconnect_handler",
             signup_handler=dict(
                 info="invenio_oauthclient.contrib.openaire_aai:account_info",
                 setup="invenio_oauthclient.contrib.openaire_aai:account_setup",
@@ -127,17 +125,14 @@ class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
     def get_rest_handlers(self):
         """Return OpenAIRE auth REST handlers."""
         return dict(
-            authorized_handler="invenio_oauthclient.handlers.rest"
-            ":authorized_signup_handler",
-            disconnect_handler="invenio_oauthclient.contrib.openaire_aai"
-            ":disconnect_rest_handler",
+            authorized_handler="invenio_oauthclient.handlers.rest:authorized_signup_handler",
+            disconnect_handler="invenio_oauthclient.contrib.openaire_aai:disconnect_rest_handler",
             signup_handler=dict(
                 info="invenio_oauthclient.contrib.openaire_aai:account_info",
                 setup="invenio_oauthclient.contrib.openaire_aai:account_setup",
                 view="invenio_oauthclient.handlers.rest:signup_handler",
             ),
-            response_handler="invenio_oauthclient.handlers.rest"
-            ":default_remote_response_handler",
+            response_handler="invenio_oauthclient.handlers.rest:default_remote_response_handler",
             authorized_redirect_url="/",
             disconnect_redirect_url="/",
             signup_redirect_url="/",
