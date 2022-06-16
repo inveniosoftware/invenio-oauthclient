@@ -57,8 +57,7 @@ class _OAuthClientState(object):
         self.default_response_handler = default_response_handler or \
             dummy_handler
 
-        for remote_app, conf in app.config[
-                remote_app_config_key].items():
+        for remote_app, conf in app.config[remote_app_config_key].items():
             # Prevent double creation problems
             if remote_app not in self.oauth.remote_apps:
                 # use this app's specific remote app class if there is one.

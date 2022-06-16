@@ -9,8 +9,8 @@
 
 {% macro render_checkbox(field, label='') %}
   <div class="ui checkbox">
-    {{field(class_="form-control")}}
-    <label>{{label}}</label>
+    {{ field(class_="form-control") }}
+    {{ field.label }}
   </div>
 {% endmacro %}
 
