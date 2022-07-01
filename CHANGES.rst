@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 2.0.0 (released 2022-07-01)
+
+- Remove Babel extension.
+- Add german translations.
+- Fix checkbox label display inside loops.
+
 Version 2.0.0 (released 2022-05-24)
 
 - Moved UserIdentity to Invenio-Accounts.
