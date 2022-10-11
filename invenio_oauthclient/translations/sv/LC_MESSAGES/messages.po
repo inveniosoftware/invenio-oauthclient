@@ -1,86 +1,88 @@
-# Translations template for invenio-oauthclient.
+# Swedish translations for invenio-oauthclient.
 # Copyright (C) 2022 CERN
 # This file is distributed under the same license as the invenio-oauthclient
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: invenio-oauthclient 2.0.1\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
 "POT-Creation-Date: 2022-10-11 12:40+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2022-10-11 12:55+0200\n"
+"Last-Translator: Sam Arbid <samaa2@kth.se>\n"
+"Language-Team: sv <LL@li.org>\n"
+"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.10.3\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: invenio_oauthclient/admin.py:56
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: invenio_oauthclient/admin.py:57
 msgid "User ID"
-msgstr ""
+msgstr "Användarid"
 
 #: invenio_oauthclient/admin.py:58
 msgid "Client ID"
-msgstr ""
+msgstr "Klient ID"
 
 #: invenio_oauthclient/admin.py:85
 msgid "ID Remote Account"
-msgstr ""
+msgstr "ID fjärrkonto"
 
 #: invenio_oauthclient/admin.py:92 invenio_oauthclient/admin.py:100
 msgid "User Management"
-msgstr ""
+msgstr "Användarhantering"
 
 #: invenio_oauthclient/admin.py:93
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:12
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:12
 #: invenio_oauthclient/views/settings.py:49
 msgid "Linked accounts"
-msgstr ""
+msgstr "Länkade konton"
 
 #: invenio_oauthclient/admin.py:101
 msgid "Linked account tokens"
-msgstr ""
+msgstr "Länkade kontotokens"
 
 #: invenio_oauthclient/contrib/cern.py:431
 #: invenio_oauthclient/contrib/cern_openid.py:296
 msgid "CERN account not allowed."
-msgstr ""
+msgstr "CERN-konto är inte tillåtet."
 
 #: invenio_oauthclient/handlers/ui.py:50
 msgid "External service is already linked to another account."
-msgstr ""
+msgstr "Extern tjänst är redan länkad till ett annat konto."
 
 #: invenio_oauthclient/handlers/ui.py:55
 msgid "You rejected the authentication request."
-msgstr ""
+msgstr "Du avvisade autentiseringsbegäran."
 
 #: invenio_oauthclient/handlers/ui.py:196
 msgid "Authorization with remote service failed."
-msgstr ""
+msgstr "Auktorisering med fjärrservice misslyckades."
 
 #: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:25
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/_macros.html:60
 #, python-format
 msgid "Sign in with %(title)s"
-msgstr ""
+msgstr "Logga in med %(title)s"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/login_user.html:21
 msgid "OR"
-msgstr ""
+msgstr "Eller"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:24
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:29
 #, python-format
 msgid "Sign-up with %(title)s!"
-msgstr ""
+msgstr "Registrera med %(title)s!"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:25
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:32
@@ -88,11 +90,13 @@ msgid ""
 "Fill in your details to complete your registration. You only have to do "
 "this once."
 msgstr ""
+"Fyll i dina uppgifter för att slutföra din registrering. Du behöver "
+"bara göra detta en gång."
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:33
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:45
 msgid "Complete registration"
-msgstr ""
+msgstr "Slutför registreringen"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:20
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:20
@@ -101,23 +105,24 @@ msgid ""
 "Tired of entering password for %(sitename)s every time you sign in? Set "
 "up single sign-on with one or more of the services below:"
 msgstr ""
+"Trött på att ange lösenord för %(sitename)s varje gång du loggar in? "
+"Konfigurera enkel inloggning med en eller flera av tjänsterna nedan:"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:32
 msgid "Disconnect"
-msgstr ""
+msgstr "Nerkoppling"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:33
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:34
 msgid "Connect"
-msgstr ""
+msgstr "Ansluta"
 
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:26
 msgid "Or"
-msgstr ""
+msgstr "Eller"
 
 #: invenio_oauthclient/views/settings.py:41
 #, python-format
 msgid "%(icon)s Linked accounts"
-msgstr ""
-
+msgstr "%(icon)s Länkade konton"

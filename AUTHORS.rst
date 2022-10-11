@@ -32,6 +32,7 @@ Contributors
 - Pamfilos Fokianos
 - Panos Paparrigopoulos
 - Paulina Lach
+- Sam Arbid (KTH)
 - Sami Hiltunen
 - Tibor Simko
 - Zacharias Zacharodimos
