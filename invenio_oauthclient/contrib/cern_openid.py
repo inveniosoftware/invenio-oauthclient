@@ -79,7 +79,7 @@ from flask_principal import (
 from invenio_db import db
 from jwt import decode
 
-from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
+from invenio_oauthclient.errors import OAuthCERNRejectedAccountError, OAuthError
 from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
@@ -117,6 +117,7 @@ BASE_APP = dict(
     ),
 )
 
+REMOTE_APP_NAME = "cern_openid"
 REMOTE_APP = dict(BASE_APP)
 REMOTE_APP.update(
     dict(
@@ -164,20 +165,44 @@ OAUTHCLIENT_CERN_OPENID_JWT_TOKEN_DECODE_PARAMS = dict(
     algorithms=["HS256", "RS256"],
 )
 
-cern_oauth_blueprint = Blueprint("cern_openid_oauth", __name__)
+cern_openid_blueprint = Blueprint("cern_openid", __name__)
+
+
+@cern_openid_blueprint.route("/cern/logout")
+def logout():
+    """CERN logout view.
+
+    This URL will be called when setting `SECURITY_POST_LOGOUT_VIEW = /cern/logout`,
+    automatically called after `/logout` actions.
+    """
+    logout_url = (
+        current_app.config["OAUTHCLIENT_REMOTE_APPS"]
+        .get(REMOTE_APP_NAME, {})
+        .get("logout_url")
+    )
+
+    if not logout_url:
+        raise OAuthError(
+            "Invalid `logout_url` for OAuth app {}".format(REMOTE_APP_NAME)
+        )
+
+    return redirect(logout_url, code=302)
 
 
 def find_remote_by_client_id(client_id):
     """Return a remote application based with given client ID."""
     for remote in current_oauthclient.oauth.remote_apps.values():
-        if remote.name == "cern_openid" and remote.consumer_key == client_id:
+        if remote.name == REMOTE_APP_NAME and remote.consumer_key == client_id:
             return remote
 
 
 def fetch_extra_data(resource):
     """Return a dict with extra data retrieved from CERN OAuth."""
     person_id = resource.get("cern_person_id")
-    return dict(person_id=person_id)
+    return dict(
+        roles=resource["cern_roles"],
+        person_id=person_id,
+    )
 
 
 def account_roles_and_extra_data(account, resource, refresh_timedelta=None):
@@ -192,13 +217,14 @@ def account_roles_and_extra_data(account, resource, refresh_timedelta=None):
     if last_update > modified_since:
         return account.extra_data.get("roles", [])
 
-    roles = resource["cern_roles"]
     extra_data = current_app.config.get(
         "OAUTHCLIENT_CERN_OPENID_EXTRA_DATA_SERIALIZER", fetch_extra_data
     )(resource)
-
-    account.extra_data.update(roles=roles, updated=updated.isoformat(), **extra_data)
-    return roles
+    extra_data.setdefault(
+        "roles", []
+    )  # ensure `roles`` is empty list, when not updated by the previous hook
+    account.extra_data.update(updated=updated.isoformat(), **extra_data)
+    return account.extra_data["roles"]
 
 
 def extend_identity(identity, roles):
@@ -282,7 +308,7 @@ def _account_info(remote, resp):
     return dict(
         user=dict(email=email.lower(), profile=dict(username=nice, full_name=name)),
         external_id=external_id,
-        external_method="cern_openid",
+        external_method=REMOTE_APP_NAME,
         active=True,
     )
 
@@ -325,7 +351,7 @@ def _disconnect(remote, *args, **kwargs):
     external_id = account.extra_data.get("external_id")
 
     if external_id:
-        oauth_unlink_external_id(dict(id=external_id, method="cern_openid"))
+        oauth_unlink_external_id(dict(id=external_id, method=REMOTE_APP_NAME))
     if account:
         with db.session.begin_nested():
             account.delete()
@@ -364,7 +390,7 @@ def account_setup(remote, token, resp):
         user = token.remote_account.user
 
         # Create user <-> external id link.
-        oauth_link_external_id(user, dict(id=external_id, method="cern_openid"))
+        oauth_link_external_id(user, dict(id=external_id, method=REMOTE_APP_NAME))
 
 
 @identity_changed.connect
@@ -378,7 +404,7 @@ def on_identity_changed(sender, identity):
         return
 
     remote = g.get("oauth_logged_in_with_remote", None)
-    if not remote or remote.name != "cern_openid":
+    if not remote or remote.name != REMOTE_APP_NAME:
         # signal coming from another remote app
         return
 
