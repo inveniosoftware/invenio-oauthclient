@@ -136,6 +136,7 @@ For more details you can play with a :doc:`working example <examplesapp>`.
 import copy
 import re
 from datetime import datetime, timedelta
+from warnings import warn
 
 from flask import Blueprint, current_app, flash, g, redirect, session, url_for
 from flask_babelex import gettext as _
@@ -155,6 +156,12 @@ from invenio_oauthclient.handlers.utils import require_more_than_one_external_ac
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.proxies import current_oauthclient
 from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_external_id
+
+warn(
+    "The cern contrib is deprecated. Please use the generic keycloak instead.",
+    DeprecationWarning,
+)
+
 
 OAUTHCLIENT_CERN_HIDDEN_GROUPS = (
     "All Exchange People",

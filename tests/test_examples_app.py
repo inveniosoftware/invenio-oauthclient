@@ -47,7 +47,7 @@ def _create_example_app(app_name):
     time.sleep(2)
 
 
-@pytest.mark.parametrize("service", ["orcid", "github", "cern", "globus"])
+@pytest.mark.parametrize("service", ["orcid", "github", "globus"])
 def test_app(service):
     """Test example app for given service."""
     with _create_example_app("{0}_app.py".format(service)):
@@ -56,7 +56,7 @@ def test_app(service):
         assert "Redirect" in output
 
 
-@pytest.mark.parametrize("service", ["orcid", "github", "cern", "globus"])
+@pytest.mark.parametrize("service", ["orcid", "github", "globus"])
 def test_app_rest(service):
     """Test example app for given service."""
     with _create_example_app("{0}_app_rest.py".format(service)):
