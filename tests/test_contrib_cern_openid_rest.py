@@ -129,23 +129,32 @@ def test_account_setup(app_rest, example_cern_openid_rest, models_fixture):
             "code": 200,
         }
         check_response_redirect_url_args(resp, expected_url_args)
-
+        # 3 needs:
+        # {
+        #   Need(method='id', value=4),
+        #   Need(method='role', value='cern_user'),
+        #   Need(method='id', value='john.doe@cern.ch')
+        # }
         assert len(g.identity.provides) == 3
 
     datastore = app_rest.extensions["invenio-accounts"].datastore
     user = datastore.find_user(email="john.doe@cern.ch")
     user.password = hash_password("1234")
     assert user
+    assert user.confirmed_at
 
     with app_rest.test_request_context():
         resp = disconnect_rest_handler(ioc.remote_apps["cern_openid"])
+        # this will delete the RemoteAccount
         assert resp.status_code >= 300
 
         # simulate login (account_info fetch)
         g.oauth_logged_in_with_remote = ioc.remote_apps["cern_openid"]
 
         login_user(user)
-        assert len(g.identity.provides) == 3
+        # 2 needs only:
+        #   missing Need(method='role', value='cern_user') that was in RemoteAccount
+        assert len(g.identity.provides) == 2
 
         logout_user()
         assert len(g.identity.provides) == 1
@@ -155,7 +164,7 @@ def test_account_setup(app_rest, example_cern_openid_rest, models_fixture):
         # Login again to test the disconnect handler
         g.oauth_logged_in_with_remote = ioc.remote_apps["cern_openid"]
         login_user(user)
-        assert len(g.identity.provides) == 3
+        assert len(g.identity.provides) == 2
 
         disconnect_rest_handler(ioc.remote_apps["cern_openid"])
 
@@ -281,7 +290,7 @@ def test_identity_changed(app_rest, example_cern_openid_rest, models_fixture):
             # login the user again
             login_user(user)
 
-            # check if the cern roles are not fetched from the provider
+            # check that the roles are not refreshed from provider
             assert len(g.identity.provides) == 2
             logout_user()
 

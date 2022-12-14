@@ -104,6 +104,10 @@ BASE_APP = dict(
     icon="",
     logout_url="https://auth.cern.ch/auth/realms/cern/protocol/"
     "openid-connect/logout",
+    signup_options={
+        "auto_confirm": True,
+        "send_register_msg": False,
+    },
     params=dict(
         base_url="https://auth.cern.ch/auth/realms/cern",
         request_token_url=None,
@@ -322,11 +326,12 @@ def _disconnect(remote, *args, **kwargs):
     account = RemoteAccount.get(
         user_id=current_user.get_id(), client_id=remote.consumer_key
     )
-    external_id = account.extra_data.get("external_id")
-
-    if external_id:
-        oauth_unlink_external_id(dict(id=external_id, method="cern_openid"))
     if account:
+        external_id = account.extra_data.get("external_id")
+
+        if external_id:
+            oauth_unlink_external_id(dict(id=external_id, method="cern_openid"))
+
         with db.session.begin_nested():
             account.delete()
 

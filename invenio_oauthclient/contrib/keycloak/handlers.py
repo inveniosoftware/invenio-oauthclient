@@ -44,16 +44,14 @@ from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_exter
 from .helpers import get_user_info
 
 
-def info_handler(remote, resp):
-    """Retrieve remote account information for finding matching local users."""
-    user_info = get_user_info(remote, resp)
-
+def default_info_serializer(remote, resp, user_info):
+    """Serialize the account info response object."""
     # fill out the information required by
     # 'invenio-accounts' and 'invenio-userprofiles'.
     #
     # note: "external_id": `preferred_username` should also work,
     #       as it is seemingly not editable in Keycloak
-    result = {
+    return {
         "user": {
             "active": True,
             "email": user_info["email"],
@@ -66,7 +64,17 @@ def info_handler(remote, resp):
         "external_method": remote.name,
     }
 
-    return result
+
+def info_handler(remote, resp, info_serializer=default_info_serializer):
+    """Retrieve remote account information for finding matching local users.
+
+    :param remote: The remote application.
+    :param resp: The response.
+    :param info_serializer: Func to serialize the info endpoint response.
+    :returns: A dictionary with the user information.
+    """
+    user_info = get_user_info(remote, resp)
+    return info_serializer(remote, resp, user_info)
 
 
 def setup_handler(remote, token, resp):

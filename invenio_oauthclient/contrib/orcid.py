@@ -85,6 +85,8 @@ from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_exter
 class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
     """Default configuration for ORCID OAuth provider."""
 
+    external_method = "orcid"
+
     def __init__(
         self,
         title=None,
@@ -94,12 +96,17 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
         access_token_url=None,
         authorize_url=None,
         precedence_mask=None,
+        signup_options=None,
     ):
         """Constructor."""
         access_token_url = access_token_url or "https://orcid.org/oauth/token"
         authorize_url = authorize_url or "https://orcid.org/oauth/authorize"
         precedence_mask = precedence_mask or {
             "email": False,
+        }
+        signup_options = signup_options or {
+            "auto_confirm": False,
+            "send_register_msg": True,
         }
 
         super().__init__(
@@ -112,11 +119,10 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
             authorize_url=authorize_url,
             content_type="application/json",
             precedence_mask=precedence_mask,
+            signup_options=signup_options,
         )
 
-    def get_handlers(self):
-        """Return ORCID auth handlers."""
-        return dict(
+        self.handlers = dict(
             authorized_handler="invenio_oauthclient.handlers:authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.orcid:disconnect_handler",
             signup_handler=dict(
@@ -126,9 +132,7 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
             ),
         )
 
-    def get_rest_handlers(self):
-        """Return ORCID auth REST handlers."""
-        return dict(
+        self.rest_handlers = dict(
             authorized_handler="invenio_oauthclient.handlers.rest:authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.orcid:disconnect_rest_handler",
             signup_handler=dict(
@@ -142,6 +146,14 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
             signup_redirect_url="/",
             error_redirect_url="/",
         )
+
+    def get_handlers(self):
+        """Return ORCID auth handlers."""
+        return self.handlers
+
+    def get_rest_handlers(self):
+        """Return ORCID auth REST handlers."""
+        return self.rest_handlers
 
 
 _orcid_app = ORCIDOAuthSettingsHelper()
@@ -182,7 +194,20 @@ REMOTE_SANDBOX_MEMBER_APP = _orcid_sandbox_member_app.remote_app
 """ORCID sandbox member API."""
 
 
-def account_info(remote, resp):
+def default_info_serializer(remote, resp):
+    """Serialize the account info response object."""
+    return {
+        "external_id": resp.get("orcid"),
+        "external_method": ORCIDOAuthSettingsHelper.external_method,
+        "user": {
+            "profile": {
+                "full_name": resp.get("name"),
+            },
+        },
+    }
+
+
+def account_info(remote, resp, info_serializer=default_info_serializer):
     """Retrieve remote account information used to find local user.
 
     It returns a dictionary with the following structure:
@@ -195,25 +220,16 @@ def account_info(remote, resp):
                     'full_name': 'Full Name',
                 },
             },
-            'external_id': 'github-unique-identifier',
-            'external_method': 'github',
+            'external_id': 'orcid-unique-identifier',
+            'external_method': 'orcid',
         }
 
     :param remote: The remote application.
     :param resp: The response.
+    :param info_serializer: Func to serialize the info endpoint response.
     :returns: A dictionary with the user information.
     """
-    orcid = resp.get("orcid")
-
-    return {
-        "external_id": orcid,
-        "external_method": "orcid",
-        "user": {
-            "profile": {
-                "full_name": resp.get("name"),
-            },
-        },
-    }
+    return info_serializer(remote, resp)
 
 
 @require_more_than_one_external_account

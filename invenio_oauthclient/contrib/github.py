@@ -100,6 +100,7 @@ class GitHubOAuthSettingsHelper(OAuthSettingsHelper):
         app_key=None,
         icon=None,
         precedence_mask=None,
+        signup_options=None,
     ):
         """Constructor."""
         super().__init__(
@@ -112,11 +113,10 @@ class GitHubOAuthSettingsHelper(OAuthSettingsHelper):
             access_token_url="https://github.com/login/oauth/access_token",
             authorize_url="https://github.com/login/oauth/authorize",
             precedence_mask=precedence_mask,
+            signup_options=signup_options,
         )
 
-    def get_handlers(self):
-        """Return GitHub auth handlers."""
-        return dict(
+        self.handlers = dict(
             authorized_handler="invenio_oauthclient.handlers:authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.github:disconnect_handler",
             signup_handler=dict(
@@ -126,9 +126,7 @@ class GitHubOAuthSettingsHelper(OAuthSettingsHelper):
             ),
         )
 
-    def get_rest_handlers(self):
-        """Return GitHub auth REST handlers."""
-        return dict(
+        self.rest_handlers = dict(
             authorized_handler="invenio_oauthclient.handlers.rest"
             ":authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.github"
@@ -146,6 +144,14 @@ class GitHubOAuthSettingsHelper(OAuthSettingsHelper):
             error_redirect_url="/",
         )
 
+    def get_handlers(self):
+        """Return GitHub auth handlers."""
+        return self.handlers
+
+    def get_rest_handlers(self):
+        """Return GitHub auth REST handlers."""
+        return self.rest_handlers
+
 
 _github_app = GitHubOAuthSettingsHelper()
 
@@ -161,7 +167,22 @@ def _extract_email(gh):
     return next((x.email for x in gh.emails() if x.verified and x.primary), None)
 
 
-def account_info(remote, resp):
+def default_info_serializer(remote, resp, user_info, github_obj):
+    """Serialize the account info response object."""
+    return dict(
+        user=dict(
+            email=_extract_email(github_obj),
+            profile=dict(
+                username=user_info.login,
+                full_name=user_info.name,
+            ),
+        ),
+        external_id=str(user_info.id),
+        external_method="github",
+    )
+
+
+def account_info(remote, resp, info_serializer=default_info_serializer):
     """Retrieve remote account information used to find local user.
 
     It returns a dictionary with the following structure:
@@ -186,21 +207,12 @@ def account_info(remote, resp):
 
     :param remote: The remote application.
     :param resp: The response.
+    :param info_serializer: Func to serialize the info endpoint response.
     :returns: A dictionary with the user information.
     """
-    gh = github3.login(token=resp["access_token"])
-    me = gh.me()
-    return dict(
-        user=dict(
-            email=_extract_email(gh),
-            profile=dict(
-                username=me.login,
-                full_name=me.name,
-            ),
-        ),
-        external_id=str(me.id),
-        external_method="github",
-    )
+    github_obj = github3.login(token=resp["access_token"])
+    user_info = github_obj.me()
+    return info_serializer(remote, resp, user_info, github_obj)
 
 
 def account_setup(remote, token, resp):

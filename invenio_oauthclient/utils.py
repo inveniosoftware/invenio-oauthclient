@@ -8,13 +8,13 @@
 
 """Utility methods to help find, authenticate or register a remote user."""
 
-import six
+from datetime import datetime
+
 from flask import after_this_request, current_app, request
 from flask_security import login_user, logout_user
 from flask_security.confirmable import requires_confirmation
 from invenio_accounts.models import User
 from invenio_accounts.utils import register_user
-from invenio_db import db
 from invenio_db.utils import rebuild_encrypted_properties
 from itsdangerous import TimedJSONWebSignatureSerializer
 from uritools import uricompose, urisplit
@@ -168,11 +168,13 @@ def remove_none_values(user_data):
         del user_data[key]
 
 
-def oauth_register(form, user_info=None, precedence_mask=None):
+def oauth_register(form, user_info=None, precedence_mask=None, signup_options={}):
     """Register user if possible.
 
     :param form: A form instance.
     :param user_info: The user info dictionary.
+    :param precedence_mask: The precedence mask to use.
+    :param signup_options: Extra signup options dict.
     :returns: A :class:`invenio_accounts.models.User` instance.
     """
     if form.validate():
@@ -186,14 +188,21 @@ def oauth_register(form, user_info=None, precedence_mask=None):
             filter_user_info(user_info, precedence_mask or default_mask)
             patch_dictionary(form_data, user_info)
 
-        # re-populate the form after appyling the precedence mask and
+        # re-populate the form after applying the precedence mask and
         # convert the form data to user model's data
         data = fill_form(form, form_data).to_dict()
         # see https://github.com/inveniosoftware/invenio-oauthclient/issues/275
         remove_none_values(data)
         # remove the CSRF tokens to avoid unexpected keyword arguments
         remove_csrf_tokens(data)
-        user = register_user(**data)
+
+        auto_confirm = signup_options.get("auto_confirm", False)
+        # auto_confirm sets the `confirmed_at` field
+        if auto_confirm:
+            data["confirmed_at"] = datetime.utcnow()
+
+        send_register_msg = signup_options.get("send_register_msg", True)
+        user = register_user(send_register_msg=send_register_msg, **data)
         _datastore.commit()
         return user
 
@@ -242,7 +251,7 @@ def get_safe_redirect_target(arg="next"):
 
 def obj_or_import_string(value, default=None):
     """Import string or return object."""
-    if isinstance(value, six.string_types):
+    if isinstance(value, str):
         return import_string(value)
     elif value:
         return value

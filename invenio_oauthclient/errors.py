@@ -36,12 +36,12 @@ class OAuthResponseError(OAuthError):
         :param remote: Remote application.
         :param response: OAuth response object.
         """
-        super(OAuthResponseError, self).__init__(message, remote)
+        super().__init__(message, remote)
         self.response = response
 
 
 class OAuthRejectedRequestError(OAuthResponseError):
-    """Define exception of rejected response during OAuth process."""
+    """Define exception for rejected response during OAuth process."""
 
 
 class OAuthClientError(OAuthResponseError):
@@ -63,9 +63,7 @@ class OAuthClientError(OAuthResponseError):
         self.code = response["error"]
         self.uri = response.get("error_uri", None)
         self.description = response.get("error_description", None)
-        super(OAuthClientError, self).__init__(
-            self.description or message, remote, response
-        )
+        super().__init__(self.description or message, remote, response)
 
 
 class OAuthCERNRejectedAccountError(OAuthResponseError):
@@ -89,7 +87,7 @@ class OAuthClientTokenNotFound(Exception):
 
 
 class OAuthClientUserNotRegistered(Exception):
-    """Define exception of user not registered."""
+    """Define exception for user not registered."""
 
 
 class OAuthClientTokenNotSet(Exception):

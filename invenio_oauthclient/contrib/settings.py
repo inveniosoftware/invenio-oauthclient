@@ -29,6 +29,7 @@ class OAuthSettingsHelper:
         request_token_params=None,
         request_token_url=None,
         precedence_mask=None,
+        signup_options=None,
         **kwargs,
     ):
         """The constructor."""
@@ -46,11 +47,16 @@ class OAuthSettingsHelper:
             },
         }
 
+        signup_options = signup_options or {}
+        signup_options.setdefault("auto_confirm", True)
+        signup_options.setdefault("send_register_msg", False)
+
         self.base_app = dict(
             title=title,
             description=description,
             icon=icon,
             precedence_mask=precedence_mask,
+            signup_options=signup_options,
             params=dict(
                 base_url=self.base_url,
                 request_token_params=request_token_params,

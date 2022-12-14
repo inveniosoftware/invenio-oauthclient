@@ -112,22 +112,32 @@ def test_account_setup(app, example_cern_openid, models_fixture):
         )
         assert resp.status_code == 302
         assert resp.location == ("/account/settings/" "linkedaccounts/")
+        # 3 needs:
+        # {
+        #   Need(method='id', value=4),
+        #   Need(method='role', value='cern_user'),
+        #   Need(method='id', value='john.doe@cern.ch')
+        # }
         assert len(g.identity.provides) == 3
 
     datastore = app.extensions["invenio-accounts"].datastore
     user = datastore.find_user(email="john.doe@cern.ch")
     user.password = hash_password("1234")
     assert user
+    assert user.confirmed_at
 
     with app.test_request_context():
         resp = disconnect_handler(ioc.remote_apps["cern_openid"])
+        # this will delete the RemoteAccount
         assert resp.status_code >= 300
 
         # simulate login (account_info fetch)
         g.oauth_logged_in_with_remote = ioc.remote_apps["cern_openid"]
 
         login_user(user)
-        assert len(g.identity.provides) == 3
+        # 2 needs only:
+        #   missing Need(method='role', value='cern_user') that was in RemoteAccount
+        assert len(g.identity.provides) == 2
 
         logout_user()
         assert len(g.identity.provides) == 1
@@ -137,7 +147,7 @@ def test_account_setup(app, example_cern_openid, models_fixture):
         # Login again to test the disconnect handler
         g.oauth_logged_in_with_remote = ioc.remote_apps["cern_openid"]
         login_user(user)
-        assert len(g.identity.provides) == 3
+        assert len(g.identity.provides) == 2
 
         disconnect_handler(ioc.remote_apps["cern_openid"])
 

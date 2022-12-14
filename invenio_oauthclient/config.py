@@ -75,6 +75,10 @@ keys:
             precedence_mask=dict(
                 email=True
             ),
+            signup_options=dict(
+                auto_confirm=True,
+                send_register_msg=False,
+            ),
             params=dict(...),
             )
         )
