@@ -31,7 +31,7 @@ from invenio_oauthclient.models import RemoteToken
 from invenio_oauthclient.utils import oauth_authenticate
 from invenio_oauthclient.views.client import rest_blueprint
 
-REMOTE_APPS = ["cern", "github", "orcid", "globus"]
+REMOTE_APPS = ["github", "orcid", "globus"]
 
 
 @pytest.fixture(scope="function")

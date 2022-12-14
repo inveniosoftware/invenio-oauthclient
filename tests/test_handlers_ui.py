@@ -132,7 +132,7 @@ def test_dummy_handler(base_app):
     """Test dummy handler."""
 
     # Force usage of dummy handlers
-    base_app.config["OAUTHCLIENT_REMOTE_APPS"]["cern"]["signup_handler"] = {}
+    base_app.config["OAUTHCLIENT_REMOTE_APPS"]["github"]["signup_handler"] = {}
 
     # Initialize InvenioOAuth
     FlaskOAuth(base_app)
@@ -142,5 +142,5 @@ def test_dummy_handler(base_app):
 
     # Try to sign-up client
     base_app.test_client().get(
-        url_for("invenio_oauthclient.signup", remote_app="cern", next="/someurl/")
+        url_for("invenio_oauthclient.signup", remote_app="github", next="/someurl/")
     )
