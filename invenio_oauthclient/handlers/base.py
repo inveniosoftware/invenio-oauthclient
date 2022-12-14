@@ -62,7 +62,7 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
     # Store token in session
     # ----------------------
     # Set token in session - token object only returned if
-    # current_user.is_autenticated().
+    # current_user.is_authenticated().
     token = response_token_setter(remote, resp)
     handlers = current_oauthclient.signup_handlers[remote.name]
 
@@ -84,9 +84,15 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
             # Auto sign-up if user not found
             form = create_csrf_disabled_registrationform(remote)
             form = fill_form(form, account_info["user"])
-            remote_apps = current_app.config["OAUTHCLIENT_REMOTE_APPS"]
-            precedence_mask = remote_apps[remote.name].get("precedence_mask")
-            user = oauth_register(form, account_info["user"], precedence_mask)
+            remote_app = current_app.config["OAUTHCLIENT_REMOTE_APPS"][remote.name]
+            precedence_mask = remote_app.get("precedence_mask")
+            signup_options = remote_app.get("signup_options")
+            user = oauth_register(
+                form,
+                account_info["user"],
+                precedence_mask=precedence_mask,
+                signup_options=signup_options,
+            )
 
             # if registration fails ...
             if user is None:
@@ -172,15 +178,21 @@ def base_signup_handler(remote, form, *args, **kwargs):
     if not session.get(session_prefix + "_autoregister", False):
         raise OAuthClientMustRedirectLogin()
 
-    handlers = current_oauthclient.signup_handlers[remote.name]
     if form.validate_on_submit():
         account_info = session.get(session_prefix + "_account_info")
         response = session.get(session_prefix + "_response")
-        remote_apps = current_app.config["OAUTHCLIENT_REMOTE_APPS"]
-        precedence_mask = remote_apps[remote.name].get("precedence_mask")
+
+        remote_app = current_app.config["OAUTHCLIENT_REMOTE_APPS"][remote.name]
+        precedence_mask = remote_app.get("precedence_mask")
+        signup_options = remote_app.get("signup_options")
 
         # Register user
-        user = oauth_register(form, account_info["user"], precedence_mask)
+        user = oauth_register(
+            form,
+            account_info["user"],
+            precedence_mask=precedence_mask,
+            signup_options=signup_options,
+        )
 
         if user is None:
             raise OAuthClientUserNotRegistered()
@@ -225,4 +237,4 @@ def base_signup_handler(remote, form, *args, **kwargs):
     # Pre-fill form
     account_info = session.get(session_prefix + "_account_info")
     if not form.is_submitted():
-        form = fill_form(form, account_info["user"])
+        fill_form(form, account_info["user"])

@@ -127,6 +127,7 @@ def test_authorized_signup(app_rest_with_userprofiles, example_orcid, orcid_bio)
         #  assert user.family_name == 'Carberry'
         # check that the user's email is not yet validated
         assert user.active
+        assert not user.confirmed_at
         # check that the validation email has been sent
         #  assert hasattr(locmem, 'outbox') and len(locmem.outbox) == 1
 

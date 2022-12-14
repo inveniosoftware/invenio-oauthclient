@@ -107,6 +107,7 @@ def test_authorized_signup_valid_user(app, example_github):
             remote = RemoteAccount.query.filter_by(user_id=user.id).one()
             RemoteToken.query.filter_by(id_remote_account=remote.id).one()
             assert user.active
+            assert user.confirmed_at
 
             # Disconnect link
             # should not work, because it's the user's only means of login

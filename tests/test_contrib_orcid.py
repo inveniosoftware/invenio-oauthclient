@@ -130,6 +130,7 @@ def test_authorized_signup(app_with_userprofiles, example_orcid, orcid_bio):
         assert user.active
         # check that the validation email has been sent
         #  assert hasattr(locmem, 'outbox') and len(locmem.outbox) == 1
+        assert not user.confirmed_at
 
         # Disconnect link
         # should not work, because it's the user's only means of login

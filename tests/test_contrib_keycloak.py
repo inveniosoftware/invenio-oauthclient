@@ -100,6 +100,7 @@ def test_authorized_signup_valid_user(
         assert user.email == example_keycloak["email"]
         assert user.user_profile["full_name"] == "Max Moser"
         assert user.active
+        assert user.confirmed_at
 
         # check that the user has a linked Keycloak account
         uid = UserIdentity.query.filter_by(
@@ -141,6 +142,59 @@ def test_authorized_signup_valid_user(
             method="keycloak", id_user=user.id, id=example_keycloak["sub"]
         ).count()
         assert count == 0
+
+
+@httpretty.activate
+def test_authorized_signup_valid_user_not_confirmed(
+    app_with_userprofiles,
+    example_keycloak_token,
+    example_keycloak_userinfo,
+    example_keycloak_realm_info,
+):
+    """Test authorized callback with sign-up and user confirmed."""
+    app = app_with_userprofiles
+    example_keycloak = example_keycloak_userinfo.data
+
+    # change default settings to avoid auto-confirm user
+    keycloak_app = app.config["OAUTHCLIENT_REMOTE_APPS"]["keycloak"]
+    keycloak_app["signup_options"]["auto_confirm"] = False
+    keycloak_app["signup_options"]["send_register_msg"] = True
+
+    with app.test_client() as c:
+        # ensure that remote_apps have been initialized (before first request)
+        resp = c.get(url_for("invenio_oauthclient.login", remote_app="keycloak"))
+        assert resp.status_code == 302
+
+        # mock a running keycloak instance
+        mock_keycloak(
+            app.config,
+            example_keycloak_token,
+            example_keycloak,
+            example_keycloak_realm_info,
+        )
+
+        # user authorized the request and is redirected back
+        resp = c.get(
+            url_for(
+                "invenio_oauthclient.authorized",
+                remote_app="keycloak",
+                code="test",
+                state=get_state("keycloak"),
+            )
+        )
+
+        # note: because we provided an e-mail address in 'info_handler',
+        #       the user does not need to sign up
+        assert resp.status_code == 302
+        assert resp.location == "/account/settings/linkedaccounts/"
+
+        # check that the user has been created and confirmed
+        user = User.query.filter_by(email=example_keycloak["email"]).one()
+        assert user is not None
+        assert user.email == example_keycloak["email"]
+        assert user.user_profile["full_name"] == "Max Moser"
+        assert user.active
+        assert not user.confirmed_at
 
 
 def test_authorized_reject(app, example_keycloak_token):

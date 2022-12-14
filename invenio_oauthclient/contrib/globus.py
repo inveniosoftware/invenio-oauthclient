@@ -88,6 +88,7 @@ class GlobusOAuthSettingsHelper(OAuthSettingsHelper):
         base_url=None,
         app_key=None,
         precedence_mask=None,
+        signup_options=None,
     ):
         """Constructor."""
         super().__init__(
@@ -97,11 +98,10 @@ class GlobusOAuthSettingsHelper(OAuthSettingsHelper):
             app_key or "GLOBUS_APP_CREDENTIALS",
             request_token_params={"scope": "openid email profile"},
             precedence_mask=precedence_mask,
+            signup_options=signup_options,
         )
 
-    def get_handlers(self):
-        """Return Globus auth handlers."""
-        return dict(
+        self.handlers = dict(
             authorized_handler="invenio_oauthclient.handlers:authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.globus:disconnect_handler",
             signup_handler=dict(
@@ -111,9 +111,7 @@ class GlobusOAuthSettingsHelper(OAuthSettingsHelper):
             ),
         )
 
-    def get_rest_handlers(self):
-        """Return Globus auth REST handlers."""
-        return dict(
+        self.rest_handlers = dict(
             authorized_handler="invenio_oauthclient.handlers.rest:authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.globus:disconnect_rest_handler",
             signup_handler=dict(
@@ -127,6 +125,14 @@ class GlobusOAuthSettingsHelper(OAuthSettingsHelper):
             signup_redirect_url="/",
             error_redirect_url="/",
         )
+
+    def get_handlers(self):
+        """Return Globus auth handlers."""
+        return self.handlers
+
+    def get_rest_handlers(self):
+        """Return Globus auth REST handlers."""
+        return self.rest_handlers
 
     @property
     def user_info_url(self):
@@ -144,7 +150,7 @@ _globus_app = GlobusOAuthSettingsHelper()
 BASE_APP = _globus_app.base_app
 GLOBUS_USER_INFO_URL = _globus_app.user_info_url
 GLOBUS_USER_ID_URL = _globus_app.user_identity_url
-GLOBUS_EXTERNAL_METHOD = _globus_app.external_method
+GLOBUS_EXTERNAL_METHOD = GlobusOAuthSettingsHelper.external_method
 """Kept only for backward compat, they should not be used."""
 
 REMOTE_APP = _globus_app.remote_app
@@ -196,7 +202,22 @@ def get_user_id(remote, email):
         )
 
 
-def account_info(remote, resp):
+def default_info_serializer(remote, resp, user_info):
+    """Serialize the account info response object."""
+    return {
+        "user": {
+            "email": user_info["email"],
+            "profile": {
+                "username": user_info["username"],
+                "full_name": user_info["name"],
+            },
+        },
+        "external_id": get_user_id(remote, user_info["preferred_username"]),
+        "external_method": GlobusOAuthSettingsHelper.external_method,
+    }
+
+
+def account_info(remote, resp, info_serializer=default_info_serializer):
     """Retrieve remote account information used to find local user.
 
     It returns a dictionary with the following structure:
@@ -221,18 +242,11 @@ def account_info(remote, resp):
 
     :param remote: The remote application.
     :param resp: The response.
+    :param info_serializer: Func to serialize the info endpoint response.
     :returns: A dictionary with the user information.
     """
-    info = get_user_info(remote)
-
-    return {
-        "user": {
-            "email": info["email"],
-            "profile": {"username": info["username"], "full_name": info["name"]},
-        },
-        "external_id": get_user_id(remote, info["preferred_username"]),
-        "external_method": _globus_app.external_method,
-    }
+    user_info = get_user_info(remote)
+    return info_serializer(remote, resp, user_info)
 
 
 def account_setup(remote, token, resp):
@@ -251,7 +265,7 @@ def account_setup(remote, token, resp):
         # Create user <-> external id link.
         oauth_link_external_id(
             token.remote_account.user,
-            dict(id=user_id, method=_globus_app.external_method),
+            dict(id=user_id, method=GlobusOAuthSettingsHelper.external_method),
         )
 
 
@@ -271,12 +285,12 @@ def _disconnect(remote, *args, **kwargs):
     external_ids = [
         i.id
         for i in current_user.external_identifiers
-        if i.method == _globus_app.external_method
+        if i.method == GlobusOAuthSettingsHelper.external_method
     ]
 
     if external_ids:
         oauth_unlink_external_id(
-            dict(id=external_ids[0], method=_globus_app.external_method)
+            dict(id=external_ids[0], method=GlobusOAuthSettingsHelper.external_method)
         )
 
     if remote_account:
