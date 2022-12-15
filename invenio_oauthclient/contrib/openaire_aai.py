@@ -73,6 +73,7 @@ from flask import current_app, redirect, url_for
 from flask_login import current_user
 from invenio_db import db
 
+from invenio_oauthclient import current_oauthclient
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
@@ -82,8 +83,6 @@ from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_exter
 
 class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
     """Default configuration for OpenAIRE OAuth provider."""
-
-    external_method = "openaire_aai"
 
     def __init__(
         self,
@@ -109,21 +108,23 @@ class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
             signup_options=signup_options,
         )
 
-        self.handlers = dict(
+        self._handlers = dict(
             authorized_handler="invenio_oauthclient.handlers:authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.openaire_aai:disconnect_handler",
             signup_handler=dict(
                 info="invenio_oauthclient.contrib.openaire_aai:account_info",
+                info_serializer="invenio_oauthclient.contrib.openaire_aai:account_info_serializer",
                 setup="invenio_oauthclient.contrib.openaire_aai:account_setup",
                 view="invenio_oauthclient.handlers:signup_handler",
             ),
         )
 
-        self.rest_handlers = dict(
+        self._rest_handlers = dict(
             authorized_handler="invenio_oauthclient.handlers.rest:authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.openaire_aai:disconnect_rest_handler",
             signup_handler=dict(
                 info="invenio_oauthclient.contrib.openaire_aai:account_info",
+                info_serializer="invenio_oauthclient.contrib.openaire_aai:account_info_serializer",
                 setup="invenio_oauthclient.contrib.openaire_aai:account_setup",
                 view="invenio_oauthclient.handlers.rest:signup_handler",
             ),
@@ -141,11 +142,11 @@ class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
 
     def get_handlers(self):
         """Return OpenAIRE auth handlers."""
-        return self.handlers
+        return self._handlers
 
     def get_rest_handlers(self):
         """Return OpenAIRE auth REST handlers."""
-        return self.rest_handlers
+        return self._rest_handlers
 
 
 # Production
@@ -191,11 +192,17 @@ OAUTHCLIENT_OPENAIRE_AAI_JWT_DECODE_PARAMS = dict(
 """OpenAIRE AAI JWT decoding parameters."""
 
 
-def default_info_serializer(remote, resp, user_info):
-    """Serialize the account info response object."""
+def account_info_serializer(remote, resp, user_info, **kwargs):
+    """Serialize the account info response object.
+
+    :param remote: The remote application.
+    :param resp: The response of the `authorized` endpoint.
+    :param user_info: The response of the `user info` endpoint.
+    :returns: A dictionary with serialized user information.
+    """
     return {
         "external_id": user_info["sub"],
-        "external_method": OpenAIREAuthSettingsHelper.external_method,
+        "external_method": remote.name,
         "user": {
             "profile": {
                 "full_name": user_info.get("name"),
@@ -205,7 +212,7 @@ def default_info_serializer(remote, resp, user_info):
     }
 
 
-def account_info(remote, resp, info_serializer=default_info_serializer):
+def account_info(remote, resp):
     """Retrieve remote account information used to find local user.
 
     It returns a dictionary with the following structure:
@@ -224,13 +231,15 @@ def account_info(remote, resp, info_serializer=default_info_serializer):
         }
 
     :param remote: The remote application.
-    :param resp: The response.
-    :param info_serializer: Func to serialize the info endpoint response.
+    :param resp: The response of the `authorized` endpoint.
     :returns: A dictionary with the user information.
     """
     user_info_url = f"{remote.base_url}/oidc/userinfo"
     user_info = remote.get(user_info_url).data
-    return info_serializer(remote, resp, user_info)
+
+    handlers = current_oauthclient.signup_handlers[remote.name]
+    # `remote` param automatically injected via `make_handler` helper
+    return handlers["info_serializer"](resp, user_info)
 
 
 @require_more_than_one_external_account
@@ -246,15 +255,11 @@ def _disconnect(remote, *args, **kwargs):
         user_id=current_user.get_id(), client_id=remote.consumer_key
     )
     external_ids = [
-        i.id
-        for i in current_user.external_identifiers
-        if i.method == OpenAIREAuthSettingsHelper.external_method
+        i.id for i in current_user.external_identifiers if i.method == remote.name
     ]
 
     if external_ids:
-        oauth_unlink_external_id(
-            dict(id=external_ids[0], method=OpenAIREAuthSettingsHelper.external_method)
-        )
+        oauth_unlink_external_id(dict(id=external_ids[0], method=remote.name))
     if remote_account:
         with db.session.begin_nested():
             remote_account.delete()
@@ -305,5 +310,5 @@ def account_setup(remote, token, resp):
         # Create user <-> external id link.
         oauth_link_external_id(
             user,
-            {"id": openaire_id, "method": OpenAIREAuthSettingsHelper.external_method},
+            {"id": openaire_id, "method": remote.name},
         )

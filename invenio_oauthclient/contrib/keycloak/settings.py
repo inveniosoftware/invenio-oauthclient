@@ -59,21 +59,23 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
             **kwargs
         )
 
-        self.handlers = dict(
+        self._handlers = dict(
             authorized_handler="invenio_oauthclient.handlers:authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.keycloak.handlers:disconnect_handler",
             signup_handler=dict(
                 info="invenio_oauthclient.contrib.keycloak.handlers:info_handler",
+                info_serializer="invenio_oauthclient.contrib.keycloak.handlers:info_serializer_handler",
                 setup="invenio_oauthclient.contrib.keycloak.handlers:setup_handler",
                 view="invenio_oauthclient.handlers:signup_handler",
             ),
         )
 
-        self.rest_handlers = dict(
+        self._rest_handlers = dict(
             authorized_handler="invenio_oauthclient.handlers.rest:authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.keycloak.handlers:disconnect_rest_handler",
             signup_handler=dict(
                 info="invenio_oauthclient.contrib.keycloak.handlers:info_handler",
+                info_serializer="invenio_oauthclient.contrib.keycloak.handlers:info_serializer_handler",
                 setup="invenio_oauthclient.contrib.keycloak.handlers:setup_handler",
                 view="invenio_oauthclient.handlers.rest:signup_handler",
             ),
@@ -107,8 +109,8 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
 
     def get_handlers(self):
         """Return a dict with the auth handlers."""
-        return self.handlers
+        return self._handlers
 
     def get_rest_handlers(self):
         """Return a dict with the auth REST handlers."""
-        return self.rest_handlers
+        return self._rest_handlers

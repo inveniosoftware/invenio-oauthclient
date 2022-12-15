@@ -75,6 +75,7 @@ from flask import current_app, redirect, url_for
 from flask_login import current_user
 from invenio_db import db
 
+from invenio_oauthclient import current_oauthclient
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
@@ -84,8 +85,6 @@ from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_exter
 
 class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
     """Default configuration for ORCID OAuth provider."""
-
-    external_method = "orcid"
 
     def __init__(
         self,
@@ -122,21 +121,23 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
             signup_options=signup_options,
         )
 
-        self.handlers = dict(
+        self._handlers = dict(
             authorized_handler="invenio_oauthclient.handlers:authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.orcid:disconnect_handler",
             signup_handler=dict(
                 info="invenio_oauthclient.contrib.orcid:account_info",
+                info_serializer="invenio_oauthclient.contrib.orcid:account_info_serializer",
                 setup="invenio_oauthclient.contrib.orcid:account_setup",
                 view="invenio_oauthclient.handlers:signup_handler",
             ),
         )
 
-        self.rest_handlers = dict(
+        self._rest_handlers = dict(
             authorized_handler="invenio_oauthclient.handlers.rest:authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.contrib.orcid:disconnect_rest_handler",
             signup_handler=dict(
                 info="invenio_oauthclient.contrib.orcid:account_info",
+                info_serializer="invenio_oauthclient.contrib.orcid:account_info_serializer",
                 setup="invenio_oauthclient.contrib.orcid:account_setup",
                 view="invenio_oauthclient.handlers.rest:signup_handler",
             ),
@@ -149,11 +150,11 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
 
     def get_handlers(self):
         """Return ORCID auth handlers."""
-        return self.handlers
+        return self._handlers
 
     def get_rest_handlers(self):
         """Return ORCID auth REST handlers."""
-        return self.rest_handlers
+        return self._rest_handlers
 
 
 _orcid_app = ORCIDOAuthSettingsHelper()
@@ -194,11 +195,16 @@ REMOTE_SANDBOX_MEMBER_APP = _orcid_sandbox_member_app.remote_app
 """ORCID sandbox member API."""
 
 
-def default_info_serializer(remote, resp):
-    """Serialize the account info response object."""
+def account_info_serializer(remote, resp, **kwargs):
+    """Serialize the account info response object.
+
+    :param remote: The remote application.
+    :param resp: The response of the `authorized` endpoint.
+    :returns: A dictionary with serialized user information.
+    """
     return {
         "external_id": resp.get("orcid"),
-        "external_method": ORCIDOAuthSettingsHelper.external_method,
+        "external_method": remote.name,
         "user": {
             "profile": {
                 "full_name": resp.get("name"),
@@ -207,7 +213,7 @@ def default_info_serializer(remote, resp):
     }
 
 
-def account_info(remote, resp, info_serializer=default_info_serializer):
+def account_info(remote, resp):
     """Retrieve remote account information used to find local user.
 
     It returns a dictionary with the following structure:
@@ -225,11 +231,12 @@ def account_info(remote, resp, info_serializer=default_info_serializer):
         }
 
     :param remote: The remote application.
-    :param resp: The response.
-    :param info_serializer: Func to serialize the info endpoint response.
+    :param resp: The response of the `authorized` endpoint.
     :returns: A dictionary with the user information.
     """
-    return info_serializer(remote, resp)
+    handlers = current_oauthclient.signup_handlers[remote.name]
+    # `remote` param automatically injected via `make_handler` helper
+    return handlers["info_serializer"](resp)
 
 
 @require_more_than_one_external_account

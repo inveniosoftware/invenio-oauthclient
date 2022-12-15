@@ -36,6 +36,7 @@ from flask import current_app, redirect, url_for
 from flask_login import current_user
 from invenio_db import db
 
+from invenio_oauthclient import current_oauthclient
 from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
@@ -44,8 +45,14 @@ from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_exter
 from .helpers import get_user_info
 
 
-def default_info_serializer(remote, resp, user_info):
-    """Serialize the account info response object."""
+def info_serializer_handler(remote, resp, user_info, **kwargs):
+    """Serialize the account info response object.
+
+    :param remote: The remote application.
+    :param resp: The response of the `authorized` endpoint.
+    :param user_info: The response of the `user info` endpoint.
+    :returns: A dictionary with serialized user information.
+    """
     # fill out the information required by
     # 'invenio-accounts' and 'invenio-userprofiles'.
     #
@@ -65,16 +72,18 @@ def default_info_serializer(remote, resp, user_info):
     }
 
 
-def info_handler(remote, resp, info_serializer=default_info_serializer):
+def info_handler(remote, resp):
     """Retrieve remote account information for finding matching local users.
 
     :param remote: The remote application.
-    :param resp: The response.
-    :param info_serializer: Func to serialize the info endpoint response.
+    :param resp: The response of the `authorized` endpoint.
     :returns: A dictionary with the user information.
     """
     user_info = get_user_info(remote, resp)
-    return info_serializer(remote, resp, user_info)
+
+    handlers = current_oauthclient.signup_handlers[remote.name]
+    # `remote` param automatically injected via `make_handler` helper
+    return handlers["info_serializer"](resp, user_info)
 
 
 def setup_handler(remote, token, resp):
