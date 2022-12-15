@@ -78,6 +78,7 @@ class OAuthSettingsHelper:
             disconnect_handler='path_to_method_authorized_disconnect_handler',
         signup_handler=dict(
             info='path_to_method_account_info',
+            info_serializer='path_to_method_account_info_serializer',
             setup='path_to_method_account_setup',
             view='path_to_method_signup_form_handler',
         )
@@ -100,6 +101,7 @@ class OAuthSettingsHelper:
             disconnect_handler='path_to_method_disconnect_rest_handler',
             signup_handler=dict(
                 info='path_to_method_account_info',
+                info_serializer='path_to_method_account_info_serializer',
                 setup='path_to_method_account_setup',
                 view='path_to_method_signup_form_handler',
             ),
