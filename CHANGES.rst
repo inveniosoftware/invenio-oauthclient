@@ -1,6 +1,6 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015-2021 CERN.
+    Copyright (C) 2015-2022 CERN.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
@@ -8,7 +8,15 @@
 Changes
 =======
 
-Version 2.0.0 (released 2022-07-01)
+Version 2.1.0 (released 2022-12-19)
+
+- Increase minimal Python version to 3.7.
+- Deprecate the old CERN OAuth contrib.
+- Allow specific sign-up settings per OAuth app.
+- Add signup `info_serialize` handler to allow serializing the
+  user info response.
+
+Version 2.0.1 (released 2022-07-01)
 
 - Remove Babel extension.
 - Add german translations.
