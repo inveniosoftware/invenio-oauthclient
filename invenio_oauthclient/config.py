@@ -134,6 +134,21 @@ WARNING: Allowing users to specify their email address arbitrarily
 security implications, as the linking of external accounts with
 accounts in Invenio is done by matching email addresses!
 
+Note on the ``signup_options``:
+
+This parameter accepts a dictionary with `auto_confirm` and `send_register_msg`
+boolean values.
+
+When `auto_confirm` is set to `True` (default), the user, after the first login, will
+be automatically confirmed and will not receive an e-mail with a link to confirm
+the account. This is the common behaviour normally expected when authentication
+happens via an external provider. The only exception is the ORCID contribution,
+given that the e-mail is input by the user (and therefor should be confirmed).
+
+The `send_register_msg` allows to set if the welcome e-mail, after the first login,
+should be sent. Normally, it should be disabled when using OAuth. `False` by
+default.
+
 
 Remote REST application
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -160,6 +175,7 @@ same keys as Remote application in addition to:
             disconnect_handler="...",
             signup_handler=dict(
                 info="...",
+                info_serializer="...",
                 setup="...",
                 view="...",
             ),
@@ -256,6 +272,7 @@ a given authorize request.
             )
             signup_handler=dict(
                 info="invenio_oauthclient.contrib.orcid:account_info",
+                info_serializer="invenio_oauthclient.contrib.orcid:account_info_serializer",
                 setup="invenio_oauthclient.contrib.orcid:account_setup",
                 view="invenio_oauthclient.handlers:signup_handler",
             ),
