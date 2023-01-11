@@ -12,10 +12,10 @@ from operator import itemgetter
 
 import six
 from flask import Blueprint, current_app, render_template, request
-from flask_babelex import lazy_gettext as _
 from flask_breadcrumbs import register_breadcrumb
 from flask_login import current_user, login_required
 from flask_menu import register_menu
+from invenio_i18n import lazy_gettext as _
 from invenio_theme.proxies import current_theme_icons
 from speaklater import make_lazy_string
 

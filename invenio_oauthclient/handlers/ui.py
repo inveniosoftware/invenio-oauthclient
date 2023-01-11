@@ -11,8 +11,8 @@
 from functools import partial, wraps
 
 from flask import current_app, flash, redirect, render_template, request, url_for
-from flask_babelex import gettext as _
 from invenio_db import db
+from invenio_i18n import gettext as _
 
 from ..errors import (
     AlreadyLinkedError,

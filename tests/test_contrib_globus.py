@@ -180,7 +180,6 @@ def test_authorized_already_authenticated(app, models_fixture, example_globus):
         return "Logged In"
 
     with app.test_client() as client:
-
         # make a fake login (using my login function)
         client.get("/foo_login", follow_redirects=True)
         # Ensure remote apps have been loaded (due to before first request)
@@ -277,7 +276,6 @@ def test_bad_provider_response(app, example_globus):
 
 def test_invalid_user_id_response(app, example_globus):
     with app.test_client() as c:
-
         # User login with email 'info'
         ioc = app.extensions["oauthlib.client"]
 

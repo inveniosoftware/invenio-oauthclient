@@ -285,7 +285,6 @@ def test_authorized_already_authenticated(app, models_fixture, example_github):
         MockLogin.return_value = MockGh(email="info@inveniosoftware.org")
 
         with app.test_client() as client:
-
             # make a fake login (using my login function)
             client.get("/foo_login", follow_redirects=True)
 
