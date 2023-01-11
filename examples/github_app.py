@@ -73,12 +73,12 @@ SPHINX-END
 import os
 
 from flask import Flask, redirect, url_for
-from flask_babelex import Babel
 from flask_login import current_user
 from flask_menu import Menu as FlaskMenu
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_user
 from invenio_db import InvenioDB
+from invenio_i18n import Babel
 from invenio_mail import InvenioMail
 from invenio_userprofiles import InvenioUserProfiles
 from invenio_userprofiles.views import blueprint_ui_init as blueprint_userprofile_init

@@ -139,7 +139,6 @@ from datetime import datetime, timedelta
 from warnings import warn
 
 from flask import Blueprint, current_app, flash, g, redirect, session, url_for
-from flask_babelex import gettext as _
 from flask_login import current_user
 from flask_principal import (
     AnonymousIdentity,
@@ -149,6 +148,7 @@ from flask_principal import (
     identity_loaded,
 )
 from invenio_db import db
+from invenio_i18n import gettext as _
 
 from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
 from invenio_oauthclient.handlers.rest import response_handler

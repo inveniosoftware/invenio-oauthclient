@@ -35,12 +35,12 @@ To be able to uninstall the example app:
 import os
 
 from flask import Flask
-from flask_babelex import Babel
 from flask_menu import Menu
 from invenio_accounts import InvenioAccounts
 from invenio_accounts.views import blueprint as blueprint_accounts
 from invenio_admin import InvenioAdmin
 from invenio_db import InvenioDB
+from invenio_i18n import Babel
 
 from invenio_oauthclient import InvenioOAuthClient
 from invenio_oauthclient.views.client import blueprint as blueprint_client
