@@ -20,7 +20,7 @@ from flask_mail import Mail
 from flask_menu import Menu as FlaskMenu
 from invenio_accounts import InvenioAccounts
 from invenio_db import InvenioDB, db
-from invenio_i18n import Babel
+from invenio_i18n import Babel, InvenioI18N
 from invenio_userprofiles import InvenioUserProfiles
 from invenio_userprofiles.views import blueprint_ui_init
 from sqlalchemy_utils.functions import create_database, database_exists, drop_database
@@ -144,6 +144,7 @@ def base_app(request):
     Mail(base_app)
     InvenioDB(base_app)
     InvenioAccounts(base_app)
+    InvenioI18N(base_app)
 
     with base_app.app_context():
         if str(db.engine.url) != "sqlite://" and not database_exists(

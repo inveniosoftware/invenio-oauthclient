@@ -10,8 +10,9 @@
 
 from flask import current_app, session
 from flask_login import current_user
+from invenio_accounts.models import Role
+from invenio_accounts.proxies import current_datastore
 from invenio_db import db
-from pkg_resources import require
 
 from ..errors import (
     OAuthClientAlreadyAuthorized,
@@ -46,6 +47,56 @@ from .utils import (
 )
 
 
+def _role_needs_update(role_obj, new_role_dict):
+    """Checks if role needs to be updated."""
+    if role_obj.name != new_role_dict.get(
+        "name"
+    ) or role_obj.description != new_role_dict.get("description"):
+        return True
+    return False
+
+
+def create_or_update_groups(account_groups):
+    """Creates the roles based on the groups provided."""
+    roles_id = []
+    for group in account_groups:
+        existing_role = current_datastore.find_role_by_id(group["id"])
+        if existing_role and existing_role.is_managed:
+            current_app.logger.exception(
+                f'Error while syncing roles: A managed role with id: ${group["id"]} already exists'
+            )
+            continue
+        existing_role_by_name = current_datastore.find_role(group["name"])
+        if existing_role_by_name and existing_role_by_name.is_managed:
+            current_app.logger.exception(
+                f'Error while syncing roles: A managed role with name: ${group["name"]} already exists'
+            )
+            continue
+        if not existing_role:
+            role = current_datastore.create_role(
+                id=group["id"],
+                name=group.get("name"),
+                description=group.get("description"),
+                is_managed=False,
+            )
+            roles_id.append(role.id)
+        elif existing_role and _role_needs_update(existing_role, group):
+            role_to_update = Role(
+                id=group["id"],
+                name=group.get("name"),
+                description=group.get("description"),
+                is_managed=False,
+            )
+            role = current_datastore.update_role(role_to_update)
+            roles_id.append(role.id)
+        else:
+            roles_id.append(existing_role.id)
+
+    current_datastore.commit()
+
+    return roles_id
+
+
 #
 # Handlers
 #
@@ -53,7 +104,7 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
     """Handle sign-in/up functionality.
 
     :param remote: The remote application.
-    :param resp: The response.
+    :param resp: The response of the `authorized` endpoint.
     :returns: Redirect response.
     """
     # Remove any previously stored auto register session key
@@ -65,11 +116,12 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
     # current_user.is_authenticated().
     token = response_token_setter(remote, resp)
     handlers = current_oauthclient.signup_handlers[remote.name]
-
-    # Sign-in/up user
-    # ---------------
+    # Needed for tests
     if not current_user.is_authenticated:
+        # Sign-in/up user
+        # ---------------
         account_info = handlers["info"](resp)
+        assert "external_id" in account_info
         account_info_received.send(
             remote, token=token, response=resp, account_info=account_info
         )
@@ -103,7 +155,15 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
                 db.session.commit()
                 raise OAuthClientMustRedirectSignup()
 
-        # Authenticate user
+        group_handler = handlers.get("groups")
+        if group_handler:
+            account_groups = group_handler(resp)
+            if account_groups:
+                roles_id = create_or_update_groups(account_groups)
+                # We set the unmanaged groups in the session because they are not linked to the user in the DB
+                session["_unmanaged_groups"] = roles_id
+
+        # Authenticate user after the unmanaged groups where set in the session
         if not oauth_authenticate(
             remote.consumer_key, user, require_existing_link=False
         ):
@@ -219,7 +279,7 @@ def base_signup_handler(remote, form, *args, **kwargs):
             # Registration has been finished
             db.session.commit()
 
-        # Authenticate the user
+        # Authenticate user
         if not oauth_authenticate(
             remote.consumer_key, user, require_existing_link=False
         ):

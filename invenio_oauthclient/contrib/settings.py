@@ -79,6 +79,8 @@ class OAuthSettingsHelper:
         signup_handler=dict(
             info='path_to_method_account_info',
             info_serializer='path_to_method_account_info_serializer',
+            groups="path_to_method_account_groups_handler",
+            groups_serializer="path_to_method_account_groups_serializer_handler",
             setup='path_to_method_account_setup',
             view='path_to_method_signup_form_handler',
         )
@@ -104,6 +106,8 @@ class OAuthSettingsHelper:
                 info_serializer='path_to_method_account_info_serializer',
                 setup='path_to_method_account_setup',
                 view='path_to_method_signup_form_handler',
+                groups="path_to_method_account_groups_handler",
+                groups_serializer="path_to_method_account_groups_serializer_handler",
             ),
             response_handler=(
                 'path_to_method_response_handler'

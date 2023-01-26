@@ -71,6 +71,8 @@ keys:
                 info="...",
                 setup="...",
                 view="...",
+                groups="...",
+                groups_serializer="...",
             ),
             precedence_mask=dict(
                 email=True
@@ -178,6 +180,8 @@ same keys as Remote application in addition to:
                 info_serializer="...",
                 setup="...",
                 view="...",
+                groups="...",
+                groups_serializer="...",
             ),
             response_handler=("..."),
             authorized_redirect_url="...",
@@ -275,6 +279,8 @@ a given authorize request.
                 info_serializer="invenio_oauthclient.contrib.orcid:account_info_serializer",
                 setup="invenio_oauthclient.contrib.orcid:account_setup",
                 view="invenio_oauthclient.handlers:signup_handler",
+                groups="invenio_oauthclient.handlers:signup_handler",
+                groups_serializer="invenio_oauthclient.handlers:groups_serializer",
             ),
             # ...
         )
