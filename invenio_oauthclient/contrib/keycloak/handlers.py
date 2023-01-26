@@ -86,6 +86,27 @@ def info_handler(remote, resp):
     return handlers["info_serializer"](resp, user_info)
 
 
+def groups_serializer_handler(remote, resp, user, groups, **kwargs):
+    """."""
+    return [{
+        "id": "my-id",
+        "name": "Group name",
+        "description": "Group description",
+    }]
+
+
+def groups_handler(remote, resp, user):
+    """."""
+    groups = [{
+        "id": "my-id",
+        "name": "Group name",
+        "description": "Group description",
+    }]
+    handlers = current_oauthclient.signup_handlers[remote.name]
+    # `remote` param automatically injected via `make_handler` helper
+    return handlers["groups_serializer"](resp, user, groups)
+
+
 def setup_handler(remote, token, resp):
     """Perform additional setup after the user has been logged in."""
     user_info = get_user_info(remote, resp)

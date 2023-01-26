@@ -53,7 +53,7 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
     """Handle sign-in/up functionality.
 
     :param remote: The remote application.
-    :param resp: The response.
+    :param resp: The response of the `authorized` endpoint.
     :returns: Redirect response.
     """
     # Remove any previously stored auto register session key
@@ -68,40 +68,47 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
 
     # Sign-in/up user
     # ---------------
-    if not current_user.is_authenticated:
-        account_info = handlers["info"](resp)
-        account_info_received.send(
-            remote, token=token, response=resp, account_info=account_info
+    account_info = handlers["info"](resp)
+    #### TODO make sure and document that all info returns external_id
+    assert "external_id" in account_info
+    account_info_received.send(
+        remote, token=token, response=resp, account_info=account_info
+    )
+
+    user = oauth_get_user(
+        remote.consumer_key,
+        account_info=account_info,
+        access_token=token_getter(remote)[0],
+    )
+
+    if user is None:
+        # Auto sign-up if user not found
+        form = create_csrf_disabled_registrationform(remote)
+        form = fill_form(form, account_info["user"])
+        remote_app = current_app.config["OAUTHCLIENT_REMOTE_APPS"][remote.name]
+        precedence_mask = remote_app.get("precedence_mask")
+        signup_options = remote_app.get("signup_options")
+        user = oauth_register(
+            form,
+            account_info["user"],
+            precedence_mask=precedence_mask,
+            signup_options=signup_options,
         )
 
-        user = oauth_get_user(
-            remote.consumer_key,
-            account_info=account_info,
-            access_token=token_getter(remote)[0],
-        )
-
+        # if registration fails ...
         if user is None:
-            # Auto sign-up if user not found
-            form = create_csrf_disabled_registrationform(remote)
-            form = fill_form(form, account_info["user"])
-            remote_app = current_app.config["OAUTHCLIENT_REMOTE_APPS"][remote.name]
-            precedence_mask = remote_app.get("precedence_mask")
-            signup_options = remote_app.get("signup_options")
-            user = oauth_register(
-                form,
-                account_info["user"],
-                precedence_mask=precedence_mask,
-                signup_options=signup_options,
-            )
+            # requires extra information
+            session[token_session_key(remote.name) + "_autoregister"] = True
+            session[token_session_key(remote.name) + "_account_info"] = account_info
+            session[token_session_key(remote.name) + "_response"] = resp
+            db.session.commit()
+            raise OAuthClientMustRedirectSignup()
 
-            # if registration fails ...
-            if user is None:
-                # requires extra information
-                session[token_session_key(remote.name) + "_autoregister"] = True
-                session[token_session_key(remote.name) + "_account_info"] = account_info
-                session[token_session_key(remote.name) + "_response"] = resp
-                db.session.commit()
-                raise OAuthClientMustRedirectSignup()
+    if requires_confirmation(user):
+        ###### TODO
+        #### redirect to the login page saying that you need to confirm it should exists
+    else:
+        groups = handlers["groups"](resp, user)
 
         # Authenticate user
         if not oauth_authenticate(
@@ -109,15 +116,16 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
         ):
             raise OAuthClientUnAuthorized()
 
-        # Link account
-        # ------------
-        # Need to store token in database instead of only the session when
-        # called first time.
-        token = response_token_setter(remote, resp)
+    # Link account
+    # ------------
+    # Need to store token in database instead of only the session when
+    # called first time.
+    token = response_token_setter(remote, resp)
 
     # Setup account
     # -------------
-    if not token.remote_account.extra_data:
+    ##### TODO inject raw response account info in the setup handler
+    if not oauth_is_external_id_linked(external_id)
         account_setup = handlers["setup"](token, resp)
         account_setup_received.send(
             remote, token=token, response=resp, account_setup=account_setup
@@ -219,11 +227,20 @@ def base_signup_handler(remote, form, *args, **kwargs):
             # Registration has been finished
             db.session.commit()
 
-        # Authenticate the user
-        if not oauth_authenticate(
-            remote.consumer_key, user, require_existing_link=False
-        ):
-            raise OAuthClientUnAuthorized()
+
+
+        if requires_confirmation(user):
+            ###### TODO
+            #### redirect to the login page saying that you need to confirm it should exists
+        else:
+            # Authenticate user
+            if not oauth_authenticate(
+                remote.consumer_key, user, require_existing_link=False
+            ):
+                raise OAuthClientUnAuthorized()
+
+
+
 
         # Remove account info from session
         session.pop(session_prefix + "_account_info", None)
