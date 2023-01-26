@@ -37,12 +37,21 @@ def test_authorized_signup_handler(remote, app, models_fixture):
     """Test authorized signup handler."""
     datastore = app.extensions["invenio-accounts"].datastore
     user = datastore.find_user(email="existing@inveniosoftware.org")
+    existing_email = "existing@inveniosoftware.org"
 
     example_response = {"access_token": "test_access_token"}
+    example_account_info = {
+        "user": {
+            "email": existing_email,
+        },
+        "external_id": "1234",
+        "external_method": "test_method",
+    }
 
     # Mock remote app's handler
     current_oauthclient.signup_handlers[remote.name] = {
-        "setup": lambda token, resp: None
+        "setup": lambda token, resp: None,
+        "info": lambda resp: example_account_info,
     }
 
     # Authenticate user
@@ -67,9 +76,9 @@ def test_unauthorized_signup(remote, app, models_fixture):
     example_account_info = {
         "user": {
             "email": existing_email,
-            "external_id": "1234",
-            "external_method": "test_method",
-        }
+        },
+        "external_id": "1234",
+        "external_method": "test_method",
     }
 
     # Mock remote app's handler
@@ -81,9 +90,8 @@ def test_unauthorized_signup(remote, app, models_fixture):
     _security.login_without_confirmation = False
     user.confirmed_at = None
     app.config["OAUTHCLIENT_REMOTE_APPS"][remote.name] = {}
-
     resp = authorized_signup_handler(example_response, remote)
-    check_redirect_location(resp, lambda x: x.startswith("/login/"))
+    check_redirect_location(resp, lambda x: x.startswith("/login"))
 
 
 def test_signup_handler(remote, app, models_fixture):

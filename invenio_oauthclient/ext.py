@@ -112,6 +112,14 @@ class _OAuthClientState(object):
                 remote,
                 with_response=False,
             )
+            account_groups_handler = handlers.make_handler(
+                signup_handler.get("groups", dummy_handler), remote, with_response=False
+            )
+            account_groups_serializer_handler = handlers.make_handler(
+                signup_handler.get("groups_serializer", dummy_handler),
+                remote,
+                with_response=False,
+            )
             account_setup_handler = handlers.make_handler(
                 signup_handler.get("setup", dummy_handler), remote, with_response=False
             )
@@ -122,6 +130,8 @@ class _OAuthClientState(object):
             self.signup_handlers[remote_app] = dict(
                 info=account_info_handler,
                 info_serializer=account_info_serializer_handler,
+                groups=account_groups_handler,
+                groups_serializer=account_groups_serializer_handler,
                 setup=account_setup_handler,
                 view=account_view_handler,
             )

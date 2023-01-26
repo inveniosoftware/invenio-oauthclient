@@ -15,6 +15,7 @@ from flask_oauthlib.client import OAuth as FlaskOAuth
 from flask_security import login_user, logout_user
 from flask_security.confirmable import _security
 from helpers import check_response_redirect_url_args
+from invenio_accounts.models import Role
 from werkzeug.routing import BuildError
 
 from invenio_oauthclient import InvenioOAuthClientREST, current_oauthclient
@@ -72,6 +73,49 @@ def test_authorized_signup_handler(remote, app_rest, models_fixture):
 
 
 @pytest.mark.parametrize("remote", REMOTE_APPS, indirect=["remote"])
+def test_group_handler(remote, app_rest, models_fixture):
+    """Test group handler."""
+    datastore = app_rest.extensions["invenio-accounts"].datastore
+    existing_email = "existing@inveniosoftware.org"
+    user = datastore.find_user(email=existing_email)
+    example_group = [
+        {
+            "id": "rdm-developers",
+            "name": "rdm-developers",
+            "description": "People contributing to RDM.",
+        }
+    ]
+
+    example_response = {"access_token": "test_access_token"}
+    example_account_info = {
+        "user": {
+            "email": existing_email,
+        },
+        "external_id": "1234",
+        "external_method": "test_method",
+    }
+
+    # Mock remote app's handler
+    current_oauthclient.signup_handlers[remote.name] = {
+        "info": lambda resp: example_account_info,
+        "groups": lambda resp: example_group,
+    }
+
+    _security.confirmable = True
+    _security.login_without_confirmation = False
+    user.confirmed_at = None
+
+    authorized_signup_handler(example_response, remote)
+
+    # Assert that the group handler works correctly
+    roles = Role.query.all()
+    assert 1 == len(roles)
+    assert roles[0].id == example_group[0]["id"]
+    assert roles[0].name == example_group[0]["name"]
+    assert roles[0].description == example_group[0]["description"]
+
+
+@pytest.mark.parametrize("remote", REMOTE_APPS, indirect=["remote"])
 def test_unauthorized_signup(remote, app_rest, models_fixture):
     """Test unauthorized redirect on signup callback handler."""
     datastore = app_rest.extensions["invenio-accounts"].datastore
@@ -82,9 +126,9 @@ def test_unauthorized_signup(remote, app_rest, models_fixture):
     example_account_info = {
         "user": {
             "email": existing_email,
-            "external_id": "1234",
-            "external_method": "test_method",
-        }
+        },
+        "external_id": "1234",
+        "external_method": "test_method",
     }
 
     # Mock remote app's handler
