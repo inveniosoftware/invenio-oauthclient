@@ -206,7 +206,6 @@ def test_authorized_already_authenticated(
         return "Logged In"
 
     with app.test_client() as client:
-
         # make a fake login (using my login function)
         client.get("/foo_login", follow_redirects=True)
 

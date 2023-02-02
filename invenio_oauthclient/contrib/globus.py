@@ -270,7 +270,6 @@ def account_setup(remote, token, resp):
     info = get_user_info(remote)
     user_id = get_user_id(remote, info["preferred_username"])
     with db.session.begin_nested():
-
         token.remote_account.extra_data = {"login": info["username"], "id": user_id}
 
         # Create user <-> external id link.

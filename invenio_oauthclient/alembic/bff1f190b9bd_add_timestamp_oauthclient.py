@@ -49,7 +49,6 @@ def downgrade():
 
 
 def _add_created_updated_columns(table, date):
-
     params = {"date": date}
 
     op.add_column(table, sa.Column("created", sa.DateTime()))
