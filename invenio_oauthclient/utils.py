@@ -295,7 +295,7 @@ def fill_form(form, data):
     :param data: The data to insert in the form.
     :returns: A pre-filled form.
     """
-    for (key, value) in data.items():
+    for key, value in data.items():
         if hasattr(form, key):
             field = getattr(form, key)
             if isinstance(value, dict):

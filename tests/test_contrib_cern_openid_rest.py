@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2016-2018 CERN.
+# Copyright (C) 2016-2023 CERN.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -281,6 +281,12 @@ def test_identity_changed(app_rest, example_cern_openid_rest, models_fixture):
 
             assert current_user.login_via_oauth2
 
+            # 3 needs:
+            # {
+            #   Need(method='id', value=4),
+            #   Need(method='role', value='cern_user'),
+            #   Need(method='id', value='john.doe@cern.ch')
+            # }
             assert len(g.identity.provides) == 3
             logout_user()
 
@@ -290,7 +296,11 @@ def test_identity_changed(app_rest, example_cern_openid_rest, models_fixture):
             # login the user again
             login_user(user)
 
-            # check that the roles are not refreshed from provider
+            # 2 needs:
+            # {
+            #   Need(method='id', value=4),
+            #   Need(method='role', value='cern_user'),
+            # }
             assert len(g.identity.provides) == 2
             logout_user()
 
