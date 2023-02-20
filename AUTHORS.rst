@@ -14,6 +14,7 @@ Contributors
 - Diego Rodriguez
 - Dinika Saxena
 - Dinos Kousidis
+- Domenic Gosein
 - Harri Hirvonsalo
 - Harris Tzovanakis
 - Ioannis Tsanaktsidis
