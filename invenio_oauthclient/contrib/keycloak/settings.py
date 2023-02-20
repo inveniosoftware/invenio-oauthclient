@@ -30,7 +30,7 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
     """
 
     def __init__(
-        self, title, description, base_url, realm, app_key=None, icon=None, **kwargs
+        self, title, description, base_url, realm=None, app_key=None, icon=None, **kwargs
     ):
         """The constructor takes two arguments.
 
@@ -41,7 +41,10 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
         app_key = app_key or "KEYCLOAK_APP_CREDENTIALS"
         base_url = "{}/".format(base_url.rstrip("/"))  # add leading `/`
 
-        self._realm_url = "{}auth/realms/{}".format(base_url, realm)
+        if realm is None:
+            self._realm_url = base_url.rstrip("/")
+        else:
+            self._realm_url = "{}auth/realms/{}".format(base_url, realm)
 
         access_token_url = self.make_url(self._realm_url, "token")
         authorize_url = self.make_url(self._realm_url, "auth")
