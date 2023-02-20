@@ -32,11 +32,16 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
     def __init__(
         self, title, base_url, no_url_modification=False, description=None, realm=None, app_key=None, icon=None, **kwargs
     ):
-        """The constructor takes two arguments.
-
+        """The constructor takes two required arguments, title and base_url. Addtionall parameters can be passed to the constructor to override the default values.
+        
+        :param title: The title of the client application
         :param base_url: The base URL on which Keycloak is running
                             (e.g. "http://localhost:8080")
+        :param no_url_modification: If True, the URL will only consist of the base URL and endpoint
+        :description: The description of the client application
         :param realm: Realm in which the invenio client application is defined
+        :param app_key: The key to use for the client application credentials
+        :param icon: The icon to use for the client application
         """
         app_key = app_key or "KEYCLOAK_APP_CREDENTIALS"
         base_url = "{}/".format(base_url.rstrip("/"))  # add leading `/`
