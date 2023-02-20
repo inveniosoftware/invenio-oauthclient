@@ -30,7 +30,7 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
     """
 
     def __init__(
-        self, title, base_url, description=None, realm=None, app_key=None, icon=None, **kwargs
+        self, title, base_url, no_url_modification=False, description=None, realm=None, app_key=None, icon=None, **kwargs
     ):
         """The constructor takes two arguments.
 
@@ -46,9 +46,9 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
         else:
             self._realm_url = "{}auth/realms/{}".format(base_url, realm)
 
-        access_token_url = self.make_url(self._realm_url, "token")
-        authorize_url = self.make_url(self._realm_url, "auth")
-        self._user_info_url = self.make_url(self._realm_url, "userinfo")
+        access_token_url = self.make_url(self._realm_url, "token", no_url_modification)
+        authorize_url = self.make_url(self._realm_url, "auth", no_url_modification)
+        self._user_info_url = self.make_url(self._realm_url, "userinfo", no_url_modification)
 
         super().__init__(
             title,
@@ -102,13 +102,16 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
         return self._realm_url
 
     @staticmethod
-    def make_url(realm_url, endpoint):
+    def make_url(realm_url, endpoint, no_url_modification):
         """Create an endpoint URL following the default Keycloak URL schema.
 
         :param realm_url: The realm base URL
         :param endpoint: The endpoint to use (e.g. "auth", "token", ...)
         """
-        return "{}/protocol/openid-connect/{}".format(realm_url, endpoint)
+        if no_url_modification is False:
+            return "{}/protocol/openid-connect/{}".format(realm_url, endpoint)
+        else:
+            return"{}/{}".format(realm_url, endpoint)
 
     def get_handlers(self):
         """Return a dict with the auth handlers."""
