@@ -103,10 +103,11 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
 
     @staticmethod
     def make_url(realm_url, endpoint, no_url_modification):
-        """Create an endpoint URL following the default Keycloak URL schema.
-
+        """Create an endpoint URL following the default Keycloak URL schema, with the option to disable URL modification and only use the base URL and endpoint.
+        
         :param realm_url: The realm base URL
         :param endpoint: The endpoint to use (e.g. "auth", "token", ...)
+        :param no_url_modification: If True, the URL will only consist of the base URL and endpoint
         """
         if no_url_modification is False:
             return "{}/protocol/openid-connect/{}".format(realm_url, endpoint)
