@@ -30,7 +30,7 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
     """
 
     def __init__(
-        self, title, description, base_url, realm=None, app_key=None, icon=None, **kwargs
+        self, title, base_url, description=None, realm=None, app_key=None, icon=None, **kwargs
     ):
         """The constructor takes two arguments.
 
