@@ -74,6 +74,7 @@ from flask_login import current_user
 from invenio_db import db
 
 from invenio_oauthclient import current_oauthclient
+from invenio_oauthclient.contrib.keycloak import KeycloakSettingsHelper
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
@@ -160,8 +161,13 @@ REMOTE_REST_APP = _openaire_aai_app.remote_rest_app
 """OpenAIRE Remote REST Application."""
 
 # Sandbox
-_openaire_aai_sandbox_app = OpenAIREAuthSettingsHelper(
-    base_url="https://openaire-dev.aai-dev.grnet.gr",
+_openaire_aai_sandbox_app = KeycloakSettingsHelper(
+    title="OpenAIRE",
+    description="Open Science Services.",
+    base_url="https://beta.aai.openaire.eu",
+    realm="openaire",
+    scopes="openid profile email eduperson_entitlement orcid",
+    app_key="OPENAIRE_APP_CREDENTIALS",
 )
 REMOTE_SANDBOX_APP = _openaire_aai_sandbox_app.remote_app
 """OpenAIRE Sandbox Remote Application."""

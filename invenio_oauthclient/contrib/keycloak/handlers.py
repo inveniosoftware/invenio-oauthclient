@@ -45,11 +45,12 @@ from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_exter
 from .helpers import get_user_info
 
 
-def info_serializer_handler(remote, resp, user_info, **kwargs):
+def info_serializer_handler(remote, resp, token_user_info, user_info=None, **kwargs):
     """Serialize the account info response object.
 
     :param remote: The remote application.
     :param resp: The response of the `authorized` endpoint.
+    :param token_user_info: The content of the authorization token response.
     :param user_info: The response of the `user info` endpoint.
     :returns: A dictionary with serialized user information.
     """
@@ -58,16 +59,25 @@ def info_serializer_handler(remote, resp, user_info, **kwargs):
     #
     # note: "external_id": `preferred_username` should also work,
     #       as it is seemingly not editable in Keycloak
+
+    user_info = user_info or {}  # prevent errors when accessing None.get(...)
+
+    email = token_user_info.get("email") or user_info["email"]
+    full_name = token_user_info.get("name") or user_info.get("name")
+    username = token_user_info.get("preferred_username") or user_info.get(
+        "preferred_username"
+    )
+
     return {
         "user": {
             "active": True,
-            "email": user_info["email"],
+            "email": email,
             "profile": {
-                "full_name": user_info.get("name"),
-                "username": user_info.get("preferred_username"),
+                "full_name": full_name,
+                "username": username,
             },
         },
-        "external_id": user_info["sub"],
+        "external_id": token_user_info["sub"],
         "external_method": remote.name,
     }
 
@@ -79,20 +89,20 @@ def info_handler(remote, resp):
     :param resp: The response of the `authorized` endpoint.
     :returns: A dictionary with the user information.
     """
-    user_info = get_user_info(remote, resp)
+    token_user_info, user_info = get_user_info(remote, resp)
 
     handlers = current_oauthclient.signup_handlers[remote.name]
     # `remote` param automatically injected via `make_handler` helper
-    return handlers["info_serializer"](resp, user_info)
+    return handlers["info_serializer"](resp, token_user_info, user_info)
 
 
 def setup_handler(remote, token, resp):
     """Perform additional setup after the user has been logged in."""
-    user_info = get_user_info(remote, resp)
+    token_user_info, _ = get_user_info(remote, resp)
 
     with db.session.begin_nested():
         # fetch the user's Keycloak ID and set it in extra_data
-        keycloak_id = user_info["sub"]
+        keycloak_id = token_user_info["sub"]
         token.remote_account.extra_data = {
             "keycloak_id": keycloak_id,
         }
