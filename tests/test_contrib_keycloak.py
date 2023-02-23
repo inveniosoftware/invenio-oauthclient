@@ -374,12 +374,8 @@ def test_get_userinfo_from_token(
             )
         )
 
-        user_info = get_user_info(
-            remote,
-            example_keycloak_token,
-            fallback_to_endpoint=False,
-            options={"verify_exp": False},
-        )
+        # use token info
+        user_info, _ = get_user_info(remote, example_keycloak_token)
 
         assert user_info is not None
         assert user_info == expected_result
@@ -396,6 +392,8 @@ def test_get_userinfo_from_endpoint(
         example_keycloak_userinfo.data,
         example_keycloak_realm_info,
     )
+
+    app.config["OAUTHCLIENT_KEYCLOAK_USER_INFO_FROM_ENDPOINT"] = True
 
     with app.test_client() as c:
         # ensure that remote apps have been loaded (before first request)
@@ -414,7 +412,7 @@ def test_get_userinfo_from_endpoint(
         )
 
         # force the endpoint mechanism by not providing a token
-        user_info = get_user_info(remote, None)
+        _, user_info = get_user_info(remote, None)
 
         assert user_info is not None
         assert user_info == example_keycloak_userinfo.data

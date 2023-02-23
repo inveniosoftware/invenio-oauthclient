@@ -65,6 +65,7 @@ def check_response_redirect_url_args(response, expected_args):
 
 def mock_keycloak(app_config, token_dict, user_info_dict, realm_info):
     """Mock a running Keycloak instance."""
+    app_config["OAUTHCLIENT_KEYCLOAK_USER_INFO_FROM_ENDPOINT"] = False
     keycloak_settings = app_config["OAUTHCLIENT_REMOTE_APPS"]["keycloak"]
 
     httpretty.register_uri(

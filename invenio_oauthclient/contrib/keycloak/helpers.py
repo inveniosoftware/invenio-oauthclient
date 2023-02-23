@@ -53,62 +53,59 @@ def get_public_key(remote, realm_url):
     return certs_resp["public_key"]
 
 
-def get_user_info(remote, resp_token, fallback_to_endpoint=True, options=dict()):
+def _get_user_info_from_token(remote, token, config_prefix):
+    """Get the user information from the JWT token."""
+    # try to parse the "id_token" part of Keycloak's (JWT) response
+    realm_url = current_app.config[f"{config_prefix}_REALM_URL"]
+    pubkey = _format_public_key(get_public_key(remote, realm_url))
+    alg = jwt.get_unverified_header(token)["alg"]
+
+    should_verify_aud = current_app.config.get(f"{config_prefix}_VERIFY_AUD", False)
+    expected_aud = current_app.config.get(f"{config_prefix}_AUD", None)
+
+    should_verify_expiration = current_app.config.get(
+        f"{config_prefix}_VERIFY_EXP", False
+    )
+
+    options = {
+        # check signature expiration
+        "verify_exp": should_verify_expiration,
+        # check the target audience
+        "verify_aud": should_verify_aud and (expected_aud is not None),
+    }
+
+    return jwt.decode(
+        token, key=pubkey, algorithms=[alg], audience=expected_aud, options=options
+    )
+
+
+def _get_user_info_from_endpoint(remote, config_prefix):
+    """Get the user info from the oauth server provider."""
+    url = current_app.config[f"{config_prefix}_USER_INFO_URL"]
+    return remote.get(url).data
+
+
+def get_user_info(remote, resp_token):
     """Get the user information from Keycloak.
 
     :param remote: The OAuthClient remote app
-    :param resp: The response from the 'token' endpoint; expected to be a dict
+    :param resp_token: The response from the 'token' endpoint; expected to be a dict
         and to contain a JWT 'id_token'
-    :param fallback_to_endpoint: Whether or not to fall back to the 'userinfo'
-        endpoint mechanism when verifying the 'id_token' fails
-    :param options: A dictionary with additional options for `jwt.decode`
+    :returns: A tuple containing the user information extracted from the token, and
+        if configured, from the UserInfo endpoint
     """
     config_prefix = _generate_config_prefix(remote)
+    from_token, from_endpoint = {}, None
+
     try:
-        # try to parse the "id_token" part of Keycloak's (JWT) response
-        token = resp_token["id_token"]
-        realm_url = current_app.config[f"{config_prefix}_REALM_URL"]
-        pubkey = _format_public_key(get_public_key(remote, realm_url))
-        alg = jwt.get_unverified_header(token)["alg"]
-
-        if not isinstance(options, dict):
-            options = {}
-
-        # consult the config whether to check the target audience
-        should_verify_aud = current_app.config.get(f"{config_prefix}_VERIFY_AUD", False)
-        expected_aud = current_app.config.get(f"{config_prefix}_AUD", None)
-
-        if should_verify_aud and (expected_aud is not None):
-            options.update({"verify_aud": True})
-        else:
-            options.update({"verify_aud": False})
-
-        # consult the config whether to check signature expiration
-        should_verify_expiration = current_app.config.get(
-            f"{config_prefix}_VERIFY_EXP", False
+        from_token = _get_user_info_from_token(
+            remote, resp_token["id_token"], config_prefix
         )
-
-        if should_verify_expiration:
-            options.update({"verify_exp": True})
-        else:
-            options.update({"verify_exp": False})
-
-        user_info = jwt.decode(
-            token, key=pubkey, algorithms=[alg], audience=expected_aud, options=options
-        )
-
     except Exception as e:
-        if not fallback_to_endpoint:
-            raise OAuthKeycloakUserInfoError(
-                "Error while fetching user information: {}".format(e),
-                remote,
-                resp_token,
-            )
+        current_app.logger.exception(e)
 
-        # as a fallback, we can still contact Keycloak's userinfo endpoint
-        # `remote.get(...)` automatically includes OAuth2 tokens in the header
-        # and the response's `data` field is a dict
-        url = current_app.config[f"{config_prefix}_USER_INFO_URL"]
-        user_info = remote.get(url).data
+    call_endpoint = current_app.config[f"{config_prefix}_USER_INFO_FROM_ENDPOINT"]
+    if call_endpoint:
+        from_endpoint = _get_user_info_from_endpoint(remote, config_prefix)
 
-    return user_info
+    return from_token, from_endpoint
