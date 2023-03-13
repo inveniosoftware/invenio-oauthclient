@@ -1,12 +1,17 @@
 ..
     This file is part of Invenio.
-    Copyright (C) 2015-2022 CERN.
+    Copyright (C) 2015-2023 CERN.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 Changes
 =======
+
+Version 2.3.0 (released 2023-03-13)
+
+- OpenAIRE AAI sandbox remote moved to Keycloak.
+- Keycloak settings helper accept configurable scopes for token request.
 
 Version 2.2.0 (released 2023-03-02)
 
