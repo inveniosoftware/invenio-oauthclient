@@ -30,7 +30,15 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
     """
 
     def __init__(
-        self, title, description, base_url, realm, app_key=None, icon=None, **kwargs
+        self,
+        title,
+        description,
+        base_url,
+        realm,
+        app_key=None,
+        icon=None,
+        scopes="openid",
+        **kwargs
     ):
         """The constructor takes two arguments.
 
@@ -53,7 +61,7 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
             base_url,
             app_key,
             icon=icon,
-            request_token_params={"scope": "openid"},
+            request_token_params={"scope": scopes},
             access_token_url=access_token_url,
             authorize_url=authorize_url,
             **kwargs
