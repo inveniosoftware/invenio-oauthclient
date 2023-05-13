@@ -169,7 +169,6 @@ class InvenioOAuthClient(object):
 
     def init_app(self, app):
         """Flask application initialization."""
-        self.init_config(app)
         state = _OAuthClientState(
             app,
             "OAUTHCLIENT_REMOTE_APPS",
@@ -178,24 +177,6 @@ class InvenioOAuthClient(object):
         )
         app.extensions["invenio-oauthclient"] = state
         return state
-
-    def init_config(self, app):
-        """Initialize configuration."""
-
-        @app.before_first_request
-        def override_template_configuration():
-            """Override template configuration."""
-            template_key = app.config.get(
-                "OAUTHCLIENT_TEMPLATE_KEY",
-                "SECURITY_LOGIN_USER_TEMPLATE",  # default template key
-            )
-            if template_key is not None:
-                template = app.config[template_key]  # keep the old value
-                app.config["OAUTHCLIENT_LOGIN_USER_TEMPLATE_PARENT"] = template
-                app.config[template_key] = app.config.get(
-                    "OAUTHCLIENT_LOGIN_USER_TEMPLATE",
-                    "invenio_oauthclient/login_user.html",
-                )
 
 
 class InvenioOAuthClientREST(object):
