@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -10,13 +11,8 @@
 
 from operator import itemgetter
 
-from flask import Blueprint, current_app, render_template, request
-from flask_breadcrumbs import register_breadcrumb
+from flask import Blueprint, current_app, render_template
 from flask_login import current_user, login_required
-from flask_menu import register_menu
-from invenio_i18n import lazy_gettext as _
-from invenio_theme.proxies import current_theme_icons
-from speaklater import make_lazy_string
 
 from ..models import RemoteAccount
 from ..proxies import current_oauthclient
@@ -32,21 +28,6 @@ blueprint = Blueprint(
 
 @blueprint.route("/", methods=["GET", "POST"])
 @login_required
-@register_menu(
-    blueprint,
-    "settings.oauthclient",
-    _(
-        "%(icon)s Linked accounts",
-        icon=make_lazy_string(lambda: f'<i class="{current_theme_icons.link}"></i>'),
-    ),
-    order=3,
-    active_when=lambda: request.endpoint.startswith("invenio_oauthclient_settings."),
-    visible_when=lambda: bool(current_app.config.get("OAUTHCLIENT_REMOTE_APPS"))
-    is not False,
-)
-@register_breadcrumb(
-    blueprint, "breadcrumbs.settings.oauthclient", _("Linked accounts")
-)
 def index():
     """List linked accounts."""
     oauth = current_oauthclient.oauth

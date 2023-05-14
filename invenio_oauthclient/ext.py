@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -10,6 +11,7 @@
 
 import warnings
 
+from flask import request
 from flask_login import user_logged_out
 from flask_principal import identity_loaded
 
@@ -205,3 +207,74 @@ class InvenioOAuthClientREST(object):
 
         app.extensions["invenio-oauthclient"] = state
         return state
+
+
+def finalize_app(app):
+    """Finalize app."""
+    override_template_configuration(app)
+    init_index_menu(app)
+    post_ext_init(app)
+
+
+def override_template_configuration(app):
+    """Override template configuration."""
+    template_key = app.config.get(
+        "OAUTHCLIENT_TEMPLATE_KEY",
+        "SECURITY_LOGIN_USER_TEMPLATE",  # default template key
+    )
+    if template_key is not None:
+        template = app.config[template_key]  # keep the old value
+        app.config["OAUTHCLIENT_LOGIN_USER_TEMPLATE_PARENT"] = template
+        app.config[template_key] = app.config.get(
+            "OAUTHCLIENT_LOGIN_USER_TEMPLATE",
+            "invenio_oauthclient/login_user.html",
+        )
+
+
+def init_index_menu(app):
+    """Init index menu."""
+    menu = app.extensions["menu"]
+
+    def active_when():
+        return request.endpoint.startswith("invenio_oauthclient_settings.")
+
+    def visible_when():
+        return bool(app.config.get("OAUTHCLIENT_REMOTE_APPS")) is not False
+
+    menu.submenu("settings.oauthclient").register(
+        "invenio_oauthclient_settings.index",
+        _(
+            "%(icon)s Linked accounts",
+            icon=make_lazy_string(
+                lambda: f'<i class="{current_theme_icons.link}"></i>'
+            ),
+        ),
+        order=3,
+        active_when=active_when,
+        visible_when=visible_when,
+    )
+
+    menu.submenu("breadcrumbs.settings.oauthclient").register(
+        "invenio_oauthclient_settings.index",
+        _("Linked accounts"),
+    )
+
+
+def post_ext_init(app):
+    """Setup blueprint."""
+    app.config.setdefault(
+        "OAUTHCLIENT_SITENAME",
+        app.config.get("THEME_SITENAME", "Invenio"),
+    )
+    app.config.setdefault(
+        "OAUTHCLIENT_BASE_TEMPLATE",
+        app.config.get("BASE_TEMPLATE", "invenio_oauthclient/base.html"),
+    )
+    app.config.setdefault(
+        "OAUTHCLIENT_COVER_TEMPLATE",
+        app.config.get("COVER_TEMPLATE", "invenio_oauthclient/base_cover.html"),
+    )
+    app.config.setdefault(
+        "OAUTHCLIENT_SETTINGS_TEMPLATE",
+        app.config.get("SETTINGS_TEMPLATE", "invenio_oauthclient/settings/base.html"),
+    )
