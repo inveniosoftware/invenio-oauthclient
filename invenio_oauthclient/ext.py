@@ -13,7 +13,11 @@ import warnings
 
 from flask import request
 from flask_login import user_logged_out
+from flask_menu import current_menu
 from flask_principal import identity_loaded
+from invenio_i18n import LazyString
+from invenio_i18n import lazy_gettext as _
+from invenio_theme.proxies import current_theme_icons
 
 from . import config, handlers
 from .utils import (
@@ -233,7 +237,6 @@ def override_template_configuration(app):
 
 def init_index_menu(app):
     """Init index menu."""
-    menu = app.extensions["menu"]
 
     def active_when():
         return request.endpoint.startswith("invenio_oauthclient_settings.")
@@ -241,20 +244,18 @@ def init_index_menu(app):
     def visible_when():
         return bool(app.config.get("OAUTHCLIENT_REMOTE_APPS")) is not False
 
-    menu.submenu("settings.oauthclient").register(
+    current_menu.submenu("settings.oauthclient").register(
         "invenio_oauthclient_settings.index",
         _(
             "%(icon)s Linked accounts",
-            icon=make_lazy_string(
-                lambda: f'<i class="{current_theme_icons.link}"></i>'
-            ),
+            icon=LazyString(lambda: f'<i class="{current_theme_icons.link}"></i>'),
         ),
         order=3,
         active_when=active_when,
         visible_when=visible_when,
     )
 
-    menu.submenu("breadcrumbs.settings.oauthclient").register(
+    current_menu.submenu("breadcrumbs.settings.oauthclient").register(
         "invenio_oauthclient_settings.index",
         _("Linked accounts"),
     )

@@ -3,6 +3,7 @@
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
 # Copyright (C) 2018 University of Chicago.
+# Copyright (C) 2023-2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -140,6 +141,7 @@ def base_app(request):
         APP_ALLOWED_HOSTS=["localhost"],
         APP_THEME=["semantic-ui"],
         THEME_ICONS={"semantic-ui": dict(link="linkify icon")},
+        OAUTHCLIENT_SETTINGS_TEMPLATE="invenio_oauthclient/settings/base.html",
     )
     FlaskMenu(base_app)
     Babel(base_app)
