@@ -109,7 +109,9 @@ def base_authorized_signup_handler(resp, remote, *args, **kwargs):
     """
     # Remove any previously stored auto register session key
     session.pop(token_session_key(remote.name) + "_autoregister", None)
-
+    # We set the remote in the session to be aware of which one is being used and, on log out redirect to
+    # the correct URL set in the OAUTHCLIENT_REMOTE_APPS for each remote
+    session["OAUTHCLIENT_SESSION_REMOTE_NAME"] = remote.name
     # Store token in session
     # ----------------------
     # Set token in session - token object only returned if

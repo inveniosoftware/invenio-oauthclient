@@ -30,6 +30,7 @@ class OAuthSettingsHelper:
         request_token_url=None,
         precedence_mask=None,
         signup_options=None,
+        logout_url=None,
         **kwargs,
     ):
         """The constructor."""
@@ -57,6 +58,7 @@ class OAuthSettingsHelper:
             icon=icon,
             precedence_mask=precedence_mask,
             signup_options=signup_options,
+            logout_url=logout_url,
             params=dict(
                 base_url=self.base_url,
                 request_token_params=request_token_params,
