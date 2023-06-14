@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 3.0.0 (released 2023-06-14)
+
+- base client: add group handler
+
 Version 2.3.0 (released 2023-03-13)
 
 - OpenAIRE AAI sandbox remote moved to Keycloak.
