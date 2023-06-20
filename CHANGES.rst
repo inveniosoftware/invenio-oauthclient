@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 3.1.0 (released 2023-06-20)
+
+- client: add provider's logout url
+
 Version 3.0.0 (released 2023-06-14)
 
 - base client: add group handler
