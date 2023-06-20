@@ -12,7 +12,7 @@ from datetime import datetime
 
 from flask import after_this_request, current_app, request
 from flask_security import login_user, logout_user
-from flask_security.confirmable import requires_confirmation
+from flask_security.confirmable import confirm_user, requires_confirmation
 from invenio_accounts.models import User
 from invenio_accounts.utils import register_user
 from invenio_db.utils import rebuild_encrypted_properties
@@ -196,13 +196,11 @@ def oauth_register(form, user_info=None, precedence_mask=None, signup_options={}
         # remove the CSRF tokens to avoid unexpected keyword arguments
         remove_csrf_tokens(data)
 
-        auto_confirm = signup_options.get("auto_confirm", False)
-        # auto_confirm sets the `confirmed_at` field
-        if auto_confirm:
-            data["confirmed_at"] = datetime.utcnow()
-
         send_register_msg = signup_options.get("send_register_msg", True)
         user = register_user(send_register_msg=send_register_msg, **data)
+        auto_confirm = signup_options.get("auto_confirm", False)
+        if auto_confirm:
+            confirm_user(user)
         _datastore.commit()
         return user
 
