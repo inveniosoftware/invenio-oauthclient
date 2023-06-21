@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 3.1.1 (released 2023-06-21)
+
+- client: fix user confirmation
+
 Version 3.1.0 (released 2023-06-20)
 
 - client: add provider's logout url
