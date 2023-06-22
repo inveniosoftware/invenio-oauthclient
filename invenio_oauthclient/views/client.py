@@ -84,9 +84,15 @@ def auto_redirect_login(*args, **kwargs):
     remote_apps = list(current_oauthclient.oauth.remote_apps)
 
     if would_redirect and len(remote_apps) == 1:
-        # if local login is disabled and we only have one OAuth2 remote app
-        # configured, we forward directly to that
-        url = url_for("invenio_oauthclient.login", remote_app=remote_apps[0])
+        redirect_args = {
+            # if local login is disabled and we only have one OAuth2 remote app
+            # configured, we forward directly to that
+            "remote_app": remote_apps[0],
+        }
+        next_url = request.args.get("next")
+        if next_url:
+            redirect_args["next"] = next_url
+        url = url_for("invenio_oauthclient.login", **redirect_args)
         return redirect(url)
 
     else:
