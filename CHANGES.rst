@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 3.1.2 (released 2023-06-23)
+
+- client: preserve "next" URL param on login redirection
+
 Version 3.1.1 (released 2023-06-21)
 
 - client: fix user confirmation
