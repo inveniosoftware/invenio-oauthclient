@@ -4,10 +4,6 @@
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
 # 
-# Translators:
-# Tibor Simko <tibor.simko@cern.ch>, 2021
-# Jesús Martín <jesusmartin@sallep.net>, 2021
-# 
 #, fuzzy
 msgid ""
 msgstr ""
@@ -15,78 +11,77 @@ msgstr ""
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
 "POT-Creation-Date: 2022-05-27 09:58+0200\n"
 "PO-Revision-Date: 2016-08-18 15:19+0000\n"
-"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2021\n"
-"Language-Team: Spanish (https://app.transifex.com/inveniosoftware/teams/23537/es/)\n"
+"Language-Team: Kinyarwanda (https://app.transifex.com/inveniosoftware/teams/23537/rw/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.1\n"
-"Language: es\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Language: rw\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: invenio_oauthclient/admin.py:52
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #: invenio_oauthclient/admin.py:53
 msgid "User ID"
-msgstr "ID de usuario"
+msgstr ""
 
 #: invenio_oauthclient/admin.py:54
 msgid "Client ID"
-msgstr "ID de cliente"
+msgstr ""
 
 #: invenio_oauthclient/admin.py:83
 msgid "ID Remote Account"
-msgstr "ID de cuenta externa"
+msgstr ""
 
 #: invenio_oauthclient/admin.py:90 invenio_oauthclient/admin.py:98
 msgid "User Management"
-msgstr "Gestión de usuarios"
+msgstr ""
 
 #: invenio_oauthclient/admin.py:91
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:12
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:12
 #: invenio_oauthclient/views/settings.py:47
 msgid "Linked accounts"
-msgstr "Cuentas enlazadas"
+msgstr ""
 
 #: invenio_oauthclient/admin.py:99
 msgid "Linked account tokens"
-msgstr "Tokens de cuentas enlazadas"
+msgstr ""
 
 #: invenio_oauthclient/contrib/cern.py:429
 #: invenio_oauthclient/contrib/cern_openid.py:305
 msgid "CERN account not allowed."
-msgstr "Cuenta CERN no permitida."
+msgstr ""
 
 #: invenio_oauthclient/handlers/ui.py:42
 msgid "External service is already linked to another account."
-msgstr "El servicio externo ya está enlazado a otra cuenta."
+msgstr ""
 
 #: invenio_oauthclient/handlers/ui.py:47
 msgid "You rejected the authentication request."
-msgstr "Ha rechazado la solicitud de autenticación."
+msgstr ""
 
 #: invenio_oauthclient/handlers/ui.py:173
 msgid "Authorization with remote service failed."
-msgstr "Error en la autorización con servicio remoto."
+msgstr ""
 
 #: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:25
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/_macros.html:60
 #, python-format
 msgid "Sign in with %(title)s"
-msgstr "Entrar con %(title)s"
+msgstr ""
 
 #: invenio_oauthclient/templates/invenio_oauthclient/login_user.html:21
 msgid "OR"
-msgstr "O"
+msgstr ""
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:24
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:29
 #, python-format
 msgid "Sign-up with %(title)s!"
-msgstr "Inscribirse con %(title)s!"
+msgstr ""
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:25
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:32
@@ -94,13 +89,11 @@ msgid ""
 "Fill in your details to complete your registration. You only have to do this"
 " once."
 msgstr ""
-"Rellene sus datos para completar su registro. Sólo tiene que hacerlo una "
-"vez."
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:33
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:45
 msgid "Complete registration"
-msgstr "Registro completo"
+msgstr ""
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:20
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:20
@@ -109,25 +102,22 @@ msgid ""
 "Tired of entering password for %(sitename)s every time you sign in? Set up "
 "single sign-on with one or more of the services below:"
 msgstr ""
-"¿Cansado de introducir la contraseña en %(sitename)s cada vez que entra? "
-"Configure el inicio de sesión único con uno o más de los servicios "
-"siguientes:"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:32
 msgid "Disconnect"
-msgstr "Desconectar"
+msgstr ""
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:33
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:34
 msgid "Connect"
-msgstr "Conectar"
+msgstr ""
 
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:26
 msgid "Or"
-msgstr "O"
+msgstr ""
 
 #: invenio_oauthclient/views/settings.py:38
 #, python-format
 msgid "%(icon)s Linked accounts"
-msgstr "%(icon)s Cuentas enlazadas"
+msgstr ""
