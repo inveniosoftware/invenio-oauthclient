@@ -9,26 +9,28 @@
 """Test utils."""
 
 import sys
+from urllib.parse import quote_plus
 
 import pytest
 from flask_security.confirmable import _security
 from invenio_db import db
-from six.moves.urllib.parse import quote_plus
 
 from invenio_oauthclient.errors import AlreadyLinkedError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
+from invenio_oauthclient.oauth import (
+    _get_external_id,
+    oauth_authenticate,
+    oauth_get_user,
+    oauth_link_external_id,
+    oauth_unlink_external_id,
+)
 from invenio_oauthclient.proxies import current_oauthclient
 from invenio_oauthclient.utils import (
-    _get_external_id,
     create_csrf_disabled_registrationform,
     create_registrationform,
     fill_form,
     filter_user_info,
     get_safe_redirect_target,
-    oauth_authenticate,
-    oauth_get_user,
-    oauth_link_external_id,
-    oauth_unlink_external_id,
     obj_or_import_string,
     patch_dictionary,
     rebuild_access_tokens,

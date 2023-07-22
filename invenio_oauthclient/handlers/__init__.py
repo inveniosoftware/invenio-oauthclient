@@ -12,18 +12,8 @@ from .rest import authorized_default_handler as authorized_default_handler_rest
 from .rest import authorized_signup_handler as authorized_signup_handler_rest
 from .rest import disconnect_handler as disconnect_handler_rest
 from .rest import signup_handler as signup_handler_rest
-from .ui import (
-    authorized_default_handler,
-    authorized_signup_handler,
-    disconnect_handler,
-    oauth2_handle_error,
-)
-from .ui import oauth_resp_remote_error_handler as oauth_error_handler
-from .ui import signup_handler
-from .utils import (
-    authorized_handler,
+from .token import (
     get_session_next_url,
-    make_handler,
     make_token_getter,
     oauth1_token_setter,
     oauth2_token_setter,
@@ -35,6 +25,15 @@ from .utils import (
     token_session_key,
     token_setter,
 )
+from .ui import (
+    authorized_default_handler,
+    authorized_signup_handler,
+    disconnect_handler,
+    oauth2_handle_error,
+)
+from .ui import oauth_resp_remote_error_handler as oauth_error_handler
+from .ui import signup_handler
+from .utils import authorized_handler, make_handler
 
 __all__ = (
     "authorized_default_handler_rest",

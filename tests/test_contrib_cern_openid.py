@@ -9,13 +9,13 @@
 """Test case for CERN oauth remote app."""
 
 import os
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 from flask import g, session, url_for
 from flask_security import login_user, logout_user
 from flask_security.utils import hash_password
 from helpers import get_state, mock_remote_get, mock_response
-from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.contrib.cern_openid import (
     OAUTHCLIENT_CERN_OPENID_SESSION_KEY,

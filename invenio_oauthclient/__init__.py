@@ -9,6 +9,7 @@
 """Advanced usage docs."""
 
 from .ext import InvenioOAuthClient, InvenioOAuthClientREST
+from .oauth import oauth_link_external_id, oauth_unlink_external_id
 from .proxies import current_oauthclient
 
 __version__ = "3.1.2"
@@ -18,4 +19,6 @@ __all__ = (
     "current_oauthclient",
     "InvenioOAuthClient",
     "InvenioOAuthClientREST",
+    "oauth_link_external_id",
+    "oauth_unlink_external_id",
 )

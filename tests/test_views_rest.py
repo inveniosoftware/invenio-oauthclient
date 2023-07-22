@@ -9,6 +9,7 @@
 """Test case for views."""
 
 import time
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 from flask import url_for
@@ -19,7 +20,6 @@ from invenio_db import db
 from itsdangerous import TimedJSONWebSignatureSerializer
 from mock import MagicMock
 from simplejson import JSONDecodeError
-from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient import InvenioOAuthClientREST
 from invenio_oauthclient._compat import _create_identifier

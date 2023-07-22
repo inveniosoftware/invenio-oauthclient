@@ -7,6 +7,8 @@
 
 """Tests for the Keycloak OAuth remote_app."""
 
+from urllib.parse import parse_qs, urlparse
+
 import httpretty
 import jwt
 import pytest
@@ -16,7 +18,6 @@ from flask_security.utils import hash_password
 from helpers import get_state, mock_keycloak
 from invenio_accounts.models import User
 from invenio_db import db
-from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.contrib.keycloak.helpers import (
     _format_public_key,

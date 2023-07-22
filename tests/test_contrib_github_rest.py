@@ -9,6 +9,7 @@
 """Test case for github oauth remote app."""
 
 from collections import namedtuple
+from urllib.parse import parse_qs, urlparse
 
 import mock
 import pytest
@@ -23,7 +24,6 @@ from helpers import (
 )
 from invenio_accounts.models import User
 from invenio_db import db
-from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient import current_oauthclient
 from invenio_oauthclient._compat import _create_identifier

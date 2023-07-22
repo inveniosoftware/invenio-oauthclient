@@ -9,6 +9,7 @@
 """Test case for github oauth remote app."""
 
 from collections import namedtuple
+from urllib.parse import parse_qs, urlparse
 
 import mock
 import pytest
@@ -19,7 +20,6 @@ from flask_security.utils import hash_password
 from helpers import check_redirect_location, mock_response
 from invenio_accounts.models import User
 from invenio_db import db
-from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient._compat import _create_identifier
 from invenio_oauthclient.contrib.github import authorized
@@ -122,11 +122,11 @@ def test_authorized_signup_valid_user(app, example_github):
                 ).count()
             )
 
-            # set a password for the user
+            # set a local password for the user
             user.password = hash_password("1234")
             db.session.commit()
 
-            # Disconnect again
+            # Disconnect again, it works because the user can login with local psw
             resp = c.get(url_for("invenio_oauthclient.disconnect", remote_app="github"))
             assert resp.status_code == 302
 

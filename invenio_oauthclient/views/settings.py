@@ -10,7 +10,6 @@
 
 from operator import itemgetter
 
-import six
 from flask import Blueprint, current_app, render_template, request
 from flask_breadcrumbs import register_breadcrumb
 from flask_login import current_user, login_required
@@ -56,7 +55,7 @@ def index():
     service_map = {}
     i = 0
 
-    for appid, conf in six.iteritems(current_app.config["OAUTHCLIENT_REMOTE_APPS"]):
+    for appid, conf in current_app.config["OAUTHCLIENT_REMOTE_APPS"].items():
         if not conf.get("hide", False):
             services.append(
                 dict(
