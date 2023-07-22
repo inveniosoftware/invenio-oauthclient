@@ -8,8 +8,8 @@
 
 """Handlers for customizing oauthclient endpoints."""
 
-import json
 from functools import partial, wraps
+from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from flask import (
     abort,
@@ -21,8 +21,8 @@ from flask import (
     request,
     url_for,
 )
+from flask_login import current_user
 from invenio_db import db
-from six.moves.urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
 from ..errors import (
     AlreadyLinkedError,
@@ -39,12 +39,10 @@ from ..errors import (
 )
 from ..proxies import current_oauthclient
 from ..utils import create_csrf_disabled_registrationform, fill_form
-from .base import (
-    base_authorized_signup_handler,
-    base_disconnect_handler,
-    base_signup_handler,
-)
-from .utils import response_token_setter
+from .authorized import authorized_handler, extra_signup_handler
+from .base import base_disconnect_handler
+from .decorators import can_extra_signup
+from .token import response_token_setter
 
 
 def response_handler_postmessage(remote, url, payload=None):
@@ -208,7 +206,7 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
     :returns: Redirect response.
     """
     remote_app_config = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][remote.name]
-    next_url = base_authorized_signup_handler(resp, remote, *args, **kwargs)
+    next_url = authorized_handler(resp, remote, *args, **kwargs)
     response_payload = dict(message="Successfully authorized.", code=200)
     if next_url:
         response_payload["next_url"] = next_url
@@ -246,6 +244,7 @@ def disconnect_handler(remote, *args, **kwargs):
 
 
 @oauth_remote_error_handler
+@can_extra_signup
 def signup_handler(remote, *args, **kwargs):
     """Handle extra signup information.
 
@@ -253,16 +252,10 @@ def signup_handler(remote, *args, **kwargs):
     :returns: Redirect response or the template rendered.
     """
     remote_app_config = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][remote.name]
-    try:
-        form = create_csrf_disabled_registrationform(remote)
+    form = create_csrf_disabled_registrationform(remote)
+    if not form.is_submitted():
         data = request.form.to_dict()
         form = fill_form(form, data)
-        next_url = base_signup_handler(remote, form, *args, **kwargs)
-        if form.is_submitted():
-            response_payload = dict(message="Successfully signed up.", code=200)
-            if next_url:
-                response_payload["next_url"] = next_url
-            return jsonify(response_payload)
         return response_handler(
             remote,
             remote_app_config["signup_redirect_url"],
@@ -274,5 +267,13 @@ def signup_handler(remote, *args, **kwargs):
                 app_icon=remote_app_config.get("icon", None),
             ),
         )
-    except OAuthClientUnAuthorized:
-        abort(401)
+    else:
+        try:
+            next_url = extra_signup_handler(remote, form, *args, **kwargs)
+        except OAuthClientUnAuthorized:
+            abort(401)
+
+        response_payload = dict(message="Successfully signed up.", code=200)
+        if next_url:
+            response_payload["next_url"] = next_url
+        return jsonify(response_payload)

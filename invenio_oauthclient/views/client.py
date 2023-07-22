@@ -228,7 +228,13 @@ def _signup(remote_app):
 
 @blueprint.route("/signup/<remote_app>/", methods=["GET", "POST"])
 def signup(remote_app):
-    """Extra signup step."""
+    """Extra signup step.
+
+    GET: automatically called when OAuthClientMustRedirectSignup exception triggered
+    during authorized handler execution: the info retrieved from the remote
+    app are not sufficient to register the user.
+    POST: called when the registration form is submitted by the user.
+    """
     try:
         res = _signup(remote_app)
         return abort(404) if res is None else res
@@ -238,7 +244,13 @@ def signup(remote_app):
 
 @rest_blueprint.route("/signup/<remote_app>/", methods=["GET", "POST"])
 def rest_signup(remote_app):
-    """Extra signup step."""
+    """Extra signup step.
+
+    GET: automatically called when OAuthClientMustRedirectSignup exception triggered
+    during authorized handler execution: the info retrieved from the remote
+    app are not sufficient to register the user.
+    POST: called when the registration form is submitted by the user.
+    """
     try:
         res = _signup(remote_app)
         return abort(404) if res is None else res

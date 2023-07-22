@@ -322,8 +322,6 @@ setting ``remote_app`` in your remote application configuration.
 
 from invenio_oauthclient.utils import _create_registrationform
 
-from .views.client import auto_redirect_login
-
 OAUTHCLIENT_REMOTE_APPS = {}
 """Configuration of remote applications."""
 

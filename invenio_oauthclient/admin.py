@@ -9,7 +9,7 @@
 """Views for OAuth."""
 
 from flask_admin.contrib.sqla import ModelView
-from invenio_accounts.admin import UserIdentityView, user_identity_adminview
+from invenio_accounts.admin import user_identity_adminview
 
 from .models import RemoteAccount, RemoteToken
 

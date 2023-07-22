@@ -8,6 +8,8 @@
 
 """Test handlers."""
 
+from turtle import pd
+
 import pytest
 from flask import session, url_for
 from flask_login import current_user
@@ -16,6 +18,7 @@ from flask_security import login_user, logout_user
 from flask_security.confirmable import _security
 from helpers import check_response_redirect_url_args
 from invenio_accounts.models import Role
+from invenio_accounts.proxies import current_datastore
 from werkzeug.routing import BuildError
 
 from invenio_oauthclient import InvenioOAuthClientREST, current_oauthclient
@@ -29,7 +32,7 @@ from invenio_oauthclient.handlers.rest import (
     signup_handler,
 )
 from invenio_oauthclient.models import RemoteToken
-from invenio_oauthclient.utils import oauth_authenticate
+from invenio_oauthclient.oauth import oauth_authenticate
 from invenio_oauthclient.views.client import rest_blueprint
 
 REMOTE_APPS = ["github", "orcid", "globus"]
@@ -47,12 +50,21 @@ def test_authorized_signup_handler(remote, app_rest, models_fixture):
     """Test authorized signup handler."""
     datastore = app_rest.extensions["invenio-accounts"].datastore
     user = datastore.find_user(email="existing@inveniosoftware.org")
+    existing_email = "existing@inveniosoftware.org"
 
     example_response = {"access_token": "test_access_token"}
+    example_account_info = {
+        "user": {
+            "email": existing_email,
+        },
+        "external_id": "1234",
+        "external_method": "test_method",
+    }
 
     # Mock remote app's handler
     current_oauthclient.signup_handlers[remote.name] = {
-        "setup": lambda token, resp: None
+        "setup": lambda token, resp: None,
+        "info": lambda resp: example_account_info,
     }
 
     # Authenticate user
@@ -73,17 +85,22 @@ def test_authorized_signup_handler(remote, app_rest, models_fixture):
 
 
 @pytest.mark.parametrize("remote", REMOTE_APPS, indirect=["remote"])
-def test_group_handler(remote, app_rest, models_fixture):
+def test_groups_handler(remote, app_rest, models_fixture):
     """Test group handler."""
     datastore = app_rest.extensions["invenio-accounts"].datastore
     existing_email = "existing@inveniosoftware.org"
     user = datastore.find_user(email=existing_email)
-    example_group = [
+    example_groups = [
         {
             "id": "rdm-developers",
             "name": "rdm-developers",
             "description": "People contributing to RDM.",
-        }
+        },
+        {
+            "id": "existing-group-id",
+            "name": "new-group-name",
+            "description": "A previously existing group with a changed name",
+        },
     ]
 
     example_response = {"access_token": "test_access_token"}
@@ -95,10 +112,20 @@ def test_group_handler(remote, app_rest, models_fixture):
         "external_method": "test_method",
     }
 
+    # prepare previously existing role in the db
+    assert 0 == Role.query.count()
+    current_datastore.create_role(
+        id=example_groups[1]["id"],
+        name="previous-group-name",
+        description=example_groups[1]["description"],
+        is_managed=False,
+    )
+    current_datastore.commit()
+
     # Mock remote app's handler
     current_oauthclient.signup_handlers[remote.name] = {
         "info": lambda resp: example_account_info,
-        "groups": lambda resp: example_group,
+        "groups": lambda resp: example_groups,
     }
 
     _security.confirmable = True
@@ -107,12 +134,20 @@ def test_group_handler(remote, app_rest, models_fixture):
 
     authorized_signup_handler(example_response, remote)
 
-    # Assert that the group handler works correctly
+    # Assert that the new group is created
     roles = Role.query.all()
-    assert 1 == len(roles)
-    assert roles[0].id == example_group[0]["id"]
-    assert roles[0].name == example_group[0]["name"]
-    assert roles[0].description == example_group[0]["description"]
+    assert 2 == len(roles)
+
+    role = Role.query.filter(Role.id == example_groups[0]["id"]).one()
+    assert role.id == example_groups[0]["id"]
+    assert role.name == example_groups[0]["name"]
+    assert role.description == example_groups[0]["description"]
+
+    # Assert that existing group is updated
+    role = Role.query.filter(Role.id == example_groups[1]["id"]).one()
+    assert role.id == example_groups[1]["id"]
+    assert role.name == "new-group-name"
+    assert role.description == example_groups[1]["description"]
 
 
 @pytest.mark.parametrize("remote", REMOTE_APPS, indirect=["remote"])

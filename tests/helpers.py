@@ -10,11 +10,10 @@
 
 import json
 from inspect import isfunction
+from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpretty
-import six
 from mock import MagicMock
-from six.moves.urllib_parse import parse_qs, urlencode, urlparse
 
 from invenio_oauthclient._compat import _create_identifier
 from invenio_oauthclient.views.client import serializer
@@ -44,7 +43,7 @@ def mock_remote_get(oauth, remote_app="test", data=None):
 def check_redirect_location(resp, loc):
     """Check response redirect location."""
     assert resp._status_code == 302
-    if isinstance(loc, six.string_types):
+    if isinstance(loc, str):
         assert resp.headers["Location"] == loc
     elif isfunction(loc):
         assert loc(resp.headers["Location"])

@@ -154,8 +154,8 @@ from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
 from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
+from invenio_oauthclient.oauth import oauth_link_external_id, oauth_unlink_external_id
 from invenio_oauthclient.proxies import current_oauthclient
-from invenio_oauthclient.utils import oauth_link_external_id, oauth_unlink_external_id
 
 warn(
     "The cern contrib is deprecated. Please use the generic keycloak instead.",

@@ -10,7 +10,16 @@
 
 from functools import partial, wraps
 
-from flask import current_app, flash, redirect, render_template, request, url_for
+from flask import (
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+from flask_login import current_user
 from invenio_db import db
 from invenio_i18n import gettext as _
 
@@ -27,13 +36,11 @@ from ..errors import (
     OAuthError,
     OAuthRejectedRequestError,
 )
-from ..utils import create_registrationform
-from .base import (
-    base_authorized_signup_handler,
-    base_disconnect_handler,
-    base_signup_handler,
-)
-from .utils import response_token_setter
+from ..utils import create_registrationform, fill_form
+from .authorized import authorized_handler, extra_signup_handler
+from .base import base_disconnect_handler
+from .decorators import can_extra_signup
+from .token import response_token_setter, token_session_key
 
 
 def _oauth_error_handler(remote, f, *args, **kwargs):
@@ -134,7 +141,7 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
     :param resp: The response.
     :returns: Redirect response.
     """
-    next_url = base_authorized_signup_handler(resp, remote, *args, **kwargs)
+    next_url = authorized_handler(resp, remote, *args, **kwargs)
     # Redirect to next
     if next_url:
         return redirect(next_url)
@@ -157,20 +164,25 @@ def disconnect_handler(remote, *args, **kwargs):
 
 
 @oauth_remote_error_handler
+@can_extra_signup
 def signup_handler(remote, *args, **kwargs):
     """Handle extra signup information.
+
+    The info in the request.form is used to fill in the user registration form.
+    When the form does not validate (e.g. missing user e-mail), it is displayed
+    to the user, who needs to fill in the missing info and submit it.
+    This method is also called when the user has filled in the form and click on
+    btn submit.
 
     :param remote: The remote application.
     :returns: Redirect response or the template rendered.
     """
-    try:
-        form = create_registrationform(request.form, oauth_remote_app=remote)
-        next_url = base_signup_handler(remote, form, *args, **kwargs)
-        if form.is_submitted() and not form.errors:
-            if next_url:
-                return redirect(next_url)
-            else:
-                return redirect("/")
+    form = create_registrationform(request.form, oauth_remote_app=remote)
+    if not form.is_submitted():
+        session_prefix = token_session_key(remote.name)
+        account_info = session.get(session_prefix + "_account_info")
+        # Pre-fill form
+        fill_form(form, account_info["user"])
         return render_template(
             current_app.config["OAUTHCLIENT_SIGNUP_TEMPLATE"],
             form=form,
@@ -185,10 +197,18 @@ def signup_handler(remote, *args, **kwargs):
                 "icon", None
             ),
         )
-    except OAuthClientUnAuthorized:
-        # Redirect the user after registration (which doesn't include the
-        # activation), waiting for user to confirm his email.
-        return redirect(url_for("security.login"))
+    elif not form.errors:
+        try:
+            next_url = extra_signup_handler(remote, form, *args, **kwargs)
+        except OAuthClientUnAuthorized:
+            # Redirect the user after registration (which doesn't include the
+            # activation), waiting for user to confirm his email.
+            return redirect(url_for("security.login"))
+
+        if next_url:
+            return redirect(next_url)
+        else:
+            return redirect("/")
 
 
 def oauth2_handle_error(remote, resp, error_code, error_uri, error_description):

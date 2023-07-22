@@ -7,6 +7,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Views for OAuth."""
+
 from flask import url_for
 from flask_admin import Admin
 from invenio_db import db

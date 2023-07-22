@@ -10,6 +10,7 @@
 
 import os
 from datetime import timedelta
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 from flask import current_app, g, session, url_for
@@ -22,7 +23,6 @@ from helpers import (
     mock_remote_get,
     mock_response,
 )
-from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.contrib.cern_openid import (
     OAUTHCLIENT_CERN_OPENID_SESSION_KEY,

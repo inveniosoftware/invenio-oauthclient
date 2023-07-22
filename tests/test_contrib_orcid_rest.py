@@ -8,6 +8,8 @@
 
 """Test case for ORCID oauth remote app."""
 
+from urllib.parse import parse_qs, urlparse
+
 import httpretty
 from flask import session, url_for
 from flask_login import current_user
@@ -16,7 +18,6 @@ from flask_security.utils import hash_password
 from helpers import check_response_redirect_url_args, get_state, mock_response
 from invenio_accounts.models import User
 from invenio_db import db
-from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient.contrib.orcid import account_info
 from invenio_oauthclient.handlers import token_session_key

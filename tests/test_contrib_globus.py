@@ -9,6 +9,7 @@
 """Test case for globus oauth remote app."""
 
 import json
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 from flask import session, url_for
@@ -19,7 +20,6 @@ from flask_security.utils import hash_password
 from helpers import mock_remote_get, mock_response
 from invenio_accounts.models import User
 from invenio_db import db
-from six.moves.urllib_parse import parse_qs, urlparse
 
 from invenio_oauthclient._compat import _create_identifier
 from invenio_oauthclient.errors import OAuthResponseError
