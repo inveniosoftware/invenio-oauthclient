@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 3.2.0 (released 2023-07-24)
+
+- authorize: refactor authorize/signup handlers
+- update translations
+
 Version 3.1.2 (released 2023-06-23)
 
 - client: preserve "next" URL param on login redirection
