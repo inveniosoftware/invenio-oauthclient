@@ -15,31 +15,55 @@
 {% set can_disconnect = (num_linked_services > 1 or not only_external_login) %}
 
 {% block settings_body %}
-<div class="ui segment">
+  <div class="ui segment">
     {% block oauth_body_text %}
-    <p>{{ _('Tired of entering password for %(sitename)s every time you sign in? Set up single sign-on with one or more of the services below:',
-            sitename=config.THEME_SITENAME) }}</p>
+      <p>
+        {{ _('Tired of entering password for %(sitename)s every time you sign in? Set up single sign-on with one or more of the services below:',
+              sitename=config.THEME_SITENAME) }}
+      </p>
     {% endblock oauth_body_text %}
-</div>
-<div class="ui celled list">
-  {%- for s in services %}
-  <div class="item">
-    <div class="ui basic segment">
-      {% block oauth_controls scoped %}
-      <div class="right floated content">
+  </div>
+
+  <ul class="ui segments no-border no-border-radius-top m-0 no-style-list p-0">
+    {%- for s in services %}
+      <li class="ui segment flex align-items-center justify-space-between">
+        <div>
+          {% if s.icon %}
+            <i class="{{s.icon}}" aria-hidden="true"></i>
+          {% endif %}
+
+          {{ s.title }}
+
+          {% if s.account %}
+            <i class="check icon green" aria-hidden="true"></i>
+          {% endif %}
+
+          <p><small>{{ s.description }}</small></p>
+        </div>
+
+        {% block oauth_controls scoped %}
           {# we'll only show the "disconnect" button if it's not the only way for the user to log in #}
           {%- if s.account and can_disconnect -%}
-          <a href="{{url_for('invenio_oauthclient.disconnect', remote_app=s.appid)}}" class="ui compact button mini"><i class="close icon"></i> {{ _('Disconnect') }}</a>
+            <a
+              role="button"
+              href="{{url_for('invenio_oauthclient.disconnect', remote_app=s.appid)}}"
+              class="ui compact button mini"
+            >
+              <i class="close icon" aria-hidden="true"></i>
+              {{ _('Disconnect') }}
+            </a>
           {%- elif not s.account -%}
-          <a href="{{url_for('invenio_oauthclient.login', remote_app=s.appid)}}" class="ui compact basic button mini"><i class="linkify icon"></i> {{ _('Connect') }}</a>
+            <a
+              role="button"
+              href="{{url_for('invenio_oauthclient.login', remote_app=s.appid)}}"
+              class="ui compact basic button mini"
+            >
+              <i class="linkify icon" aria-hidden="true"></i>
+              {{ _('Connect') }}
+            </a>
           {%- endif -%}
-      </div>
-      {% endblock oauth_controls %}
-      <div>{% if s.icon %}<i class="{{s.icon}}"></i>{% endif %} {{s.title}} {% if s.account %}<i class="check icon green"></i>{% endif %}</div>
-      <small>{{s.description}}</small>
-
-    </div>
-  </div>
-  {%- endfor %}
-</div>
+        {% endblock oauth_controls %}
+      </li>
+    {%- endfor %}
+  </ul>
 {% endblock %}
