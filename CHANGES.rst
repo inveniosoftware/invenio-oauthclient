@@ -8,7 +8,11 @@
 Changes
 =======
 
-Version 3.3.0 (released 2023-07-31)
+Version 3.3.0 (released 2023-07-24)
+
+- settings: Improve layout for a11y
+
+Version 3.2.0 (released 2023-07-24)
 
 - authorize: refactor authorize/signup handlers
 - update translations
