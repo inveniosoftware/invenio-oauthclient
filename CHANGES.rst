@@ -8,7 +8,7 @@
 Changes
 =======
 
-Version 3.2.0 (released 2023-07-24)
+Version 3.3.0 (released 2023-07-31)
 
 - authorize: refactor authorize/signup handlers
 - update translations
