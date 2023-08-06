@@ -164,8 +164,8 @@ def _authorized(remote_app=None):
     # Store next URL
     set_session_next_url(remote_app, state["next"])
 
-    handler = current_oauthclient.handlers[remote_app]()
-    return handler
+    handler = current_oauthclient.handlers[remote_app]
+    return handler()
 
 
 @blueprint.route("/authorized/<remote_app>/")
@@ -231,8 +231,8 @@ def signup(remote_app):
     """Extra signup step.
 
     GET: automatically called when OAuthClientMustRedirectSignup exception triggered
-    during authorized handler execution: the info retrieved from the remote
-    app are not sufficient to register the user.
+    during `authorized` handler execution: the account info retrieved from the remote
+    app is not sufficient to register the user (e.g missing e-mail.
     POST: called when the registration form is submitted by the user.
     """
     try:
@@ -247,8 +247,8 @@ def rest_signup(remote_app):
     """Extra signup step.
 
     GET: automatically called when OAuthClientMustRedirectSignup exception triggered
-    during authorized handler execution: the info retrieved from the remote
-    app are not sufficient to register the user.
+    during `authorized` handler execution: the account info retrieved from the remote
+    app is not sufficient to register the user (e.g missing e-mail).
     POST: called when the registration form is submitted by the user.
     """
     try:

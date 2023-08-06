@@ -98,7 +98,7 @@ def info_handler(remote, resp):
 
 def setup_handler(remote, token, resp):
     """Perform additional setup after the user has been logged in."""
-    token_user_info, _ = get_user_info(remote, resp)
+    token_user_info, _ = get_user_info(remote, resp, from_token_only=True)
 
     with db.session.begin_nested():
         # fetch the user's Keycloak ID and set it in extra_data

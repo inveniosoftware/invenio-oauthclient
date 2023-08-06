@@ -248,12 +248,18 @@ def disconnect_handler(remote, *args, **kwargs):
 def signup_handler(remote, *args, **kwargs):
     """Handle extra signup information.
 
+    This should be called when the account info from the remote `info` endpoint is
+    not enough to register the user (e.g. e-mail missing): it will show the
+    registration form, validate it on submission and register the user.
+
     :param remote: The remote application.
     :returns: Redirect response or the template rendered.
     """
     remote_app_config = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][remote.name]
     form = create_csrf_disabled_registrationform(remote)
     if not form.is_submitted():
+        # Show the form when the user is redirected here after `authorized`
+        # (GET request), to fill in the missing information (e.g. e-mail)
         data = request.form.to_dict()
         form = fill_form(form, data)
         return response_handler(
@@ -267,7 +273,9 @@ def signup_handler(remote, *args, **kwargs):
                 app_icon=remote_app_config.get("icon", None),
             ),
         )
-    else:
+    elif form.is_submitted():
+        # Form is submitted (POST request): validate the user input and register
+        # the user
         try:
             next_url = extra_signup_handler(remote, form, *args, **kwargs)
         except OAuthClientUnAuthorized:

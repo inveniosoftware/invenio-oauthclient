@@ -8,7 +8,9 @@
 
 """Utility methods."""
 
-from flask import current_app, request
+from flask import current_app, request, session
+from flask_login import current_user
+from flask_principal import RoleNeed, UserNeed
 from invenio_db.utils import rebuild_encrypted_properties
 from itsdangerous import TimedJSONWebSignatureSerializer
 from uritools import uricompose, urisplit
@@ -194,3 +196,20 @@ def _get_csrf_disabled_param():
 
     supports_meta = parse_version(flask_wtf.__version__) >= parse_version("0.14.0")
     return dict(meta={"csrf": False}) if supports_meta else dict(csrf_enabled=False)
+
+
+def load_user_role_needs(identity):
+    """Add User/RoleNeed to the logged in user whenever identity is loaded."""
+    if identity.id is None:
+        # no user is logged in
+        return
+
+    needs = set()
+    if current_user.email:
+        needs.add(UserNeed(current_user.email))
+
+    roles_ids = session.get("unmanaged_roles_ids", [])
+    for role_id in roles_ids:
+        needs.add(RoleNeed(role_id))
+
+    identity.provides |= needs

@@ -85,12 +85,14 @@ def _get_user_info_from_endpoint(remote, config_prefix):
     return remote.get(url).data
 
 
-def get_user_info(remote, resp_token):
+def get_user_info(remote, resp_token, from_token_only=False):
     """Get the user information from Keycloak.
 
     :param remote: The OAuthClient remote app
     :param resp_token: The response from the 'token' endpoint; expected to be a dict
         and to contain a JWT 'id_token'
+    :param from_token_only: return info only from the token, without calling the
+        user info endpoint.
     :returns: A tuple containing the user information extracted from the token, and
         if configured, from the UserInfo endpoint
     """
@@ -105,7 +107,7 @@ def get_user_info(remote, resp_token):
         current_app.logger.exception(e)
 
     call_endpoint = current_app.config[f"{config_prefix}_USER_INFO_FROM_ENDPOINT"]
-    if call_endpoint:
+    if not from_token_only and call_endpoint:
         from_endpoint = _get_user_info_from_endpoint(remote, config_prefix)
 
     return from_token, from_endpoint

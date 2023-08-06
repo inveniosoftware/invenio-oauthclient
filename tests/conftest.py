@@ -19,6 +19,7 @@ from flask import Flask
 from flask_mail import Mail
 from flask_menu import Menu as FlaskMenu
 from invenio_accounts import InvenioAccounts
+from invenio_celery import InvenioCelery
 from invenio_db import InvenioDB, db
 from invenio_i18n import Babel, InvenioI18N
 from invenio_userprofiles import InvenioUserProfiles
@@ -72,6 +73,7 @@ def base_app(request):
         WTF_CSRF_ENABLED=False,
         LOGIN_DISABLED=False,
         CACHE_TYPE="simple",
+        CELERY_TASK_ALWAYS_EAGER=True,
         OAUTHCLIENT_SIGNUP_FORM=_create_registrationform,
         OAUTHCLIENT_REMOTE_APPS=dict(
             cern_openid=CERN_OPENID_REMOTE_APP,
@@ -145,6 +147,7 @@ def base_app(request):
     InvenioDB(base_app)
     InvenioAccounts(base_app)
     InvenioI18N(base_app)
+    InvenioCelery(base_app)
 
     with base_app.app_context():
         if str(db.engine.url) != "sqlite://" and not database_exists(
