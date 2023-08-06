@@ -27,6 +27,7 @@ from ..signals import (
     account_setup_committed,
     account_setup_received,
 )
+from ..tasks import create_or_update_roles_task
 from ..utils import create_csrf_disabled_registrationform, fill_form
 from .token import (
     get_session_next_url,
@@ -35,7 +36,6 @@ from .token import (
     token_session_key,
     token_setter,
 )
-from .utils import create_or_update_roles
 
 
 def authorized_handler(resp, remote, *args, **kwargs):
@@ -64,15 +64,18 @@ def authorized_handler(resp, remote, *args, **kwargs):
     account_info_received.send(remote, response=resp, account_info=account_info)
 
     # call groups endpoint, when defined
-    group_handler = handlers.get("groups")
-    if group_handler:
-        account_groups = group_handler(resp)
-        if account_groups:
-            roles_ids = create_or_update_roles(account_groups)
+    session["unmanaged_roles_ids"] = set()
+    groups_handler = handlers.get("groups")
+    if groups_handler:
+        groups = groups_handler(resp)
+        if groups:
+            # preventively add/update Invenio roles based on the fetched user groups
+            # (async), so that new groups are almost immediately searchable
+            create_or_update_roles_task.delay(groups)
             # Set the unmanaged roles in the user session, used in other modules.
             # Unmanaged user roles are not stored in the DB for privacy reasons:
             # sys admins should not know the external groups of a user.
-            session["unmanaged_roles_ids"] = roles_ids
+            session["unmanaged_roles_ids"] = set(group["id"] for group in groups)
 
     # In the normal OAuth flow, the user is not yet authenticated. However, it the user
     # is already logged in, and goes to 'Linked accounts', clicks 'Connect' on another

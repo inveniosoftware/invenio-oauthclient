@@ -168,17 +168,17 @@ def disconnect_handler(remote, *args, **kwargs):
 def signup_handler(remote, *args, **kwargs):
     """Handle extra signup information.
 
-    The info in the request.form is used to fill in the user registration form.
-    When the form does not validate (e.g. missing user e-mail), it is displayed
-    to the user, who needs to fill in the missing info and submit it.
-    This method is also called when the user has filled in the form and click on
-    btn submit.
+    This should be called when the account info from the remote `info` endpoint is
+    not enough to register the user (e.g. e-mail missing): it will show the
+    registration form, validate it on submission and register the user.
 
     :param remote: The remote application.
     :returns: Redirect response or the template rendered.
     """
     form = create_registrationform(request.form, oauth_remote_app=remote)
     if not form.is_submitted():
+        # Show the form when the user is redirected here after `authorized`
+        # (GET request), to fill in the missing information (e.g. e-mail)
         session_prefix = token_session_key(remote.name)
         account_info = session.get(session_prefix + "_account_info")
         # Pre-fill form
@@ -197,7 +197,9 @@ def signup_handler(remote, *args, **kwargs):
                 "icon", None
             ),
         )
-    elif not form.errors:
+    elif form.is_submitted() and not form.errors:
+        # Form is submitted (POST request): validate the user input and register
+        # the user
         try:
             next_url = extra_signup_handler(remote, form, *args, **kwargs)
         except OAuthClientUnAuthorized:

@@ -108,10 +108,10 @@ def _role_needs_update(role_obj, new_role_dict):
     return False
 
 
-def create_or_update_roles(account_groups):
-    """Creates the DB roles based on the groups provided."""
+def create_or_update_roles(groups):
+    """Create/update DB roles based on the groups provided."""
     roles_ids = set()
-    for group in account_groups:
+    for group in groups:
         existing_role = current_datastore.find_role_by_id(group["id"])
         if existing_role and existing_role.is_managed:
             current_app.logger.exception(

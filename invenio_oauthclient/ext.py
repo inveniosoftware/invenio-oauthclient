@@ -11,9 +11,14 @@
 import warnings
 
 from flask_login import user_logged_out
+from flask_principal import identity_loaded
 
 from . import config, handlers
-from .utils import load_or_import_from_config, obj_or_import_string
+from .utils import (
+    load_or_import_from_config,
+    load_user_role_needs,
+    obj_or_import_string,
+)
 
 from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
 
@@ -41,6 +46,11 @@ class _OAuthClientState(object):
         self.disconnect_handlers = {}
         self.signup_handlers = {}
         self.remote_app_response_handler = {}
+
+        # Connect signal to add User/Role needs on identity loaded
+        @identity_loaded.connect_via(app)
+        def on_identity_loaded(_, identity):
+            load_user_role_needs(identity)
 
         # Connect signal to remove access tokens on logout
         user_logged_out.connect(handlers.oauth_logout_handler)

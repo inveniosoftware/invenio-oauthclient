@@ -45,7 +45,7 @@ fi
 
 python -m check_manifest
 python -m sphinx.cmd.build -qnN docs docs/_build/html
-eval "$(docker-services-cli up --db ${DB:-postgresql} --env)"
+eval "$(docker-services-cli up --db ${DB:-postgresql} --mq ${MQ:-rabbitmq} --env)"
 python -m pytest ${pytest_args[@]+"${pytest_args[@]}"}
 tests_exit_code=$?
 exit "$tests_exit_code"
