@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 3.4.0 (released 2023-08-09)
+
+- groups: make groups fetching async
+- load user and role needs on identity loaded
+
 Version 3.3.0 (released 2023-07-24)
 
 - settings: Improve layout for a11y
