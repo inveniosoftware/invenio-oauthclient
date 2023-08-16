@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 3.4.1 (released 2023-08-16)
+
+-  utils: removed creation of UserNeed email
+
 Version 3.4.0 (released 2023-08-09)
 
 - groups: make groups fetching async
