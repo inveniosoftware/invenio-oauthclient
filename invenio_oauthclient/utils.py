@@ -205,8 +205,6 @@ def load_user_role_needs(identity):
         return
 
     needs = set()
-    if current_user.email:
-        needs.add(UserNeed(current_user.email))
 
     roles_ids = session.get("unmanaged_roles_ids", [])
     for role_id in roles_ids:
