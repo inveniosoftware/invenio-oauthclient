@@ -96,6 +96,10 @@ class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
     ):
         """Constructor."""
         base_url = base_url or "https://aai.openaire.eu"
+        signup_options = signup_options or {
+            "auto_confirm": False,
+            "send_register_msg": True,
+        }
         super().__init__(
             title or "OpenAIRE",
             description or "Open Science Services.",
@@ -106,10 +110,7 @@ class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
             authorize_url=f"{base_url}/oidc/authorize",
             content_type="application/json",
             precedence_mask=precedence_mask or {"email": True},
-            signup_options=signup_options or {
-                "auto_confirm": False,
-                "send_register_msg": True,
-            },
+            signup_options=signup_options,
         )
 
         self._handlers = dict(
