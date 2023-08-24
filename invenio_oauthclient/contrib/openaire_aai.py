@@ -106,7 +106,10 @@ class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
             authorize_url=f"{base_url}/oidc/authorize",
             content_type="application/json",
             precedence_mask=precedence_mask or {"email": True},
-            signup_options=signup_options,
+            signup_options=signup_options or {
+                "auto_confirm": False,
+                "send_register_msg": True,
+            },
         )
 
         self._handlers = dict(
