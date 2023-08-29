@@ -104,3 +104,15 @@ class OAuthClientMustRedirectLogin(Exception):
 
 class OAuthRemoteNotFound(Exception):
     """Define exception for remote app not found."""
+
+
+class OAuthClientUserRequiresConfirmation(Exception):
+    """User requires to confirm their email."""
+
+    def __init__(self, user, *args, **kwargs):
+        """Initialize exception.
+
+        :param user: User object whose email requires confirmation.
+        """
+        self.user = user
+        super().__init__(*args, **kwargs)

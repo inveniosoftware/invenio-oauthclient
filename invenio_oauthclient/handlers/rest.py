@@ -34,6 +34,7 @@ from ..errors import (
     OAuthClientTokenNotSet,
     OAuthClientUnAuthorized,
     OAuthClientUserNotRegistered,
+    OAuthClientUserRequiresConfirmation,
     OAuthError,
     OAuthRejectedRequestError,
 )
@@ -100,7 +101,7 @@ def _oauth_error_handler(remote, f, *args, **kwargs):
             remote_app_config["error_redirect_url"],
             payload=dict(message=msg, code=400),
         )
-    except OAuthClientUnAuthorized:
+    except (OAuthClientUnAuthorized, OAuthClientUserRequiresConfirmation):
         return response_handler(
             remote,
             remote_app_config["error_redirect_url"],
