@@ -158,7 +158,7 @@ def test_unauthorized_signup(remote, app, models_fixture):
     user.confirmed_at = None
     app.config["OAUTHCLIENT_REMOTE_APPS"][remote.name] = {}
     resp = authorized_signup_handler(example_response, remote)
-    check_redirect_location(resp, lambda x: x.startswith("/login"))
+    check_redirect_location(resp, "/")
 
 
 def test_signup_handler(remote, app, models_fixture):

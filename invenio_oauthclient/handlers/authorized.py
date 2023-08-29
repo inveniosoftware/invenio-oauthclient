@@ -8,8 +8,10 @@
 
 """Authorize handlers."""
 
-from flask import current_app, g, session
+from flask import current_app, session
 from flask_login import current_user
+from flask_security.confirmable import requires_confirmation
+from flask_security.utils import get_message
 from invenio_db import db
 
 from ..errors import (
@@ -19,6 +21,7 @@ from ..errors import (
     OAuthClientTokenNotSet,
     OAuthClientUnAuthorized,
     OAuthClientUserNotRegistered,
+    OAuthClientUserRequiresConfirmation,
 )
 from ..oauth import oauth_authenticate, oauth_get_user, oauth_register
 from ..proxies import current_oauthclient
@@ -108,14 +111,29 @@ def authorized_handler(resp, remote, *args, **kwargs):
                 # to fill in the registration form with the missing information
                 raise OAuthClientMustRedirectSignup()
 
+        # check if user requires confirmation
+        # that happens when user was previously logged in but email was not yet
+        # confirmed
+        if requires_confirmation(user):
+            raise OAuthClientUserRequiresConfirmation(user=user)
+
         if not oauth_authenticate(
-            remote.consumer_key, user, require_existing_link=False
+            remote.consumer_key,
+            user,
+            require_existing_link=False,
+            require_user_confirmation=False,
         ):
             raise OAuthClientUnAuthorized()
+
         # Store token in the database instead of only the session
         token = response_token_setter(remote, resp)
 
-    return _complete_authorize(resp, remote, handlers, token)
+    _complete_authorize(resp, remote, handlers, token)
+
+    # Return the URL where to go next
+    next_url = get_session_next_url(remote.name)
+    if next_url:
+        return next_url
 
 
 def _register_user(resp, remote, account_info, form):
@@ -163,11 +181,6 @@ def _complete_authorize(resp, remote, handlers, token):
     else:
         db.session.commit()
 
-    # Return the URL where to go next
-    next_url = get_session_next_url(remote.name)
-    if next_url:
-        return next_url
-
 
 def extra_signup_handler(remote, form, *args, **kwargs):
     """Handle extra signup information.
@@ -202,11 +215,25 @@ def extra_signup_handler(remote, form, *args, **kwargs):
         if token is None:
             raise OAuthClientTokenNotSet()
 
+        # check if user requires confirmation
+        # that happens when user was previously logged in but email was not yet
+        # confirmed
+        if requires_confirmation(user):
+            _complete_authorize(response, remote, handlers, token)
+            raise OAuthClientUserRequiresConfirmation(user=user)
+
         # Authenticate user, without requiring the existence of the RemoteAccount,
         # which is created later in the setup handler.
         if not oauth_authenticate(
-            remote.consumer_key, user, require_existing_link=False
+            remote.consumer_key,
+            user,
+            require_existing_link=False,
+            require_user_confirmation=False,
         ):
             raise OAuthClientUnAuthorized()
 
-        return _complete_authorize(response, remote, handlers, token)
+        _complete_authorize(response, remote, handlers, token)
+        # Return the URL where to go next
+        next_url = get_session_next_url(remote.name)
+        if next_url:
+            return next_url

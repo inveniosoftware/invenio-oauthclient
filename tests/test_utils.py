@@ -48,12 +48,14 @@ def test_utilities(app, models_fixture):
 
     # Authenticate
     assert not _get_external_id({})
-    assert not oauth_authenticate("dev", user, require_existing_link=True)
+    assert not oauth_authenticate(
+        "dev", user, require_existing_link=True, require_user_confirmation=False
+    )
 
     _security.confirmable = True
     _security.login_without_confirmation = False
     user.confirmed_at = None
-    assert not oauth_authenticate("dev", user)
+    assert not oauth_authenticate("dev", user, require_user_confirmation=True)
 
     # Tokens
     t = RemoteToken.create(user.id, "dev", "mytoken", "mysecret")

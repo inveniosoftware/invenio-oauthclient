@@ -19,7 +19,7 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import current_user
+from flask_security.utils import do_flash, get_message
 from invenio_db import db
 from invenio_i18n import gettext as _
 
@@ -33,6 +33,7 @@ from ..errors import (
     OAuthClientTokenNotSet,
     OAuthClientUnAuthorized,
     OAuthClientUserNotRegistered,
+    OAuthClientUserRequiresConfirmation,
     OAuthError,
     OAuthRejectedRequestError,
 )
@@ -141,11 +142,20 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
     :param resp: The response.
     :returns: Redirect response.
     """
-    next_url = authorized_handler(resp, remote, *args, **kwargs)
-    # Redirect to next
-    if next_url:
-        return redirect(next_url)
-    return redirect(url_for("invenio_oauthclient_settings.index"))
+    try:
+        next_url = authorized_handler(resp, remote, *args, **kwargs)
+        # Redirect to next
+        if next_url:
+            return redirect(next_url)
+        return redirect(url_for("invenio_oauthclient_settings.index"))
+    except OAuthClientUserRequiresConfirmation as exc:
+        do_flash(
+            _(
+                f"A confirmation email has already been sent to {exc.user.email}. Please confirm your email to be able to log in."
+            ),
+            category="success",
+        )
+        return redirect("/")
 
 
 @oauth_remote_error_handler
@@ -203,9 +213,13 @@ def signup_handler(remote, *args, **kwargs):
         try:
             next_url = extra_signup_handler(remote, form, *args, **kwargs)
         except OAuthClientUnAuthorized:
+            # Redirect the user to login page
+            return redirect(url_for("security.login"))
+        except OAuthClientUserRequiresConfirmation as exc:
             # Redirect the user after registration (which doesn't include the
             # activation), waiting for user to confirm his email.
-            return redirect(url_for("security.login"))
+            do_flash(*get_message("CONFIRM_REGISTRATION", email=exc.user.email))
+            return redirect("/")
 
         if next_url:
             return redirect(next_url)
