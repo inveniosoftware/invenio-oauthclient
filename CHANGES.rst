@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 3.5.0 (released 2023-08-30)
+
+- oauth: handle properly workflow when user is not yet confirmed and auto-confirm is
+  disabled for remote
+
 Version 3.4.1 (released 2023-08-16)
 
 -  utils: removed creation of UserNeed email
