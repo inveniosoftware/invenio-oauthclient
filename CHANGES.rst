@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 3.5.1 (released 2023-08-30)
+
+- orcid: show registration form errors on validations errors
+
 Version 3.5.0 (released 2023-08-30)
 
 - oauth: handle properly workflow when user is not yet confirmed and auto-confirm is
@@ -15,7 +19,7 @@ Version 3.5.0 (released 2023-08-30)
 
 Version 3.4.1 (released 2023-08-16)
 
--  utils: removed creation of UserNeed email
+- utils: removed creation of UserNeed email
 
 Version 3.4.0 (released 2023-08-09)
 
