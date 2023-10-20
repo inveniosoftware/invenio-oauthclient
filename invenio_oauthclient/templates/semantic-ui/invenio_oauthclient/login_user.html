@@ -32,15 +32,19 @@
 
 {%- block recoverable %}
   {%- if security.recoverable or security.confirmable %}
-    <div class="ui basic segment padded">
-      {%- if security.recoverable %}
-        <a class="ui inverted header tiny"
-            href="{{ url_for_security('forgot_password') }}">{{ _('Forgot password?') }}</a>
-      {%- endif %}
-      {%- if security.confirmable %}
-        <a class="ui inverted header tiny"
-          href="{{url_for('security.send_confirmation')}}" class="text-muted">{{_('Resend confirmation email?')}}</a>
-      {%- endif %}
+  <div class="ui one column centered grid">
+    {%- if security.recoverable %}
+    <div class="row">
+      <a class="ui inverted header tiny"
+          href="{{ url_for_security('forgot_password') }}">{{ _('Forgot password?') }}</a>
     </div>
+    {%- endif %}
+    {%- if security.confirmable %}
+    <div class="row">
+      <a class="ui inverted header tiny"
+        href="{{url_for('security.send_confirmation')}}" class="text-muted">{{_('Resend confirmation email')}}</a>
+    </div>
+    {%- endif %}
+  </div>
   {%- endif %}
 {%- endblock %}

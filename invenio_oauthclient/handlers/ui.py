@@ -11,6 +11,7 @@
 from functools import partial, wraps
 
 from flask import (
+    Markup,
     current_app,
     flash,
     redirect,
@@ -150,8 +151,10 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
         return redirect(url_for("invenio_oauthclient_settings.index"))
     except OAuthClientUserRequiresConfirmation as exc:
         do_flash(
-            _(
-                f"A confirmation email has already been sent to {exc.user.email}. Please confirm your email to be able to log in."
+            Markup(
+                _(
+                    f"A confirmation email has already been sent to {exc.user.email}. Didn't receive it? Click <strong><a href=\"{url_for('security.send_confirmation')}\">here</a></strong> to resend it."
+                )
             ),
             category="success",
         )
@@ -185,33 +188,23 @@ def signup_handler(remote, *args, **kwargs):
     :param remote: The remote application.
     :returns: Redirect response or the template rendered.
     """
+    session_prefix = token_session_key(remote.name)
+    account_info = session.get(session_prefix + "_account_info")
+
     form = create_registrationform(request.form, oauth_remote_app=remote)
     if not form.is_submitted():
         # Show the form when the user is redirected here after `authorized`
         # (GET request), to fill in the missing information (e.g. e-mail)
-        session_prefix = token_session_key(remote.name)
-        account_info = session.get(session_prefix + "_account_info")
-        # Pre-fill form
-        fill_form(form, account_info["user"])
-        return render_template(
-            current_app.config["OAUTHCLIENT_SIGNUP_TEMPLATE"],
-            form=form,
-            remote=remote,
-            app_title=current_app.config["OAUTHCLIENT_REMOTE_APPS"][remote.name].get(
-                "title", ""
-            ),
-            app_description=current_app.config["OAUTHCLIENT_REMOTE_APPS"][
-                remote.name
-            ].get("description", ""),
-            app_icon=current_app.config["OAUTHCLIENT_REMOTE_APPS"][remote.name].get(
-                "icon", None
-            ),
-        )
-    elif form.is_submitted() and not form.errors:
+        return _render_signup_form(remote, form, account_info)
+    elif form.is_submitted():
         # Form is submitted (POST request): validate the user input and register
         # the user
         try:
             next_url = extra_signup_handler(remote, form, *args, **kwargs)
+            # after validation, if errors occurred, render the form to display
+            # the error messages.
+            if form.errors:
+                return _render_signup_form(remote, form, account_info)
         except OAuthClientUnAuthorized:
             # Redirect the user to login page
             return redirect(url_for("security.login"))
@@ -225,6 +218,20 @@ def signup_handler(remote, *args, **kwargs):
             return redirect(next_url)
         else:
             return redirect("/")
+
+
+def _render_signup_form(remote, form, account_info):
+    """Return the rendered signup form."""
+    fill_form(form, account_info["user"])
+    remote_app = current_app.config["OAUTHCLIENT_REMOTE_APPS"][remote.name]
+    return render_template(
+        current_app.config["OAUTHCLIENT_SIGNUP_TEMPLATE"],
+        form=form,
+        remote=remote,
+        app_title=remote_app.get("title", ""),
+        app_description=remote_app.get("description", ""),
+        app_icon=remote_app.get("icon", None),
+    )
 
 
 def oauth2_handle_error(remote, resp, error_code, error_uri, error_description):
