@@ -24,7 +24,8 @@ from invenio_celery import InvenioCelery
 from invenio_db import InvenioDB, db
 from invenio_i18n import Babel, InvenioI18N
 from invenio_userprofiles import InvenioUserProfiles
-from invenio_userprofiles.views import blueprint_ui_init
+from invenio_userprofiles.ext import finalize_app as userprofiles_finalize_app
+from invenio_userprofiles.views import create_blueprint
 from sqlalchemy_utils.functions import create_database, database_exists, drop_database
 
 from invenio_oauthclient import InvenioOAuthClient, InvenioOAuthClientREST
@@ -142,6 +143,7 @@ def base_app(request):
         APP_THEME=["semantic-ui"],
         THEME_ICONS={"semantic-ui": dict(link="linkify icon")},
         OAUTHCLIENT_SETTINGS_TEMPLATE="invenio_oauthclient/settings/base.html",
+        USERPROFILES_EXTEND_SECURITY_FORMS=False,
     )
     FlaskMenu(base_app)
     Babel(base_app)
@@ -182,6 +184,10 @@ def _init_app(app_):
     InvenioOAuthClient(app_)
     app_.register_blueprint(blueprint_client)
     app_.register_blueprint(blueprint_settings)
+
+    with app_.app_context():
+        userprofiles_finalize_app(app_)
+
     return app_
 
 
@@ -228,7 +234,10 @@ def app_rest_with_userprofiles(app_rest):
 def _init_userprofiles(app_):
     """Init userprofiles module."""
     InvenioUserProfiles(app_)
-    app_.register_blueprint(blueprint_ui_init)
+    app_.register_blueprint(create_blueprint(app_))
+
+    with app_.app_context():
+        userprofiles_finalize_app(app_)
     return app_
 
 
