@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 4.0.0 (released 2024-03-23)
+
+- fix: before_app_first_request deprecation
+- installation: remove invenio-admin
+- installation: switch to uritemplate to avoid dependency conflicts
+
 Version 3.5.1 (released 2023-08-30)
 
 - orcid: show registration form errors on validations errors
