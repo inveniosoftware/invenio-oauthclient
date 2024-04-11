@@ -14,7 +14,7 @@
 
 {%- block form_outer %}
   {% if config.OAUTHCLIENT_REMOTE_APPS %}
-    {% for name in config.OAUTHCLIENT_REMOTE_APPS.keys() %}
+    {% for name, config in config.OAUTHCLIENT_REMOTE_APPS.items() if not config.hide %}
       {{ oauth_button(name, next=request.args.get('next')) }}
     {% endfor %}
     {%- if config.ACCOUNTS_LOCAL_LOGIN_ENABLED %}

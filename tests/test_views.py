@@ -119,6 +119,12 @@ def test_login(views_fixture):
         resp = client.get(url_for("invenio_oauthclient.login", remote_app="invalid"))
         assert resp.status_code == 404
 
+        # Hidden remote
+        resp = client.get(
+            url_for("invenio_oauthclient.login", remote_app="hidden", next="/")
+        )
+        assert resp.status_code == 404
+
 
 def test_authorized(base_app, params):
     """Test login."""
