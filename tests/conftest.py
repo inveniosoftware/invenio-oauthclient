@@ -335,6 +335,11 @@ def views_fixture(base_app, params, models_fixture):
                 params=params("fullid"),
                 title="Full",
             ),
+            hidden=dict(
+                params=params("hiddenid"),
+                title="Hidden",
+                hide=True,
+            ),
         )
     )
 
@@ -371,6 +376,15 @@ def views_fixture_rest(base_app, params, models_fixture):
                 signup_redirect_url="/",
                 error_redirect_url="/",
                 title="Full",
+            ),
+            hidden=dict(
+                params=params("hiddenid"),
+                authorized_redirect_url="/",
+                disconnect_redirect_url="/",
+                signup_redirect_url="/",
+                error_redirect_url="/",
+                title="Hidden",
+                hide=True,
             ),
         )
     )

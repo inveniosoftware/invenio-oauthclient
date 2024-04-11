@@ -8,6 +8,7 @@
 """Common OAuth configuration helper."""
 
 from werkzeug import cached_property
+from werkzeug.local import LocalProxy
 
 
 class OAuthSettingsHelper:
@@ -31,6 +32,7 @@ class OAuthSettingsHelper:
         precedence_mask=None,
         signup_options=None,
         logout_url=None,
+        hide_when=False,
         **kwargs,
     ):
         """The constructor."""
@@ -51,6 +53,7 @@ class OAuthSettingsHelper:
         signup_options = signup_options or {}
         signup_options.setdefault("auto_confirm", True)
         signup_options.setdefault("send_register_msg", False)
+        self.hide_when = hide_when if hide_when is not None else False
 
         self.base_app = dict(
             title=title,
@@ -59,6 +62,9 @@ class OAuthSettingsHelper:
             precedence_mask=precedence_mask,
             signup_options=signup_options,
             logout_url=logout_url,
+            hide=LocalProxy(
+                lambda: self.hide_when() if callable(hide_when) else self.hide_when
+            ),
             params=dict(
                 base_url=self.base_url,
                 request_token_params=request_token_params,

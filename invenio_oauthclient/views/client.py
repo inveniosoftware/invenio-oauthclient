@@ -60,8 +60,13 @@ def auto_redirect_login(*args, **kwargs):
     )
     would_redirect = auto_redirect_enabled and not local_login_enabled
     remote_apps = list(current_oauthclient.oauth.remote_apps)
+    remote_app_configs = current_app.config["OAUTHCLIENT_REMOTE_APPS"]
 
-    if would_redirect and len(remote_apps) == 1:
+    if (
+        would_redirect
+        and len(remote_apps) == 1
+        and not remote_app_configs[0].get("hide", False)
+    ):
         redirect_args = {
             # if local login is disabled and we only have one OAuth2 remote app
             # configured, we forward directly to that
@@ -109,6 +114,13 @@ def _login(remote_app, authorized_view_name):
 @blueprint.route("/login/<remote_app>/")
 def login(remote_app):
     """Send user to remote application for authentication."""
+    if (
+        current_app.config["OAUTHCLIENT_REMOTE_APPS"]
+        .get(remote_app, {})
+        .get("hide", False)
+    ):
+        abort(404)
+
     try:
         return _login(remote_app, ".authorized")
     except OAuthRemoteNotFound:
@@ -118,6 +130,13 @@ def login(remote_app):
 @rest_blueprint.route("/login/<remote_app>/")
 def rest_login(remote_app):
     """Send user to remote application for authentication."""
+    if (
+        current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"]
+        .get(remote_app, {})
+        .get("hide", False)
+    ):
+        abort(404)
+
     try:
         return _login(remote_app, ".rest_authorized")
     except OAuthRemoteNotFound:
