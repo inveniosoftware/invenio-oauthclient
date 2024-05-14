@@ -51,4 +51,4 @@ def test_token_getter(remote, models_fixture, app):
     # Populated RemoteToken
     RemoteToken.create(user.id, "testkey", "mytoken", "mysecret")
     oauth_authenticate("dev", user)
-    assert token_getter(remote) == ("mytoken", "mysecret")
+    assert token_getter(remote) == ("mytoken", "mysecret", None, None)
