@@ -40,6 +40,11 @@ def mock_remote_get(oauth, remote_app="test", data=None):
     oauth.remote_apps[remote_app].get = MagicMock(return_value=data)
 
 
+def mock_remote_http_request(oauth, remote_app="test", data=None):
+    """Mock the oauth remote get response."""
+    oauth.remote_apps[remote_app].http_request = MagicMock(return_value=data)
+
+
 def check_redirect_location(resp, loc):
     """Check response redirect location."""
     assert resp._status_code == 302

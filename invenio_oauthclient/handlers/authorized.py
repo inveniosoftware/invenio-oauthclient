@@ -211,7 +211,14 @@ def extra_signup_handler(remote, form, *args, **kwargs):
         user = _register_user(response, remote, account_info, form)
 
         # Link account and set session data
-        token = token_setter(remote, oauth_token[0], secret=oauth_token[1], user=user)
+        token = token_setter(
+            remote,
+            oauth_token[0],
+            secret=oauth_token[1],
+            user=user,
+            refresh_token=oauth_token[2] if len(oauth_token) > 2 else None,
+            expires_at=oauth_token[3] if len(oauth_token) > 3 else None,
+        )
         if token is None:
             raise OAuthClientTokenNotSet()
 

@@ -7,7 +7,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Funcs to manage tokens."""
-
+from datetime import datetime, timedelta
 from functools import partial
 
 from flask import current_app, session
@@ -112,10 +112,31 @@ def oauth2_token_setter(remote, resp, token_type="", extra_data=None):
         secret="",
         token_type=token_type,
         extra_data=extra_data,
+        refresh_token=resp.get("refresh_token"),
+        expires_at=make_expiration_time(resp.get("expires_in")),
     )
 
 
-def token_setter(remote, token, secret="", token_type="", extra_data=None, user=None):
+def make_expiration_time(expires_in):
+    """Make expiration time from expires_in.
+
+    :param expires_in: The time in seconds.
+    """
+    if expires_in is None:
+        return None
+    return datetime.utcnow() + timedelta(seconds=expires_in)
+
+
+def token_setter(
+    remote,
+    token,
+    secret="",
+    token_type="",
+    extra_data=None,
+    user=None,
+    refresh_token=None,
+    expires_at=None,
+):
     """Set token for user.
 
     :param remote: The remote application.
@@ -127,7 +148,12 @@ def token_setter(remote, token, secret="", token_type="", extra_data=None, user=
     :returns: A :class:`invenio_oauthclient.models.RemoteToken` instance or
         ``None``.
     """
-    session[token_session_key(remote.name)] = (token, secret)
+    session[token_session_key(remote.name)] = (
+        token,
+        secret,
+        refresh_token,
+        expires_at.isoformat() if expires_at else None,
+    )
     user = user or current_user
 
     # Save token if user is not anonymous (user exists but can be not active at
@@ -140,10 +166,17 @@ def token_setter(remote, token, secret="", token_type="", extra_data=None, user=
         t = RemoteToken.get(uid, cid, token_type=token_type)
 
         if t:
-            t.update_token(token, secret)
+            t.update_token(token, secret, refresh_token, expires_at)
         else:
             t = RemoteToken.create(
-                uid, cid, token, secret, token_type=token_type, extra_data=extra_data
+                uid,
+                cid,
+                token,
+                secret,
+                token_type=token_type,
+                extra_data=extra_data,
+                refresh_token=refresh_token,
+                expires_at=expires_at,
             )
         return t
     return None
@@ -176,7 +209,15 @@ def token_getter(remote, token=""):
         # Store token and secret in session
         session[session_key] = remote_token.token()
 
-    return session.get(session_key, None)
+    ret = session.get(session_key, None)
+    if ret:
+        if len(ret) == 2:
+            # no refresh token nor expiration time
+            return ret[0], ret[1], None, None
+        if ret[3] is not None:
+            # refresh token and expiration time
+            return ret[0], ret[1], ret[2], datetime.fromisoformat(ret[3])
+    return ret
 
 
 def token_delete(remote, token=""):

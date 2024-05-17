@@ -9,8 +9,7 @@
 """Utility methods."""
 
 from flask import current_app, request, session
-from flask_login import current_user
-from flask_principal import RoleNeed, UserNeed
+from flask_principal import RoleNeed
 from invenio_db.utils import rebuild_encrypted_properties
 from itsdangerous import TimedJSONWebSignatureSerializer
 from uritools import uricompose, urisplit
