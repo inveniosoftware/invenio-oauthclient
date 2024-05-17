@@ -9,7 +9,7 @@
 
 """Models for storing access tokens and links between users and remote apps."""
 
-import datetime
+from datetime import datetime, timedelta
 
 from flask import current_app
 
@@ -148,9 +148,8 @@ class RemoteToken(db.Model, Timestamp):
             return False
 
         leeway = current_app.config.get("OAUTHCLIENT_TOKEN_EXPIRES_LEEWAY", 10)
-        expiration_with_leeway = self.expires_at - datetime.timedelta(seconds=leeway)
-
-        return expiration_with_leeway < datetime.datetime.now()
+        expiration_with_leeway = self.expires_at - timedelta(seconds=leeway)
+        return expiration_with_leeway < datetime.utcnow()
 
     def __repr__(self):
         """String representation for model."""

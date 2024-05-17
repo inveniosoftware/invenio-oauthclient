@@ -7,8 +7,8 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Test handlers."""
-import datetime
 import json
+from datetime import datetime
 
 from helpers import mock_remote_http_request
 
@@ -27,7 +27,7 @@ def test_refresh(models_fixture, app):
         "mytoken",
         "mysecret",
         refresh_token="myrefreshtoken",
-        expires_at=datetime.datetime.now(),
+        expires_at=datetime.utcnow(),
     )
     assert rt.is_expired is True
 

@@ -7,7 +7,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Funcs to manage tokens."""
-import datetime
+from datetime import datetime, timedelta
 from functools import partial
 
 from flask import current_app, session
@@ -125,7 +125,7 @@ def make_expiration_time(expires_in):
     """
     if expires_in is None:
         return None
-    return datetime.datetime.now() + datetime.timedelta(seconds=expires_in)
+    return datetime.utcnow() + timedelta(seconds=expires_in)
 
 
 def token_setter(
@@ -217,7 +217,7 @@ def token_getter(remote, token=""):
             return ret[0], ret[1], None, None
         if ret[3] is not None:
             # refresh token and expiration time
-            return ret[0], ret[1], ret[2], datetime.datetime.fromisoformat(ret[3])
+            return ret[0], ret[1], ret[2], datetime.fromisoformat(ret[3])
     return ret
 
 
