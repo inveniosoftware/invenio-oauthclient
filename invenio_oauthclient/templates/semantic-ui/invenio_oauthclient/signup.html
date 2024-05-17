@@ -2,6 +2,7 @@
 
   This file is part of Invenio.
   Copyright (C) 2015-2020 CERN.
+  Copyright (C) 2024      KTH Royal Institute of Technology.
 
   Invenio is free software; you can redistribute it and/or modify it
   under the terms of the MIT License; see LICENSE file for more details.
@@ -51,3 +52,86 @@
 </div>
 </div>
 {% endblock %}
+
+{% block javascript %}
+{{ super() }}
+<script>
+  async function fetchAffiliations(query, callback) {
+      const maxSuggestions = 3;
+      try {
+        const response = await fetch(`/api/affiliations?size=${maxSuggestions}&suggest=${query}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      const suggestions = data.hits.hits.map(hit => hit.title.en);
+      callback(suggestions);
+    } catch (error) {
+      console.error("Error fetching affiliations:", error);
+      callback([]);
+    }
+  }
+
+  function autocomplete(inputElement) {
+    const cache = new Map();
+    const debounceTimeout = 100;
+    let debounceTimer;
+
+    // Create and append the datalist element
+    const datalist = document.createElement('datalist');
+    datalist.id = "affiliations-list";
+    document.body.appendChild(datalist);
+
+    // Link the datalist to the input element
+    inputElement.setAttribute('list', datalist.id);
+    inputElement.addEventListener("input", handleInput);
+    inputElement.addEventListener("keydown", handleTabPress);
+
+    function handleInput() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const query = inputElement.value.trim().toLowerCase();
+        if (!query) return;
+
+        if (cache.has(query)) {
+          updateDatalist(cache.get(query));
+        } else {
+          fetchAffiliations(query, suggestions => {
+            cache.set(query, suggestions);
+            updateDatalist(suggestions);
+          });
+        }
+      }, debounceTimeout);
+    }
+
+    function handleTabPress(e) {
+      if (e.key === 'Tab' && datalist.options.length > 0) {
+        inputElement.value = datalist.options[0].value;
+      }
+    }
+
+    function updateDatalist(suggestions) {
+      datalist.innerHTML = '';
+      const fragment = document.createDocumentFragment();
+
+      // Add suggestions to the datalist
+      suggestions.forEach(suggestion => {
+        const option = document.createElement('option');
+        option.value = suggestion;
+        fragment.appendChild(option);
+      });
+      datalist.appendChild(fragment);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const inputElement = document.getElementById("profile.affiliations");
+    if (inputElement) {
+      autocomplete(inputElement);
+    } else {
+      console.error('Input element with id "profile.affiliations" not found.');
+    }
+  });
+
+</script>
+{% endblock javascript %}
