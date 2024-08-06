@@ -1,68 +1,72 @@
 # Translations template for invenio-oauthclient.
-# Copyright (C) 2022 CERN
+# Copyright (C) 2024 CERN
 # This file is distributed under the same license as the invenio-oauthclient
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-oauthclient 2.0.0\n"
+"Project-Id-Version: invenio-oauthclient 4.0.0\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
-"POT-Creation-Date: 2022-05-27 09:58+0200\n"
+"POT-Creation-Date: 2024-08-06 08:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.1\n"
+"Generated-By: Babel 2.15.0\n"
 
-#: invenio_oauthclient/admin.py:52
+#: invenio_oauthclient/admin.py:56
 msgid "ID"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:53
+#: invenio_oauthclient/admin.py:57
 msgid "User ID"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:54
+#: invenio_oauthclient/admin.py:58
 msgid "Client ID"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:83
+#: invenio_oauthclient/admin.py:85
 msgid "ID Remote Account"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:90 invenio_oauthclient/admin.py:98
+#: invenio_oauthclient/admin.py:92 invenio_oauthclient/admin.py:100
 msgid "User Management"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:91
+#: invenio_oauthclient/admin.py:93 invenio_oauthclient/ext.py:260
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:12
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:12
-#: invenio_oauthclient/views/settings.py:47
 msgid "Linked accounts"
 msgstr ""
 
-#: invenio_oauthclient/admin.py:99
+#: invenio_oauthclient/admin.py:101
 msgid "Linked account tokens"
 msgstr ""
 
-#: invenio_oauthclient/contrib/cern.py:429
-#: invenio_oauthclient/contrib/cern_openid.py:305
+#: invenio_oauthclient/ext.py:251
+#, python-format
+msgid "%(icon)s Linked accounts"
+msgstr ""
+
+#: invenio_oauthclient/contrib/cern.py:438
+#: invenio_oauthclient/contrib/cern_openid.py:300
 msgid "CERN account not allowed."
 msgstr ""
 
-#: invenio_oauthclient/handlers/ui.py:42
+#: invenio_oauthclient/handlers/ui.py:59
 msgid "External service is already linked to another account."
 msgstr ""
 
-#: invenio_oauthclient/handlers/ui.py:47
+#: invenio_oauthclient/handlers/ui.py:64
 msgid "You rejected the authentication request."
 msgstr ""
 
-#: invenio_oauthclient/handlers/ui.py:173
+#: invenio_oauthclient/handlers/ui.py:239
 msgid "Authorization with remote service failed."
 msgstr ""
 
@@ -95,7 +99,7 @@ msgid "Complete registration"
 msgstr ""
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:20
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:20
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:21
 #, python-format
 msgid ""
 "Tired of entering password for %(sitename)s every time you sign in? Set "
@@ -103,12 +107,12 @@ msgid ""
 msgstr ""
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:32
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:53
 msgid "Disconnect"
 msgstr ""
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:33
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:34
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:62
 msgid "Connect"
 msgstr ""
 
@@ -116,8 +120,11 @@ msgstr ""
 msgid "Or"
 msgstr ""
 
-#: invenio_oauthclient/views/settings.py:38
-#, python-format
-msgid "%(icon)s Linked accounts"
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:39
+msgid "Forgot password?"
+msgstr ""
+
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:45
+msgid "Resend confirmation email"
 msgstr ""
 
