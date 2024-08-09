@@ -38,7 +38,7 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
         app_key=None,
         icon=None,
         scopes="openid",
-        **kwargs
+        **kwargs,
     ):
         """The constructor takes two arguments.
 
@@ -64,7 +64,7 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
             request_token_params={"scope": scopes},
             access_token_url=access_token_url,
             authorize_url=authorize_url,
-            **kwargs
+            **kwargs,
         )
 
         self._handlers = dict(

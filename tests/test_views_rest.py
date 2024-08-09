@@ -385,7 +385,12 @@ def test_token_getter_setter(app_rest, monkeypatch):
         # Assert if everything is as it should be.
         from flask import session as flask_session
 
-        assert flask_session["oauth_token_full"] == ("test_access_token", "")
+        assert flask_session["oauth_token_full"] == (
+            "test_access_token",
+            "",
+            None,
+            None,
+        )
 
         t = RemoteToken.get(1, "fullid")
         assert t.remote_account.client_id == "fullid"
@@ -417,7 +422,7 @@ def test_token_getter_setter(app_rest, monkeypatch):
         assert RemoteToken.query.count() == 1
 
         val = token_getter(app_rest.extensions["oauthlib.client"].remote_apps["full"])
-        assert val == ("new_access_token", "")
+        assert val == ("new_access_token", "", None, None)
 
         # Disconnect account
         res = c.get(
