@@ -38,6 +38,7 @@ from invenio_oauthclient.contrib.github import REMOTE_REST_APP as GITHUB_REMOTE_
 from invenio_oauthclient.contrib.globus import REMOTE_APP as GLOBUS_REMOTE_APP
 from invenio_oauthclient.contrib.globus import REMOTE_REST_APP as GLOBUS_REMOTE_REST_APP
 from invenio_oauthclient.contrib.keycloak import KeycloakSettingsHelper
+from invenio_oauthclient.contrib.cilogon import CilogonSettingsHelper
 from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_oauthclient.contrib.orcid import REMOTE_REST_APP as ORCID_REMOTE_REST_APP
 from invenio_oauthclient.utils import _create_registrationform
@@ -67,6 +68,11 @@ def base_app(request):
     )
     KEYCLOAK_REMOTE_APP = helper.remote_app
 
+    helper2 = CilogonSettingsHelper(
+        title="CILOGON", description="CILOGON",
+        base_url="http://localhost:8080")
+    CILOGON_REMOTE_APP = helper2.remote_app
+
     instance_path = tempfile.mkdtemp()
     base_app = Flask("testapp")
     base_app.config.update(
@@ -83,6 +89,7 @@ def base_app(request):
             github=GITHUB_REMOTE_APP,
             globus=GLOBUS_REMOTE_APP,
             keycloak=KEYCLOAK_REMOTE_APP,
+            cilogon=CILOGON_REMOTE_APP,
         ),
         OAUTHCLIENT_REST_REMOTE_APPS=dict(
             cern_openid=CERN_OPENID_REMOTE_REST_APP,
@@ -119,6 +126,18 @@ def base_app(request):
         KEYCLOAK_APP_CREDENTIALS=dict(
             consumer_key="keycloak_key_changeme",
             consumer_secret="keycloak_secret_changeme",
+        ),
+
+        OAUTHCLIENT_CILOGON_USER_INFO_URL=helper2.user_info_url,
+        OAUTHCLIENT_CILOGON_JWKS_URL= helper2.jwks_url,
+        OAUTHCLIENT_CILOGON_VERIFY_AUD=True,
+        OAUTHCLIENT_CILOGON_VERIFY_EXP=False,
+        OAUTHCLIENT_CILOGON_AUD="cilogon:/client_id/14f788b154a4becc091a1b1b8274aaa3",
+        OAUTHCLIENT_CILOGON_ALLOWED_ROLES=["CO:COU:eic:members:all"],
+
+        CILOGON_APP_CREDENTIALS=dict(
+            consumer_key="cilogon_key_changeme",
+            consumer_secret="cilogon_secret_changeme",
         ),
         # use local memory mailbox
         EMAIL_BACKEND="flask_email.backends.locmem.Mail",
@@ -579,3 +598,41 @@ def example_keycloak_public_key():
         "FZ+3rJGEbEKFUbFNPTJfslXh+mnH89/ZM8mZDb4V8YNX1lafSeJdvC7nnvvyQIDAQ"
         "AB"
     )
+
+
+@pytest.fixture()
+def example_cilogon_token():
+    """Keycloak example data."""
+    file_path = os.path.join(
+        os.path.dirname(__file__), "data/cilogon_token_response.json"
+    )
+
+    with open(file_path) as token_file:
+        token = json.load(token_file)
+
+    return token
+
+
+@pytest.fixture()
+def example_cilogon_userinfo():
+    """Keycloak example user info response."""
+    file_path = os.path.join(
+        os.path.dirname(__file__), "data/cilogon_userinfo_response.json"
+    )
+
+    with open(file_path) as response_file:
+        response = json.load(response_file)
+    return response
+
+
+@pytest.fixture()
+def example_jwks_info():
+    """Keycloak example JWKs info."""
+    file_path = os.path.join(
+        os.path.dirname(__file__), "data/cilogon_jwks_info.json"
+    )
+
+    with open(file_path) as info_file:
+        jwks_info = json.load(info_file)
+
+    return jwks_info

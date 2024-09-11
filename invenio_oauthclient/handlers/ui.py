@@ -37,6 +37,7 @@ from ..errors import (
     OAuthClientUserRequiresConfirmation,
     OAuthError,
     OAuthRejectedRequestError,
+    OAuthCilogonRejectedAccountError,
 )
 from ..utils import create_registrationform, fill_form
 from .authorized import authorized_handler, extra_signup_handler
@@ -85,6 +86,14 @@ def _oauth_error_handler(remote, f, *args, **kwargs):
                 remote_app=remote.name,
             )
         )
+    except OAuthCilogonRejectedAccountError as e:
+        error_message = e.message
+        flash(_(error_message), category="danger")
+        redirect_url = current_app.config.get(
+            "OAUTHCLIENT_CILOGON_ROLES_ERROR_URL",
+            "/",
+            )
+        return redirect(redirect_url)
 
 
 #

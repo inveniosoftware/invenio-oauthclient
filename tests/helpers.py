@@ -11,12 +11,14 @@
 import json
 from inspect import isfunction
 from urllib.parse import parse_qs, urlencode, urlparse
+from unittest.mock import patch
 
 import httpretty
 from mock import MagicMock
 
 from invenio_oauthclient._compat import _create_identifier
 from invenio_oauthclient.views.client import serializer
+from invenio_oauthclient.contrib.cilogon.helpers import jwks2pem
 
 
 def get_state(app="test"):
@@ -87,3 +89,37 @@ def mock_keycloak(app_config, token_dict, user_info_dict, realm_info):
         body=json.dumps(realm_info),
         content_type="application/json",
     )
+
+def mock_cilogon(app_config, token_dict, user_info_dict, jwks_info):
+    """Mock a running CiLogon instance."""
+    cilogon_settings = app_config["OAUTHCLIENT_REMOTE_APPS"]["cilogon"]
+    httpretty.register_uri(
+        httpretty.POST,
+        cilogon_settings["params"]["access_token_url"],
+        body=json.dumps(token_dict),
+        content_type="application/json",
+    )
+
+    httpretty.register_uri(
+        httpretty.GET,
+        app_config["OAUTHCLIENT_CILOGON_USER_INFO_URL"],
+        body=json.dumps(user_info_dict),
+        content_type="application/json",
+    )
+
+    httpretty.register_uri(
+        httpretty.GET,
+        app_config["OAUTHCLIENT_CILOGON_JWKS_URL"],  # Make sure this key exists in your settings
+        body=json.dumps(jwks_info),
+        content_type="application/json",
+    )
+
+    def mock_get_all_keys(remote, jwsurl):
+        return jwks2pem(jwks_info)
+
+    # Patch the get_all_keys function
+    patcher = patch('invenio_oauthclient.contrib.cilogon.helpers.get_all_keys',
+                    side_effect=mock_get_all_keys)
+    patcher.start()
+
+    return patcher
