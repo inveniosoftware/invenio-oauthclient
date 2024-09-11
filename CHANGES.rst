@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 4.0.1 (released 2024-09-11)
+
+- i18n: push translations
+- keycloak: add `legacy_url_path` parameter to the `KeycloakSettingsHelper`
+- global: explicitly set and use `hide` attribute for config
+
 Version 4.0.0 (released 2024-03-23)
 
 - fix: before_app_first_request deprecation
