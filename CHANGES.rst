@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 4.0.2 (released 2024-09-17)
+
+- fix: inverted check for visible remote apps
+
 Version 4.0.1 (released 2024-09-11)
 
 - i18n: push translations
