@@ -11,6 +11,7 @@ import re
 
 import jwt
 from flask import current_app
+from invenio_i18n import gettext as _
 
 from ...errors import OAuthError, OAuthKeycloakUserInfoError
 
@@ -27,9 +28,12 @@ def _generate_config_prefix(remote):
     app_name = remote.name
     if not is_app_name_valid(app_name):
         raise OAuthError(
-            f"Invalid app name {app_name}. "
-            "It should only contain letters, numbers, dashes "
-            "and underscores",
+            _(
+                "Invalid app name %(app_name)s. "
+                "It should only contain letters, numbers, dashes "
+                "and underscores",
+                app_name=app_name,
+            ),
             remote,
         )
     return f"OAUTHCLIENT_{app_name.upper()}"

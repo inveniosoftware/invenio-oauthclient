@@ -10,13 +10,8 @@
 
 from flask_admin.contrib.sqla import ModelView
 from invenio_accounts.admin import user_identity_adminview
-
+from invenio_i18n import lazy_gettext as _
 from .models import RemoteAccount, RemoteToken
-
-
-def _(x):
-    """Identity."""
-    return x
 
 
 class RemoteAccountView(ModelView):

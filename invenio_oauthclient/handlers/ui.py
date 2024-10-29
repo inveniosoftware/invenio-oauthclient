@@ -153,7 +153,9 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
         do_flash(
             Markup(
                 _(
-                    f"A confirmation email has already been sent to {exc.user.email}. Didn't receive it? Click <strong><a href=\"{url_for('security.send_confirmation')}\">here</a></strong> to resend it."
+                    'A confirmation email has already been sent to %(email)s. Didn\'t receive it? Click <strong><a href="%(url)s">here</a></strong> to resend it.',
+                    mail=exc.user.email,
+                    url=url_for("security.send_confirmation"),
                 )
             ),
             category="success",

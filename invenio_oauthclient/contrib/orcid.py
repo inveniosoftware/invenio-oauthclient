@@ -75,6 +75,7 @@ from flask import current_app, redirect, url_for
 from flask_login import current_user
 from invenio_db import db
 
+from invenio_i18n import lazy_gettext as _
 from invenio_oauthclient import current_oauthclient
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 from invenio_oauthclient.handlers.rest import response_handler
@@ -109,8 +110,8 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
         }
 
         super().__init__(
-            title or "ORCID",
-            description or "Connecting Research and Researchers.",
+            title or _("ORCID"),
+            description or _("Connecting Research and Researchers."),
             base_url or "https://pub.orcid.org/v1.2/",
             app_key or "ORCID_APP_CREDENTIALS",
             request_token_params={"scope": "/authenticate", "show_login": "true"},
