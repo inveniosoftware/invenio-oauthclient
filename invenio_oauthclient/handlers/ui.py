@@ -154,7 +154,7 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
             Markup(
                 _(
                     'A confirmation email has already been sent to %(email)s. Didn\'t receive it? Click <strong><a href="%(url)s">here</a></strong> to resend it.',
-                    mail=exc.user.email,
+                    email=exc.user.email,
                     url=url_for("security.send_confirmation"),
                 )
             ),

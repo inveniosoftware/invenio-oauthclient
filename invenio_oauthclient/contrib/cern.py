@@ -148,7 +148,8 @@ from flask_principal import (
     identity_loaded,
 )
 from invenio_db import db
-from invenio_i18n import gettext as _, lazy_gettext
+from invenio_i18n import gettext as _
+from invenio_i18n import lazy_gettext
 
 from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
 from invenio_oauthclient.handlers.rest import response_handler

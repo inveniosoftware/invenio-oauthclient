@@ -67,8 +67,8 @@ you can re-define the default Globus OAuth instance:
 from flask import current_app, redirect, url_for
 from flask_login import current_user
 from invenio_db import db
-
 from invenio_i18n import lazy_gettext as _
+
 from invenio_oauthclient import current_oauthclient
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
 from invenio_oauthclient.errors import OAuthResponseError
