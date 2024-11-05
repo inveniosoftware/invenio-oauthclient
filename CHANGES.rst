@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 4.1.0 (released 2024-11-07)
+
+- setup: remove upper pins oauthlib,requests-oauthlib
+- global: jws use from invenio-base
+- fix: for flask >= 3.0.0 compatibility
+
 Version 4.0.2 (released 2024-09-17)
 
 - fix: inverted check for visible remote apps
