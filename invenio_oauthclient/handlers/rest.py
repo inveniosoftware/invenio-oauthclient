@@ -37,6 +37,7 @@ from ..errors import (
     OAuthClientUserRequiresConfirmation,
     OAuthError,
     OAuthRejectedRequestError,
+    OAuthCilogonRejectedAccountError,
 )
 from ..proxies import current_oauthclient
 from ..utils import create_csrf_disabled_registrationform, fill_form
@@ -142,6 +143,19 @@ def _oauth_error_handler(remote, f, *args, **kwargs):
                 ".rest_login",
                 remote_app=remote.name,
             )
+        )
+    except OAuthCilogonRejectedAccountError as e:
+        error_message = e.message
+        return response_handler(
+            remote,
+            current_app.config.get(
+                "OAUTHCLIENT_CILOGON_ROLES_ERROR_URL",
+                "/",
+                ),
+            payload=dict(
+                message=error_message,
+                code=401,
+            ),
         )
 
 
