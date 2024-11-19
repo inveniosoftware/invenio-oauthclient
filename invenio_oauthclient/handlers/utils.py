@@ -112,37 +112,45 @@ def create_or_update_roles(groups):
     """Create/update DB roles based on the groups provided."""
     roles_ids = set()
     for group in groups:
-        existing_role = current_datastore.find_role_by_id(group["id"])
-        if existing_role and existing_role.is_managed:
-            current_app.logger.exception(
-                f'Error while syncing roles: A managed role with id: ${group["id"]} already exists'
+        try:
+            current_app.logger.debug(f"Syncing role: {group['name']}")
+            existing_role = current_datastore.find_role_by_id(group["id"])
+            if existing_role and existing_role.is_managed:
+                current_app.logger.exception(
+                    f'Error while syncing roles: A managed role with id: ${group["id"]} already exists'
+                )
+                continue
+            existing_role_by_name = current_datastore.find_role(group["name"])
+            if existing_role_by_name and existing_role_by_name.is_managed:
+                current_app.logger.exception(
+                    f'Error while syncing roles: A managed role with name: ${group["name"]} already exists'
+                )
+                continue
+            if not existing_role:
+                role = current_datastore.create_role(
+                    id=group["id"],
+                    name=group["name"],
+                    description=group.get("description"),
+                    is_managed=False,
+                )
+                roles_ids.add(role.id)
+            elif existing_role and _role_needs_update(existing_role, group):
+                role_to_update = Role(
+                    id=group["id"],
+                    name=group["name"],
+                    description=group.get("description"),
+                    is_managed=False,
+                )
+                role = current_datastore.update_role(role_to_update)
+                roles_ids.add(role.id)
+            else:
+                roles_ids.add(existing_role.id)
+
+        except Exception as e:
+            current_app.logger.error(
+                f"Error while syncing roles: {group['name']}. Error: {e}"
             )
             continue
-        existing_role_by_name = current_datastore.find_role(group["name"])
-        if existing_role_by_name and existing_role_by_name.is_managed:
-            current_app.logger.exception(
-                f'Error while syncing roles: A managed role with name: ${group["name"]} already exists'
-            )
-            continue
-        if not existing_role:
-            role = current_datastore.create_role(
-                id=group["id"],
-                name=group["name"],
-                description=group.get("description"),
-                is_managed=False,
-            )
-            roles_ids.add(role.id)
-        elif existing_role and _role_needs_update(existing_role, group):
-            role_to_update = Role(
-                id=group["id"],
-                name=group["name"],
-                description=group.get("description"),
-                is_managed=False,
-            )
-            role = current_datastore.update_role(role_to_update)
-            roles_ids.add(role.id)
-        else:
-            roles_ids.add(existing_role.id)
 
     current_datastore.commit()
     return roles_ids
