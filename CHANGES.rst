@@ -10,6 +10,11 @@ Changes
 
 Version 4.1.0 (released 2024-11-07)
 
+- handlers: add basic error handling for roles creation
+- fix: compat for flask-oauthlib
+
+Version 4.1.0 (released 2024-11-07)
+
 - setup: remove upper pins oauthlib,requests-oauthlib
 - global: jws use from invenio-base
 - fix: for flask >= 3.0.0 compatibility
