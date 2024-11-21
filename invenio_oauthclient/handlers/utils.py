@@ -23,6 +23,8 @@ def make_handler(f, remote, with_response=True):
     """Make a handler for authorized and disconnect callbacks.
 
     :param f: Callable or an import path to a callable
+    :param remote: Remote app
+    :param with_response:
     """
     if isinstance(f, str):
         f = import_string(f)
@@ -41,8 +43,7 @@ def authorized_handler(f, authorized_response):
     """Handles an OAuth callback.
 
     As authorized_handler is deprecated in favor of authorized_response,
-    it's has to be wrapped with handler which will be executed
-    at the proper time.
+    it has to be wrapped with handler which will be executed at the proper time.
     """
 
     @wraps(f)
@@ -67,24 +68,28 @@ def require_more_than_one_external_account(f):
         if current_user.is_anonymous:
             return f(*args, **kwargs)
 
-        local_login_enabled = current_app.config.get(
-            "ACCOUNTS_LOCAL_LOGIN_ENABLED", True
-        )
+        local_login_enabled = current_app.config.get("ACCOUNTS_LOCAL_LOGIN_ENABLED", True)
         password_set = current_user.password is not None
         local_login_possible = local_login_enabled and password_set
 
         remote_apps = current_app.config["OAUTHCLIENT_REMOTE_APPS"]
         accounts = RemoteAccount.query.filter_by(user_id=current_user.get_id()).all()
 
-        # find out all of the linked external accounts for the user
+        # find out all the linked external accounts for the user
         # that are currently configured and not hidden
         consumer_keys = set()
-        remote_apps = current_app.config["OAUTHCLIENT_REMOTE_APPS"]
+
         for name, remote_app in remote_apps.items():
             if not remote_app.get("hide", False):
                 consumer_keys.add(name)  # backcompat with v1.5.4
-                remote_app_config = current_app.config[remote_app["params"]["app_key"]]
-                consumer_keys.add(remote_app_config["consumer_key"])
+
+                # consumer key is Flask-OAuthLib config that could either be passed as
+                # lazy loaded variable app_key or directly
+                if "app_key" in remote_app["params"] and remote_app["params"]["app_key"] is not None:
+                    remote_app_config = current_app.config[remote_app["params"]["app_key"]]
+                    consumer_keys.add(remote_app_config["consumer_key"])
+                else:
+                    consumer_keys.add(remote_app["params"]["consumer_key"])
 
         linked_accounts = [acc for acc in accounts if acc.client_id in consumer_keys]
 
