@@ -1,12 +1,18 @@
 ..
     This file is part of Invenio.
     Copyright (C) 2015-2023 CERN.
+    Copyright (C) 2024 Graz University of Technology.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 Changes
 =======
+
+Version 4.1.2 (release 2024-11-30)
+
+- setup: pin dependencies
+- ci: use reusable workflow when publishing
 
 Version 4.1.0 (released 2024-11-07)
 
