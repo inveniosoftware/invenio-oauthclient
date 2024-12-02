@@ -14,6 +14,7 @@ from flask import abort, current_app
 from flask_login import current_user
 from invenio_accounts.models import Role
 from invenio_accounts.proxies import current_datastore
+from invenio_db import db
 from werkzeug.utils import import_string
 
 from ..models import RemoteAccount
@@ -108,43 +109,55 @@ def _role_needs_update(role_obj, new_role_dict):
     return False
 
 
-def create_or_update_roles(groups):
+def create_or_update_roles(groups, persist_every=500):
     """Create/update DB roles based on the groups provided."""
     roles_ids = set()
+    processed_count = 0
+
     for group in groups:
         try:
             current_app.logger.debug(f"Syncing role: {group['name']}")
+
             existing_role = current_datastore.find_role_by_id(group["id"])
             if existing_role and existing_role.is_managed:
                 current_app.logger.exception(
-                    f'Error while syncing roles: A managed role with id: ${group["id"]} already exists'
+                    f'Error while syncing roles: A managed role with id: {group["id"]} already exists'
                 )
                 continue
+
             existing_role_by_name = current_datastore.find_role(group["name"])
             if existing_role_by_name and existing_role_by_name.is_managed:
                 current_app.logger.exception(
-                    f'Error while syncing roles: A managed role with name: ${group["name"]} already exists'
+                    f'Error while syncing roles: A managed role with name: {group["name"]} already exists'
                 )
                 continue
-            if not existing_role:
-                role = current_datastore.create_role(
-                    id=group["id"],
-                    name=group["name"],
-                    description=group.get("description"),
-                    is_managed=False,
-                )
-                roles_ids.add(role.id)
-            elif existing_role and _role_needs_update(existing_role, group):
-                role_to_update = Role(
-                    id=group["id"],
-                    name=group["name"],
-                    description=group.get("description"),
-                    is_managed=False,
-                )
-                role = current_datastore.update_role(role_to_update)
-                roles_ids.add(role.id)
-            else:
-                roles_ids.add(existing_role.id)
+
+            with db.session.begin_nested():
+                if not existing_role:
+                    role = current_datastore.create_role(
+                        id=group["id"],
+                        name=group["name"],
+                        description=group.get("description"),
+                        is_managed=False,
+                    )
+                    roles_ids.add(role.id)
+                elif existing_role and _role_needs_update(existing_role, group):
+                    role_to_update = Role(
+                        id=group["id"],
+                        name=group["name"],
+                        description=group.get("description"),
+                        is_managed=False,
+                    )
+                    role = current_datastore.update_role(role_to_update)
+                    roles_ids.add(role.id)
+                else:
+                    roles_ids.add(existing_role.id)
+
+            processed_count += 1
+
+            # Commit every `persist_every` iterations
+            if processed_count % persist_every == 0:
+                current_datastore.commit()
 
         except Exception as e:
             current_app.logger.error(
@@ -152,5 +165,6 @@ def create_or_update_roles(groups):
             )
             continue
 
+    # Final commit for any remaining uncommitted changes
     current_datastore.commit()
     return roles_ids
