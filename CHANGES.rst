@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version 4.1.3 (release 2024-12-03)
+
+- utils: improve and fix creation/update of groups
+
 Version 4.1.2 (release 2024-11-30)
 
 - setup: pin dependencies
