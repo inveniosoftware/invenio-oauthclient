@@ -154,17 +154,19 @@ def base_app(request):
     InvenioCelery(base_app)
 
     with base_app.app_context():
-        if str(db.engine.url) != "sqlite://" and not database_exists(
-            str(db.engine.url)
+        if str(
+            db.engine.url.render_as_string(hide_password=False)
+        ) != "sqlite://" and not database_exists(
+            str(db.engine.url.render_as_string(hide_password=False))
         ):
-            create_database(str(db.engine.url))
+            create_database(str(db.engine.url.render_as_string(hide_password=False)))
         db.create_all()
 
     def teardown():
         with base_app.app_context():
             db.session.close()
-            if str(db.engine.url) != "sqlite://":
-                drop_database(str(db.engine.url))
+            if str(db.engine.url.render_as_string(hide_password=False)) != "sqlite://":
+                drop_database(str(db.engine.url.render_as_string(hide_password=False)))
             shutil.rmtree(instance_path)
             db.engine.dispose()
 

@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -111,10 +112,14 @@ def test_db(request):
     request.addfinalizer(teardown)
 
     with app.app_context():
-        is_sqllite = str(db.engine.url) == "sqlite://"
-        db_exists = database_exists(str(db.engine.url))
+        is_sqllite = (
+            str(db.engine.url.render_as_string(hide_password=False)) == "sqlite://"
+        )
+        db_exists = database_exists(
+            str(db.engine.url.render_as_string(hide_password=False))
+        )
         if not is_sqllite and not db_exists:
-            create_database(str(db.engine.url))
+            create_database(str(db.engine.url.render_as_string(hide_password=False)))
         db.create_all()
         tables = list(
             filter(
