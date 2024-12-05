@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -16,8 +17,8 @@ from flask import url_for
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from helpers import check_response_redirect_url, check_response_redirect_url_args
 from invenio_accounts.testutils import login_user_via_session
+from invenio_base.jws import TimedJSONWebSignatureSerializer
 from invenio_db import db
-from itsdangerous import TimedJSONWebSignatureSerializer
 from mock import MagicMock
 from simplejson import JSONDecodeError
 

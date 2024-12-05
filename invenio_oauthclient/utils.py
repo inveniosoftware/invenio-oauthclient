@@ -11,20 +11,13 @@
 
 from flask import current_app, request, session
 from flask_principal import RoleNeed
+from invenio_base.jws import TimedJSONWebSignatureSerializer
 from invenio_db.utils import rebuild_encrypted_properties
 from uritools import uricompose, urisplit
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string
 
 from .models import RemoteToken
-
-try:
-    # itsdangerous < 2.1.0
-    from itsdangerous import TimedJSONWebSignatureSerializer
-except ImportError:
-    # itsdangerous >= 2.1.0
-    from invenio_base.jws import TimedJSONWebSignatureSerializer
-
 
 _security = LocalProxy(lambda: current_app.extensions["security"])
 
