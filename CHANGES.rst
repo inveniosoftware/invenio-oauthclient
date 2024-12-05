@@ -9,6 +9,13 @@
 Changes
 =======
 
+Version 5.0.0 (released 2024-12-06)
+
+- fix: sqlalchemy.exc.ArgumentError:
+- global: use invenio_base.jws not itsdangerous
+- tests: apply changes for sqlalchemy>=2.0
+- setup: bump major dependencies
+
 Version 4.1.3 (release 2024-12-03)
 
 - utils: improve and fix creation/update of groups
