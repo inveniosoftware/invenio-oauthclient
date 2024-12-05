@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -174,7 +175,11 @@ class RemoteToken(db.Model, Timestamp):
         if access_token:
             args.append(RemoteToken.access_token == access_token)
 
-        return cls.query.options(db.joinedload("remote_account")).filter(*args).first()
+        return (
+            cls.query.options(db.joinedload(RemoteToken.remote_account))
+            .filter(*args)
+            .first()
+        )
 
     @classmethod
     def get_by_token(cls, client_id, access_token, token_type=""):
@@ -186,7 +191,7 @@ class RemoteToken(db.Model, Timestamp):
         :returns: A :class:`invenio_oauthclient.models.RemoteToken` instance.
         """
         return (
-            cls.query.options(db.joinedload("remote_account"))
+            cls.query.options(db.joinedload(RemoteToken.remote_account))
             .filter(
                 RemoteAccount.id == RemoteToken.id_remote_account,
                 RemoteAccount.client_id == client_id,
