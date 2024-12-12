@@ -18,7 +18,7 @@ from invenio_accounts.models import User, UserIdentity
 from invenio_db import db
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import backref
-from sqlalchemy_utils import EncryptedType, JSONType, Timestamp
+from sqlalchemy_utils import JSONType, StringEncryptedType, Timestamp
 
 
 def _secret_key():
@@ -116,7 +116,7 @@ class RemoteToken(db.Model, Timestamp):
     """Type of token."""
 
     access_token = db.Column(
-        EncryptedType(type_in=db.Text, key=_secret_key), nullable=False
+        StringEncryptedType(type_in=db.Text, key=_secret_key), nullable=False
     )
     """Access token to remote application."""
 
