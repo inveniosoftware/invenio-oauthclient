@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2016-2018 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -56,7 +57,9 @@ def upgrade():
         "oauthclient_remotetoken",
         sa.Column("id_remote_account", sa.Integer(), nullable=False),
         sa.Column("token_type", sa.String(length=40), nullable=False),
-        sa.Column("access_token", sqlalchemy_utils.EncryptedType(), nullable=False),
+        sa.Column(
+            "access_token", sqlalchemy_utils.StringEncryptedType(), nullable=False
+        ),
         sa.Column("secret", sa.Text(), nullable=False),
         sa.ForeignKeyConstraint(
             ["id_remote_account"],
