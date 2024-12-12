@@ -9,6 +9,12 @@
 Changes
 =======
 
+Version 5.1.0 (released 2024-12-12)
+
+- fix: DeprecationWarning:
+- fix: TypeError
+- setup: move to flask-oauthlib-invenio
+
 Version 5.0.0 (released 2024-12-06)
 
 - fix: sqlalchemy.exc.ArgumentError:
