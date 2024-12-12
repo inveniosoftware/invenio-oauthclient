@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2016-2018 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -49,17 +50,11 @@ def downgrade():
 
 
 def _add_created_updated_columns(table, date):
-    params = {"date": date}
-
     op.add_column(table, sa.Column("created", sa.DateTime()))
     op.add_column(table, sa.Column("updated", sa.DateTime()))
 
-    op.execute(
-        text("UPDATE " + table + " SET created= :date").bindparams(date=date), params
-    )
-    op.execute(
-        text("UPDATE " + table + " SET updated= :date").bindparams(date=date), params
-    )
+    op.execute(text("UPDATE " + table + " SET created= :date").bindparams(date=date))
+    op.execute(text("UPDATE " + table + " SET updated= :date").bindparams(date=date))
 
     op.alter_column(table, "created", existing_type=sa.DateTime, nullable=False)
     op.alter_column(table, "updated", existing_type=sa.DateTime, nullable=False)
