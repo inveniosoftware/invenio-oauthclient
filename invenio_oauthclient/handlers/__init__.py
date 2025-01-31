@@ -32,7 +32,9 @@ from .ui import (
     oauth2_handle_error,
 )
 from .ui import oauth_resp_remote_error_handler as oauth_error_handler
-from .ui import signup_handler
+from .ui import (
+    signup_handler,
+)
 from .utils import authorized_handler, make_handler
 
 __all__ = (
