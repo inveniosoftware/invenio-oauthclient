@@ -13,6 +13,7 @@ from functools import partial
 from flask import current_app, session
 from flask_login import current_user
 from invenio_db import db
+from invenio_i18n import gettext as _
 
 from ..errors import OAuthClientError, OAuthRejectedRequestError, OAuthResponseError
 from ..models import RemoteToken
@@ -58,7 +59,7 @@ def response_token_setter(remote, resp):
     :returns: The token.
     """
     if resp is None:
-        raise OAuthRejectedRequestError("User rejected request.", remote, resp)
+        raise OAuthRejectedRequestError(_("User rejected request."), remote, resp)
     else:
         if "access_token" in resp:
             return oauth2_token_setter(remote, resp)
@@ -67,11 +68,11 @@ def response_token_setter(remote, resp):
         elif "error" in resp:
             # Only OAuth2 specifies how to send error messages
             raise OAuthClientError(
-                "Authorization with remote service failed.",
+                _("Authorization with remote service failed."),
                 remote,
                 resp,
             )
-    raise OAuthResponseError("Bad OAuth authorized request", remote, resp)
+    raise OAuthResponseError(_("Bad OAuth authorized request"), remote, resp)
 
 
 def oauth1_token_setter(remote, resp, token_type="", extra_data=None):
