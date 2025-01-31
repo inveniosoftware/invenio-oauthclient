@@ -77,6 +77,7 @@ from flask_principal import (
 )
 from invenio_db import db
 from invenio_i18n import gettext as _
+from invenio_i18n import lazy_gettext
 from jwt import decode
 
 from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
@@ -99,8 +100,8 @@ OAUTHCLIENT_CERN_OPENID_ALLOWED_ROLES = ["cern_user"]
 """CERN OAuth application role values that are allowed to be used."""
 
 BASE_APP = dict(
-    title="CERN",
-    description="Connecting to CERN Organization.",
+    title=lazy_gettext("CERN"),
+    description=lazy_gettext("Connecting to CERN Organization."),
     icon="",
     logout_url="https://auth.cern.ch/auth/realms/cern/protocol/"
     "openid-connect/logout",
@@ -273,7 +274,11 @@ def _account_info(remote, resp):
     cern_roles = resource.get("cern_roles")
     if cern_roles is None or not set(cern_roles).issubset(valid_roles):
         raise OAuthCERNRejectedAccountError(
-            "User roles {0} are not one of {1}".format(cern_roles, valid_roles),
+            _(
+                "User roles %(cern_roles)s are not one of %(valid_roles)s",
+                cern_roles=cern_roles,
+                valid_roles=valid_roles,
+            ),
             remote,
             resp,
         )
