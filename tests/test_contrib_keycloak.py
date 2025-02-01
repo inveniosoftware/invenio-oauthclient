@@ -419,7 +419,7 @@ def test_get_userinfo_from_endpoint(
         assert user_info == example_keycloak_userinfo.data
 
 
-def test_raise_on_invalid_app_name():
+def test_raise_on_invalid_app_name(app):
     """Test that the app name format is validated."""
 
     class FakeRemote:

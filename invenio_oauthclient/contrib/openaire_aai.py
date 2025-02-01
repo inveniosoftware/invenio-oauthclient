@@ -72,6 +72,7 @@ import jwt
 from flask import current_app, redirect, url_for
 from flask_login import current_user
 from invenio_db import db
+from invenio_i18n import lazy_gettext as _
 
 from invenio_oauthclient import current_oauthclient
 from invenio_oauthclient.contrib.keycloak import KeycloakSettingsHelper
@@ -101,8 +102,8 @@ class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
             "send_register_msg": True,
         }
         super().__init__(
-            title or "OpenAIRE",
-            description or "Open Science Services.",
+            title or _("OpenAIRE"),
+            description or _("Open Science Services."),
             base_url,
             app_key or "OPENAIRE_APP_CREDENTIALS",
             request_token_params={"scope": "openid profile email orcid"},
@@ -166,8 +167,8 @@ REMOTE_REST_APP = _openaire_aai_app.remote_rest_app
 
 # Sandbox
 _openaire_aai_sandbox_app = KeycloakSettingsHelper(
-    title="OpenAIRE",
-    description="Open Science Services.",
+    title=_("OpenAIRE"),
+    description=_("Open Science Services."),
     base_url="https://beta.aai.openaire.eu",
     realm="openaire",
     scopes="openid profile email eduperson_entitlement orcid",

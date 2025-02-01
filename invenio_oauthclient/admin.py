@@ -10,13 +10,9 @@
 
 from flask_admin.contrib.sqla import ModelView
 from invenio_accounts.admin import user_identity_adminview
+from invenio_i18n import gettext as _
 
 from .models import RemoteAccount, RemoteToken
-
-
-def _(x):
-    """Identity."""
-    return x
 
 
 class RemoteAccountView(ModelView):
@@ -52,11 +48,13 @@ class RemoteAccountView(ModelView):
     column_display_all_relations = True
     inline_models = (RemoteToken,)
 
-    column_labels = {
-        "id": _("ID"),
-        "user_id": _("User ID"),
-        "client_id": _("Client ID"),
-    }
+    @property
+    def column_labels(self):
+        return {
+            "id": _("ID"),
+            "user_id": _("User ID"),
+            "client_id": _("Client ID"),
+        }
 
 
 class RemoteTokenView(ModelView):
@@ -81,9 +79,11 @@ class RemoteTokenView(ModelView):
         "token_type",
     )
 
-    column_labels = {
-        "id_remote_account": _("ID Remote Account"),
-    }
+    @property
+    def column_labels(self):
+        return {
+            "id_remote_account": _("ID Remote Account"),
+        }
 
 
 remote_account_adminview = {

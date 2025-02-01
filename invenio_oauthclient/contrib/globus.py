@@ -67,6 +67,7 @@ you can re-define the default Globus OAuth instance:
 from flask import current_app, redirect, url_for
 from flask_login import current_user
 from invenio_db import db
+from invenio_i18n import lazy_gettext as _
 
 from invenio_oauthclient import current_oauthclient
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
@@ -91,8 +92,8 @@ class GlobusOAuthSettingsHelper(OAuthSettingsHelper):
     ):
         """Constructor."""
         super().__init__(
-            title or "Globus",
-            description or "Research data management simplified.",
+            title or _("Globus"),
+            description or _("Research data management simplified."),
             base_url or "https://auth.globus.org/v2/",
             app_key or "GLOBUS_APP_CREDENTIALS",
             request_token_params={"scope": "openid email profile"},
@@ -164,7 +165,7 @@ def get_dict_from_response(response):
     """Check for errors in the response and return the resulting JSON."""
     if getattr(response, "_resp") and response._resp.code > 400:
         raise OAuthResponseError(
-            "Application mis-configuration in Globus", None, response
+            _("Application mis-configuration in Globus"), None, response
         )
 
     return response.data
@@ -199,7 +200,7 @@ def get_user_id(remote, email):
         # If we got here the response was successful but the data was invalid.
         # It's likely the URL is wrong but possible the API has changed.
         raise OAuthResponseError(
-            "Failed to fetch user id, likely server " "mis-configuration", None, remote
+            _("Failed to fetch user id, likely server mis-configuration"), None, remote
         )
 
 

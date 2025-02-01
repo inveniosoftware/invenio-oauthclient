@@ -15,6 +15,7 @@ from flask_login import current_user
 from invenio_accounts.models import Role
 from invenio_accounts.proxies import current_datastore
 from invenio_db import db
+from invenio_i18n import gettext as _
 from werkzeug.utils import import_string
 
 from ..models import RemoteAccount
@@ -121,14 +122,20 @@ def create_or_update_roles(groups, persist_every=500):
             existing_role = current_datastore.find_role_by_id(group["id"])
             if existing_role and existing_role.is_managed:
                 current_app.logger.exception(
-                    f'Error while syncing roles: A managed role with id: {group["id"]} already exists'
+                    _(
+                        "Error while syncing roles: A managed role with id: %(group_id)s already exists",
+                        group_id=group["id"],
+                    )
                 )
                 continue
 
             existing_role_by_name = current_datastore.find_role(group["name"])
             if existing_role_by_name and existing_role_by_name.is_managed:
                 current_app.logger.exception(
-                    f'Error while syncing roles: A managed role with name: {group["name"]} already exists'
+                    _(
+                        "Error while syncing roles: A managed role with name: %(group_name)s already exists",
+                        group_name=group["name"],
+                    )
                 )
                 continue
 

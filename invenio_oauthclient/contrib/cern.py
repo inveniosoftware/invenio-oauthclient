@@ -149,6 +149,7 @@ from flask_principal import (
 )
 from invenio_db import db
 from invenio_i18n import gettext as _
+from invenio_i18n import lazy_gettext
 
 from invenio_oauthclient.errors import OAuthCERNRejectedAccountError
 from invenio_oauthclient.handlers.rest import response_handler
@@ -204,8 +205,8 @@ OAUTHCLIENT_CERN_ALLOWED_IDENTITY_CLASSES = ["CERN Registered", "CERN Shared"]
 """Cern oauth identityClass values that are allowed to be used."""
 
 BASE_APP = dict(
-    title="CERN",
-    description="Connecting to CERN Organization.",
+    title=lazy_gettext("CERN"),
+    description=lazy_gettext("Connecting to CERN Organization."),
     icon="",
     logout_url="https://login.cern.ch/adfs/ls/?wa=wsignout1.0",
     params=dict(
@@ -405,8 +406,10 @@ def _account_info(remote, resp):
     identity_class = resource.get("IdentityClass", [None])[0]
     if identity_class is None or identity_class not in valid_identities:
         raise OAuthCERNRejectedAccountError(
-            "Identity class {0} is not one of [{1}]".format(
-                identity_class, "".join(valid_identities)
+            _(
+                "Identity class %(identity_class)s is not one of [%(valid_identities)s]",
+                identity_class=identity_class,
+                valid_identities="".join(valid_identities),
             ),
             remote,
             resp,
