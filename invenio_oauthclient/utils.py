@@ -2,7 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2023 CERN.
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -103,7 +103,7 @@ def get_safe_redirect_target(arg="next"):
     :param arg: URL argument.
     :returns: The redirect target or ``None``.
     """
-    allowed_hosts = current_app.config.get("APP_ALLOWED_HOSTS") or []
+    allowed_hosts = current_app.config.get("TRUSTED_HOSTS") or []
     for target in request.args.get(arg), request.referrer:
         if target:
             redirect_uri = urisplit(target)
