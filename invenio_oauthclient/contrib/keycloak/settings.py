@@ -47,7 +47,7 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
         :param base_url: The base URL on which Keycloak is running
                             (e.g. "http://localhost:8080")
         :param realm: Realm in which the invenio client application is defined
-        :param leagcy_url_path: Add "/auth/" between the base URL and realm names for generated Keycloak URLs (default: True, for Keycloak up to v17)
+        :param legacy_url_path: Add "/auth/" between the base URL and realm names for generated Keycloak URLs (default: True, for Keycloak up to v17)
         """
         app_key = app_key or "KEYCLOAK_APP_CREDENTIALS"
         base_url = "{}/".format(base_url.rstrip("/"))  # add leading `/`
