@@ -1,78 +1,221 @@
 # Translations template for invenio-oauthclient.
-# Copyright (C) 2022 CERN
+# Copyright (C) 2025 CERN
 # This file is distributed under the same license as the invenio-oauthclient
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
 # Alizee Pace <alizee.pace@gmail.com>, 2016
 # Tibor Simko <tibor.simko@cern.ch>, 2021
 # Mojib Wali <mojib.wali@tugraz.at>, 2021
-# chriz_uniba <christina.zeller@uni-bamberg.de>, 2022
+# c960a0736ea0fb7507bb1c3555e7d33f_88b575f <3cef15c38ce2563e884ec389656c9161_1006830>, 2024
+# David Eckhard <dabombeeer@gmail.com>, 2025
+# Sarah Wiechers, 2025
+# Adienne Karsten-Welker, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-oauthclient 2.0.0\n"
+"Project-Id-Version: invenio-oauthclient 4.1.4\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
-"POT-Creation-Date: 2022-05-27 09:58+0200\n"
+"POT-Creation-Date: 2025-03-27 15:00+0000\n"
 "PO-Revision-Date: 2016-08-18 15:19+0000\n"
-"Last-Translator: chriz_uniba <christina.zeller@uni-bamberg.de>, 2022\n"
+"Last-Translator: Adienne Karsten-Welker, 2025\n"
 "Language-Team: German (https://app.transifex.com/inveniosoftware/teams/23537/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.1\n"
+"Generated-By: Babel 2.17.0\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: invenio_oauthclient/admin.py:52
+#: invenio_oauthclient/admin.py:54
 msgid "ID"
 msgstr "ID"
 
-#: invenio_oauthclient/admin.py:53
+#: invenio_oauthclient/admin.py:55
 msgid "User ID"
-msgstr "BenutzerIn-ID"
+msgstr "Benutzer*innen-ID"
 
-#: invenio_oauthclient/admin.py:54
+#: invenio_oauthclient/admin.py:56
 msgid "Client ID"
 msgstr "Client-ID"
 
-#: invenio_oauthclient/admin.py:83
+#: invenio_oauthclient/admin.py:85
 msgid "ID Remote Account"
 msgstr "ID des externen Kontos"
 
-#: invenio_oauthclient/admin.py:90 invenio_oauthclient/admin.py:98
+#: invenio_oauthclient/admin.py:92 invenio_oauthclient/admin.py:100
 msgid "User Management"
-msgstr "BenutzerInverwaltung"
+msgstr "Benutzer*innen-Verwaltung"
 
-#: invenio_oauthclient/admin.py:91
+#: invenio_oauthclient/admin.py:93 invenio_oauthclient/ext.py:260
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:12
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:12
-#: invenio_oauthclient/views/settings.py:47
 msgid "Linked accounts"
 msgstr "Verknüpfte Konten"
 
-#: invenio_oauthclient/admin.py:99
+#: invenio_oauthclient/admin.py:101
 msgid "Linked account tokens"
 msgstr "Verknüpfte Konto-Token"
 
-#: invenio_oauthclient/contrib/cern.py:429
+#: invenio_oauthclient/ext.py:250
+#, python-format
+msgid "%(icon)s Linked accounts"
+msgstr "%(icon)s Verknüpfte Konten"
+
+#: invenio_oauthclient/contrib/cern.py:410
+#, python-format
+msgid "Identity class %(identity_class)s is not one of [%(valid_identities)s]"
+msgstr ""
+"Identitätsklasse %(identity_class)s ist keine der folgenden: "
+"[%(valid_identities)s]"
+
+#: invenio_oauthclient/contrib/cern.py:441
 #: invenio_oauthclient/contrib/cern_openid.py:305
 msgid "CERN account not allowed."
 msgstr "CERN-Konto nicht erlaubt."
 
-#: invenio_oauthclient/handlers/ui.py:42
+#: invenio_oauthclient/contrib/cern_openid.py:278
+#, python-format
+msgid "User roles %(cern_roles)s are not one of %(valid_roles)s"
+msgstr ""
+"Benutzerrollen %(cern_roles)s sind keine der folgenden: %(valid_roles)s"
+
+#: invenio_oauthclient/contrib/github.py:109
+msgid "GitHub"
+msgstr "GitHub"
+
+#: invenio_oauthclient/contrib/github.py:110
+msgid "Software collaboration platform."
+msgstr "Software-Kollaborationsplattform."
+
+#: invenio_oauthclient/contrib/github.py:265
+#: invenio_oauthclient/contrib/github.py:287
+msgid "Application mis-configuration in GitHub"
+msgstr "Falsche Anwendungskonfiguration in GitHub"
+
+#: invenio_oauthclient/contrib/globus.py:95
+msgid "Globus"
+msgstr "Globus"
+
+#: invenio_oauthclient/contrib/globus.py:96
+msgid "Research data management simplified."
+msgstr "Vereinfachte Forschungsdatenverwaltung."
+
+#: invenio_oauthclient/contrib/globus.py:168
+msgid "Application mis-configuration in Globus"
+msgstr "Falsche Anwendungskonfiguration in Globus"
+
+#: invenio_oauthclient/contrib/globus.py:203
+msgid "Failed to fetch user id, likely server mis-configuration"
+msgstr ""
+"Benutzer*innen-ID konnte nicht abgerufen werden, wahrscheinlich aufgrund "
+"einer falschen Serverkonfiguration."
+
+#: invenio_oauthclient/contrib/openaire_aai.py:105
+#: invenio_oauthclient/contrib/openaire_aai.py:170
+msgid "OpenAIRE"
+msgstr "OpenAIRE"
+
+#: invenio_oauthclient/contrib/openaire_aai.py:106
+#: invenio_oauthclient/contrib/openaire_aai.py:171
+msgid "Open Science Services."
+msgstr "Dienste für Open Science."
+
+#: invenio_oauthclient/contrib/orcid.py:113
+msgid "ORCID"
+msgstr "ORCID"
+
+#: invenio_oauthclient/contrib/orcid.py:114
+msgid "Connecting Research and Researchers."
+msgstr "Forschung und Forschende verbinden."
+
+#: invenio_oauthclient/contrib/keycloak/helpers.py:32
+#, python-format
+msgid ""
+"Invalid app name %(app_name)s. It should only contain letters, numbers, "
+"dashes and underscores"
+msgstr ""
+"Ungültiger Anwendungsname %(app_name)s. Er sollte nur Buchstaben, Zahlen, "
+"Bindestriche und Unterstriche enthalten."
+
+#: invenio_oauthclient/handlers/rest.py:91
+#: invenio_oauthclient/handlers/token.py:71
+#: invenio_oauthclient/handlers/ui.py:242
+msgid "Authorization with remote service failed."
+msgstr "Autorisierung mit externem Dienst fehlgeschlagen."
+
+#: invenio_oauthclient/handlers/rest.py:99
+#: invenio_oauthclient/handlers/ui.py:65
+msgid "You rejected the authentication request."
+msgstr "Sie haben die Authentifizierungs-Anfrage abgelehnt."
+
+#: invenio_oauthclient/handlers/rest.py:103
+#: invenio_oauthclient/handlers/ui.py:60
 msgid "External service is already linked to another account."
 msgstr "Der externe Dienst ist bereits mit einem anderen Konto verknüpft."
 
-#: invenio_oauthclient/handlers/ui.py:47
-msgid "You rejected the authentication request."
-msgstr "Sie haben die Authentifizierungsanfrage abgelehnt."
+#: invenio_oauthclient/handlers/rest.py:113
+msgid "Unauthorized."
+msgstr "Nicht autorisiert."
 
-#: invenio_oauthclient/handlers/ui.py:173
-msgid "Authorization with remote service failed."
-msgstr "Autorisierung mit externem Dienst fehlgeschlagen."
+#: invenio_oauthclient/handlers/rest.py:120
+#: invenio_oauthclient/handlers/rest.py:290
+msgid "Successfully signed up."
+msgstr "Erfolgreich angemeldet."
+
+#: invenio_oauthclient/handlers/rest.py:129
+msgid "Token not found."
+msgstr "Token nicht gefunden."
+
+#: invenio_oauthclient/handlers/rest.py:136
+msgid "Could not create token for user."
+msgstr "Konnte keinen Token für Benutzer*in erstellen."
+
+#: invenio_oauthclient/handlers/rest.py:216
+msgid "Successfully authorized."
+msgstr "Erfolgreich autorisiert."
+
+#: invenio_oauthclient/handlers/rest.py:246
+msgid "Successfully disconnected."
+msgstr "Erfolgreich getrennt."
+
+#: invenio_oauthclient/handlers/token.py:62
+msgid "User rejected request."
+msgstr "Benutzer*in hat die Anfrage abgelehnt."
+
+#: invenio_oauthclient/handlers/token.py:75
+msgid "Bad OAuth authorized request"
+msgstr "Ungültige OAuth-Autorisierungsanfrage"
+
+#: invenio_oauthclient/handlers/ui.py:157
+#, python-format
+msgid ""
+"A confirmation email has already been sent to %(email)s. Didn't receive it? "
+"Click <strong><a href=\"%(url)s\">here</a></strong> to resend it."
+msgstr ""
+"Eine Bestätigungs-E-Mail wurde bereits an %(email)s gesendet. Haben Sie sie "
+"nicht erhalten? Klicken Sie <strong><a href=\"%(url)s\">hier</a></strong>, "
+"um sie erneut zu senden."
+
+#: invenio_oauthclient/handlers/utils.py:126
+#, python-format
+msgid ""
+"Error while syncing roles: A managed role with id: %(group_id)s already "
+"exists"
+msgstr ""
+"Fehler beim Synchronisieren von Rollen: Eine verwaltete Rolle mit der ID: "
+"%(group_id)s existiert bereits"
+
+#: invenio_oauthclient/handlers/utils.py:136
+#, python-format
+msgid ""
+"Error while syncing roles: A managed role with name: %(group_name)s already "
+"exists"
+msgstr ""
+"Fehler beim Synchronisieren von Rollen: Eine verwaltete Rolle mit dem Namen:"
+" %(group_name)s existiert bereits"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:25
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/_macros.html:60
@@ -81,6 +224,7 @@ msgid "Sign in with %(title)s"
 msgstr "Mit %(title)s einloggen"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/login_user.html:21
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:26
 msgid "OR"
 msgstr "ODER"
 
@@ -96,7 +240,7 @@ msgid ""
 "Fill in your details to complete your registration. You only have to do this"
 " once."
 msgstr ""
-"Füllen Sie bitte Ihren Daten ein, um die Registrierung abzuschließen. Dies "
+"Tragen Sie bitte Ihre Daten ein, um die Registrierung abzuschließen. Dies "
 "ist nur einmalig nötig."
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:33
@@ -105,30 +249,29 @@ msgid "Complete registration"
 msgstr "Registrierung abschließen"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:20
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:20
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:21
 #, python-format
 msgid ""
 "Tired of entering password for %(sitename)s every time you sign in? Set up "
 "single sign-on with one or more of the services below:"
 msgstr ""
 "Wollen Sie nicht jedes Mal beim Einloggen auf %(sitename)s Ihr Passwort "
-"eingeben? Verwenden Sie Single-Sign-On mit einem der folgenden Diensten:"
+"eingeben? Verwenden Sie das Single-Sign-On mit einem der folgenden Dienste:"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:32
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:53
 msgid "Disconnect"
 msgstr "Trennen"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:33
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:34
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:62
 msgid "Connect"
 msgstr "Verbinden"
 
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:26
-msgid "Or"
-msgstr "Oder"
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:39
+msgid "Forgot password?"
+msgstr "Passwort vergessen?"
 
-#: invenio_oauthclient/views/settings.py:38
-#, python-format
-msgid "%(icon)s Linked accounts"
-msgstr "%(icon)s Verknüpfte Konten"
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:45
+msgid "Resend confirmation email"
+msgstr "Bestätigungs-Mail erneut senden"
