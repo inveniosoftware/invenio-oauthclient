@@ -64,6 +64,8 @@ msgstr "%(icon)s حسابات مرتبطة"
 #, python-format
 msgid "Identity class %(identity_class)s is not one of [%(valid_identities)s]"
 msgstr ""
+"فئة الهوية Identity class %(identity_class)s ليست واحدة من "
+"[%(valid_identities)s]"
 
 #: invenio_oauthclient/contrib/cern.py:441
 #: invenio_oauthclient/contrib/cern_openid.py:305
@@ -73,7 +75,7 @@ msgstr " حساب CERN غير مسموح به."
 #: invenio_oauthclient/contrib/cern_openid.py:278
 #, python-format
 msgid "User roles %(cern_roles)s are not one of %(valid_roles)s"
-msgstr ""
+msgstr "أدوار المستخدم %(cern_roles)s ليست واحدة من %(valid_roles)s"
 
 #: invenio_oauthclient/contrib/github.py:109
 msgid "GitHub"
@@ -81,38 +83,38 @@ msgstr "جيت هوب GitHub"
 
 #: invenio_oauthclient/contrib/github.py:110
 msgid "Software collaboration platform."
-msgstr ""
+msgstr "منصة تعاون للبرمجة."
 
 #: invenio_oauthclient/contrib/github.py:265
 #: invenio_oauthclient/contrib/github.py:287
 msgid "Application mis-configuration in GitHub"
-msgstr ""
+msgstr "خطأ في تثبيت إعدادات التطبيق في GitHub"
 
 #: invenio_oauthclient/contrib/globus.py:95
 msgid "Globus"
-msgstr ""
+msgstr "غلوبس Globus"
 
 #: invenio_oauthclient/contrib/globus.py:96
 msgid "Research data management simplified."
-msgstr ""
+msgstr "إدارة بيانات البحث مبسّطة."
 
 #: invenio_oauthclient/contrib/globus.py:168
 msgid "Application mis-configuration in Globus"
-msgstr ""
+msgstr "خطأ في تثبيت إعدادات التطبيق في Globus"
 
 #: invenio_oauthclient/contrib/globus.py:203
 msgid "Failed to fetch user id, likely server mis-configuration"
-msgstr ""
+msgstr "فشل جلب معرف id المستخدم، ربما يكون هناك خطأ في تثبيت إعدادات الموزّع"
 
 #: invenio_oauthclient/contrib/openaire_aai.py:105
 #: invenio_oauthclient/contrib/openaire_aai.py:170
 msgid "OpenAIRE"
-msgstr ""
+msgstr "OpenAIRE"
 
 #: invenio_oauthclient/contrib/openaire_aai.py:106
 #: invenio_oauthclient/contrib/openaire_aai.py:171
 msgid "Open Science Services."
-msgstr ""
+msgstr "خدمات العلم المفتوح."
 
 #: invenio_oauthclient/contrib/orcid.py:113
 msgid "ORCID"
@@ -120,7 +122,7 @@ msgstr "أوركيد ORCID"
 
 #: invenio_oauthclient/contrib/orcid.py:114
 msgid "Connecting Research and Researchers."
-msgstr ""
+msgstr "ربط التواصل بين البحث والباحثين."
 
 #: invenio_oauthclient/contrib/keycloak/helpers.py:32
 #, python-format
@@ -128,6 +130,8 @@ msgid ""
 "Invalid app name %(app_name)s. It should only contain letters, numbers, "
 "dashes and underscores"
 msgstr ""
+"اسم التطبيق غير صالح %(app_name)s. يجب أن يحتوي على أحرف وأرقام وشرطات "
+"وشرطات سفلية فقط."
 
 #: invenio_oauthclient/handlers/rest.py:91
 #: invenio_oauthclient/handlers/token.py:71
@@ -147,36 +151,36 @@ msgstr "الخدمة الخارجية مرتبطة حاليا مع حساب أخ
 
 #: invenio_oauthclient/handlers/rest.py:113
 msgid "Unauthorized."
-msgstr ""
+msgstr "غير مرخّص"
 
 #: invenio_oauthclient/handlers/rest.py:120
 #: invenio_oauthclient/handlers/rest.py:290
 msgid "Successfully signed up."
-msgstr ""
+msgstr "تم التسجيل بنجاح."
 
 #: invenio_oauthclient/handlers/rest.py:129
 msgid "Token not found."
-msgstr ""
+msgstr "الرمز Token غير موجود"
 
 #: invenio_oauthclient/handlers/rest.py:136
 msgid "Could not create token for user."
-msgstr ""
+msgstr "لم يتمكن من إنشاء رمز token للمستخدم."
 
 #: invenio_oauthclient/handlers/rest.py:216
 msgid "Successfully authorized."
-msgstr ""
+msgstr "تمت الموافقة على الإذن بنجاح."
 
 #: invenio_oauthclient/handlers/rest.py:246
 msgid "Successfully disconnected."
-msgstr ""
+msgstr "تم قطع الاتصال بنجاح."
 
 #: invenio_oauthclient/handlers/token.py:62
 msgid "User rejected request."
-msgstr ""
+msgstr "تم رفض الطلب من قبل المستخدم."
 
 #: invenio_oauthclient/handlers/token.py:75
 msgid "Bad OAuth authorized request"
-msgstr ""
+msgstr "طلب تفويض OAuth غير صالح"
 
 #: invenio_oauthclient/handlers/ui.py:157
 #, python-format
@@ -184,6 +188,8 @@ msgid ""
 "A confirmation email has already been sent to %(email)s. Didn't receive it? "
 "Click <strong><a href=\"%(url)s\">here</a></strong> to resend it."
 msgstr ""
+"تم إرسال رسالة تأكيد إلى %(email)s. إن لم تستلمها؟ انقر <strong><a "
+"href=\"%(url)s\">هنا</a></strong> لإعادة إرسالها."
 
 #: invenio_oauthclient/handlers/utils.py:126
 #, python-format
@@ -191,6 +197,8 @@ msgid ""
 "Error while syncing roles: A managed role with id: %(group_id)s already "
 "exists"
 msgstr ""
+"حدث خطأ أثناء مزامنة الأدوار: يوجد دور بصدد الإدارة يحمل المعرف id: "
+"%(group_id)sبالفعل"
 
 #: invenio_oauthclient/handlers/utils.py:136
 #, python-format
@@ -198,6 +206,8 @@ msgid ""
 "Error while syncing roles: A managed role with name: %(group_name)s already "
 "exists"
 msgstr ""
+"حدث خطأ أثناء مزامنة الأدوار: يوجد دور بصدد الإدارة يحمل إسم: %(group_name)s"
+" بالفعل"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:25
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/_macros.html:60
@@ -254,4 +264,4 @@ msgstr "فقدت كلمة المرور؟"
 
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:45
 msgid "Resend confirmation email"
-msgstr "أرسل إعاد تأكيد البريد الإلكتروني"
+msgstr "أعد إرسال تأكيد البريد الإلكتروني"
