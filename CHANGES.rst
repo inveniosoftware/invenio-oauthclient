@@ -1,7 +1,7 @@
 ..
     This file is part of Invenio.
     Copyright (C) 2015-2023 CERN.
-    Copyright (C) 2024 Graz University of Technology.
+    Copyright (C) 2024-2025 Graz University of Technology.
     Copyright (C) 2025 KTH Royal Institute of Technology.
 
     Invenio is free software; you can redistribute it and/or modify it
@@ -9,6 +9,11 @@
 
 Changes
 =======
+
+Version 4.2.0 (released 2025-04-29)
+
+- i18n: pulled translations
+- i18n: push translations
 
 Version 4.1.4 (released 2025-03-19)
 
