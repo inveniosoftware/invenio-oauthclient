@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 3.5.2 (released 2025-05-05)
+
+- installation: fix dependency conflict for uritemplate
+  (newer python versions are not picking up <2.0.0 anymore
+
 Version 3.5.1 (released 2023-08-30)
 
 - orcid: show registration form errors on validations errors
