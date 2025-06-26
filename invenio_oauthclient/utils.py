@@ -2,7 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2023 CERN.
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -192,9 +192,9 @@ def _get_csrf_disabled_param():
     `meta={csrf: True/False}`.
     """
     import flask_wtf
-    from pkg_resources import parse_version
+    from packaging.version import Version
 
-    supports_meta = parse_version(flask_wtf.__version__) >= parse_version("0.14.0")
+    supports_meta = Version(flask_wtf.__version__) >= Version("0.14.0")
     return dict(meta={"csrf": False}) if supports_meta else dict(csrf_enabled=False)
 
 
