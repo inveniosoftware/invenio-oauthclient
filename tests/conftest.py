@@ -33,6 +33,7 @@ from invenio_oauthclient.contrib.cern_openid import REMOTE_APP as CERN_OPENID_RE
 from invenio_oauthclient.contrib.cern_openid import (
     REMOTE_REST_APP as CERN_OPENID_REMOTE_REST_APP,
 )
+from invenio_oauthclient.contrib.eosc_aai import REMOTE_APP as EOSC_AAI_REMOTE_APP
 from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
 from invenio_oauthclient.contrib.github import REMOTE_REST_APP as GITHUB_REMOTE_REST_APP
 from invenio_oauthclient.contrib.globus import REMOTE_APP as GLOBUS_REMOTE_APP
@@ -46,11 +47,6 @@ from invenio_oauthclient.views.client import rest_blueprint
 from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 
 from invenio_oauthclient._compat import monkey_patch_werkzeug  # noqa isort:skip
-
-try:
-    from werkzeug.middleware.dispatcher import DispatcherMiddleware
-except ImportError:
-    from werkzeug.wsgi import DispatcherMiddleware
 
 from flask_oauthlib.client import OAuth as FlaskOAuth  # noqa isort:skip
 from flask_oauthlib.client import OAuthResponse  # noqa isort:skip
@@ -83,6 +79,7 @@ def base_app(request):
             github=GITHUB_REMOTE_APP,
             globus=GLOBUS_REMOTE_APP,
             keycloak=KEYCLOAK_REMOTE_APP,
+            eosc_aai=EOSC_AAI_REMOTE_APP,
         ),
         OAUTHCLIENT_REST_REMOTE_APPS=dict(
             cern_openid=CERN_OPENID_REMOTE_REST_APP,
@@ -106,6 +103,10 @@ def base_app(request):
         GLOBUS_APP_CREDENTIALS=dict(
             consumer_key="globus_key_changeme",
             consumer_secret="globus_secret_changeme",
+        ),
+        EOSC_AAI_APP_CREDENTIALS=dict(
+            consumer_key="eosc_aai_key_changeme",
+            consumer_secret="eosc_aai_secret_changeme",
         ),
         TEST_APP_CREDENTIALS=dict(
             consumer_key="test_key_changeme",
@@ -489,6 +490,42 @@ def example_cern(request):
             active=True,
         ),
     )
+
+
+@pytest.fixture
+def example_eosc_aai():
+    """Example EOSC AAI response data."""
+    example_data = {
+        "sub": "28c5353b8bb34984a8bd4169ba94c606@eosc-federation.eu",
+        "name": "Jane Doe",
+        "given_name": "Jane",
+        "family_name": "Doe",
+        "email": "jane.doe@example.org",
+        "eunode_projects": [
+            "pp-0190356a-ac97-db53-21c0-df7cd31a47c4",
+            "gp-01903568-c385-49ba-0356-1b4ac60a90ec",
+            "gp-0190356b-25a5-4f61-f926-38f9e0cd541a",
+        ],
+        "entitlements": [
+            "urn:geant:eosc-federation.eu:group:pp-0190356a-ac97-db53-21c0-df7cd31a47c4",
+            "urn:geant:eosc-federation.eu:group:gp-01903568-c385-49ba-0356-1b4ac60a90ec:role=owner",
+            "urn:geant:eosc-federation.eu:group:gp-0190356b-25a5-4f61-f926-38f9e0cd541a:role=member",
+        ],
+    }
+
+    example_account_info = {
+        "external_id": "28c5353b8bb34984a8bd4169ba94c606@eosc-federation.eu",
+        "external_method": "eosc_aai",
+        "user": {
+            "email": "jane.doe@example.org",
+            "profile": {
+                "full_name": "Jane Doe",
+            },
+        },
+        "active": True,
+    }
+
+    return example_data, example_account_info
 
 
 @pytest.fixture(scope="session")
