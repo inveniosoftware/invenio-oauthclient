@@ -163,7 +163,7 @@ class EOSCAAIOAuthSettingsHelper(OAuthSettingsHelper):
             base_url=base_url,
             app_key=app_key or "EOSC_AAI_APP_CREDENTIALS",
             request_token_params={
-                "scope": "openid profile email",
+                "scope": "openid profile email entitlements",
             },
             access_token_url=f"{base_url}/OIDC/token",
             authorize_url=f"{base_url}/OIDC/authorization",
