@@ -69,8 +69,13 @@ In templates you can add a sign in/up link:
 
 """
 
-from flask import current_app, redirect, url_for
+import base64
+import hashlib
+import secrets
+
+from flask import current_app, redirect, session, url_for
 from flask_login import current_user
+from flask_oauthlib.client import OAuthRemoteApp
 from invenio_db import db
 from invenio_i18n import lazy_gettext as _
 
@@ -80,6 +85,52 @@ from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.oauth import oauth_link_external_id, oauth_unlink_external_id
+
+
+class EOSCAAIOAuthRemoteApp(OAuthRemoteApp):
+    """Custom OAuth remote app with PKCE support for EOSC AAI."""
+
+    def authorize(self, callback=None, **kwargs):
+        """Override authorize method to add PKCE parameters."""
+        # Generate code verifier (43-128 characters, URL-safe)
+        code_verifier = (
+            base64.urlsafe_b64encode(secrets.token_bytes(32))
+            .decode("utf-8")
+            .rstrip("=")
+        )
+
+        # Generate code challenge using SHA256
+        code_challenge = (
+            base64.urlsafe_b64encode(
+                hashlib.sha256(code_verifier.encode("utf-8")).digest()
+            )
+            .decode("utf-8")
+            .rstrip("=")
+        )
+
+        # Store code verifier in session for later use in token exchange
+        session[f"oauth_code_verifier_{self.name}"] = code_verifier
+
+        # Add PKCE parameters to the authorization request
+        kwargs.update(
+            {"code_challenge": code_challenge, "code_challenge_method": "S256"}
+        )
+
+        return super().authorize(callback=callback, **kwargs)
+
+    def handle_oauth2_response(self, args):
+        """Override token exchange to include PKCE code_verifier."""
+        # Get the stored code_verifier from session
+        code_verifier = session.pop(f"oauth_code_verifier_{self.name}", None)
+
+        if code_verifier:
+            # Add code_verifier to access_token_params for token exchange
+            if not hasattr(self, "access_token_params"):
+                self.access_token_params = {}
+            self.access_token_params["code_verifier"] = code_verifier
+
+        # Call the parent implementation to perform token exchange
+        return super().handle_oauth2_response(args)
 
 
 class EOSCAAIOAuthSettingsHelper(OAuthSettingsHelper):
@@ -119,6 +170,11 @@ class EOSCAAIOAuthSettingsHelper(OAuthSettingsHelper):
             content_type="application/json",
             precedence_mask=precedence_mask,
             signup_options=signup_options,
+        )
+
+        # Override the base_app to use our custom remote app class with PKCE support
+        self.base_app["remote_app"] = (
+            "invenio_oauthclient.contrib.eosc_aai:EOSCAAIOAuthRemoteApp"
         )
 
         self._handlers = dict(
