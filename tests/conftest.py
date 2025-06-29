@@ -520,8 +520,6 @@ def example_eosc_aai():
             "email": "jane.doe@example.org",
             "profile": {
                 "full_name": "Jane Doe",
-                "given_name": "Jane",
-                "family_name": "Doe",
             },
         },
         "active": True,

@@ -14,13 +14,21 @@ from flask import session, url_for
 from flask_login import current_user
 from flask_security import login_user
 from flask_security.utils import hash_password
-from helpers import get_state, mock_response
+from helpers import get_state, mock_remote_get, mock_response
 from invenio_accounts.models import User
 from invenio_db import db
 
 from invenio_oauthclient.contrib.eosc_aai import account_info
 from invenio_oauthclient.handlers import token_session_key
 from invenio_oauthclient.models import RemoteAccount, RemoteToken, UserIdentity
+
+
+class MockResponse:
+    """Mock response object for userinfo endpoint."""
+
+    def __init__(self, data, status=200):
+        self.data = data
+        self.status = status
 
 
 def test_account_info(app, example_eosc_aai):
@@ -32,9 +40,42 @@ def test_account_info(app, example_eosc_aai):
 
     example_data, example_account_info = example_eosc_aai
 
-    assert (
-        account_info(ioc.remote_apps["eosc_aai"], example_data) == example_account_info
-    )
+    # Mock userinfo endpoint response
+    userinfo_data = {
+        "sub": "28c5353b8bb34984a8bd4169ba94c606@eosc-federation.eu",
+        "name": "Jane Doe",
+        "given_name": "Jane",
+        "family_name": "Doe",
+        "email": "jane.doe@example.org",
+        "eunode_projects": [
+            "pp-0190356a-ac97-db53-21c0-df7cd31a47c4",
+            "gp-01903568-c385-49ba-0356-1b4ac60a90ec",
+            "gp-0190356b-25a5-4f61-f926-38f9e0cd541a",
+        ],
+        "entitlements": [
+            "urn:geant:eosc-federation.eu:group:pp-0190356a-ac97-db53-21c0-df7cd31a47c4",
+            "urn:geant:eosc-federation.eu:group:gp-01903568-c385-49ba-0356-1b4ac60a90ec:role=owner",
+            "urn:geant:eosc-federation.eu:group:gp-0190356b-25a5-4f61-f926-38f9e0cd541a:role=member",
+        ],
+    }
+    userinfo_response = MockResponse(userinfo_data, 200)
+    mock_remote_get(ioc, "eosc_aai", userinfo_response)
+
+    # Test with token response (ID token) data - profile info should come from userinfo
+    token_data = {"sub": "28c5353b8bb34984a8bd4169ba94c606@eosc-federation.eu"}
+
+    result = account_info(ioc.remote_apps["eosc_aai"], token_data)
+
+    # Verify the result
+    assert result == example_account_info
+
+    # Verify that the original token_data has been updated with userinfo data
+    assert token_data["name"] == "Jane Doe"
+    assert token_data["email"] == "jane.doe@example.org"
+
+    # Test empty userinfo response fallback
+    empty_userinfo_response = MockResponse({}, 200)
+    mock_remote_get(ioc, "eosc_aai", empty_userinfo_response)
 
     assert account_info(ioc.remote_apps["eosc_aai"], {}) == dict(
         external_id=None,
@@ -43,12 +84,34 @@ def test_account_info(app, example_eosc_aai):
             email=None,
             profile=dict(
                 full_name=None,
-                given_name=None,
-                family_name=None,
             ),
         ),
         active=True,
     )
+
+    # Test userinfo failure with JWT fallback
+    failed_userinfo_response = MockResponse({}, 500)
+    mock_remote_get(ioc, "eosc_aai", failed_userinfo_response)
+
+    # Create a mock JWT token
+    import jwt
+
+    jwt_payload = {
+        "sub": "28c5353b8bb34984a8bd4169ba94c606@eosc-federation.eu",
+        "email": "jane.doe@example.org",
+        "name": "Jane Doe",
+    }
+    mock_jwt_token = jwt.encode(jwt_payload, "secret", algorithm="HS256")
+
+    # Test with JWT fallback
+    resp_with_jwt = {"id_token": mock_jwt_token}
+    result = account_info(ioc.remote_apps["eosc_aai"], resp_with_jwt)
+
+    assert (
+        result["external_id"] == "28c5353b8bb34984a8bd4169ba94c606@eosc-federation.eu"
+    )
+    assert result["user"]["email"] == "jane.doe@example.org"
+    assert result["user"]["profile"]["full_name"] == "Jane Doe"
 
 
 def test_login(app):
@@ -62,7 +125,7 @@ def test_login(app):
 
     params = parse_qs(urlparse(resp.location).query)
     assert params["response_type"] == ["code"]
-    assert params["scope"] == ["openid profile email"]
+    assert params["scope"] == ["openid profile email entitlements"]
     assert params["redirect_uri"]
     assert params["client_id"]
     assert params["state"]
@@ -92,6 +155,29 @@ def test_authorized_signup(app_with_userprofiles, example_eosc_aai):
         # Mock the response from EOSC AAI
         mock_response(
             app.extensions["oauthlib.client"], "eosc_aai", oauth_token_response
+        )
+
+        # Mock userinfo endpoint response
+        userinfo_data = {
+            "sub": "28c5353b8bb34984a8bd4169ba94c606@eosc-federation.eu",
+            "name": "Jane Doe",
+            "given_name": "Jane",
+            "family_name": "Doe",
+            "email": "jane.doe@example.org",
+            "eunode_projects": [
+                "pp-0190356a-ac97-db53-21c0-df7cd31a47c4",
+                "gp-01903568-c385-49ba-0356-1b4ac60a90ec",
+                "gp-0190356b-25a5-4f61-f926-38f9e0cd541a",
+            ],
+            "entitlements": [
+                "urn:geant:eosc-federation.eu:group:pp-0190356a-ac97-db53-21c0-df7cd31a47c4",
+                "urn:geant:eosc-federation.eu:group:gp-01903568-c385-49ba-0356-1b4ac60a90ec:role=owner",
+                "urn:geant:eosc-federation.eu:group:gp-0190356b-25a5-4f61-f926-38f9e0cd541a:role=member",
+            ],
+        }
+        userinfo_response = MockResponse(userinfo_data, 200)
+        mock_remote_get(
+            app.extensions["oauthlib.client"], "eosc_aai", userinfo_response
         )
 
         # User authorized the requests and is redirect back
@@ -135,6 +221,29 @@ def test_authorized_signup_complete_flow(app_with_userprofiles, example_eosc_aai
         # Mock the response from EOSC AAI
         mock_response(
             app.extensions["oauthlib.client"], "eosc_aai", oauth_token_response
+        )
+
+        # Mock userinfo endpoint response
+        userinfo_data = {
+            "sub": "28c5353b8bb34984a8bd4169ba94c606@eosc-federation.eu",
+            "name": "Jane Doe",
+            "given_name": "Jane",
+            "family_name": "Doe",
+            "email": "jane.doe@example.org",
+            "eunode_projects": [
+                "pp-0190356a-ac97-db53-21c0-df7cd31a47c4",
+                "gp-01903568-c385-49ba-0356-1b4ac60a90ec",
+                "gp-0190356b-25a5-4f61-f926-38f9e0cd541a",
+            ],
+            "entitlements": [
+                "urn:geant:eosc-federation.eu:group:pp-0190356a-ac97-db53-21c0-df7cd31a47c4",
+                "urn:geant:eosc-federation.eu:group:gp-01903568-c385-49ba-0356-1b4ac60a90ec:role=owner",
+                "urn:geant:eosc-federation.eu:group:gp-0190356b-25a5-4f61-f926-38f9e0cd541a:role=member",
+            ],
+        }
+        userinfo_response = MockResponse(userinfo_data, 200)
+        mock_remote_get(
+            app.extensions["oauthlib.client"], "eosc_aai", userinfo_response
         )
 
         # User authorized the requests and is redirect back
@@ -295,6 +404,29 @@ def test_authorized_already_authenticated(app, models_fixture, example_eosc_aai)
         # Mock access token request
         mock_response(
             app.extensions["oauthlib.client"], "eosc_aai", oauth_token_response
+        )
+
+        # Mock userinfo endpoint response
+        userinfo_data = {
+            "sub": "28c5353b8bb34984a8bd4169ba94c606@eosc-federation.eu",
+            "name": "Jane Doe",
+            "given_name": "Jane",
+            "family_name": "Doe",
+            "email": "jane.doe@example.org",
+            "eunode_projects": [
+                "pp-0190356a-ac97-db53-21c0-df7cd31a47c4",
+                "gp-01903568-c385-49ba-0356-1b4ac60a90ec",
+                "gp-0190356b-25a5-4f61-f926-38f9e0cd541a",
+            ],
+            "entitlements": [
+                "urn:geant:eosc-federation.eu:group:pp-0190356a-ac97-db53-21c0-df7cd31a47c4",
+                "urn:geant:eosc-federation.eu:group:gp-01903568-c385-49ba-0356-1b4ac60a90ec:role=owner",
+                "urn:geant:eosc-federation.eu:group:gp-0190356b-25a5-4f61-f926-38f9e0cd541a:role=member",
+            ],
+        }
+        userinfo_response = MockResponse(userinfo_data, 200)
+        mock_remote_get(
+            app.extensions["oauthlib.client"], "eosc_aai", userinfo_response
         )
 
         # User goes to 'Linked accounts' and clicks 'Connect'

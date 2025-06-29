@@ -73,6 +73,7 @@ import base64
 import hashlib
 import secrets
 
+import jwt
 from flask import current_app, redirect, session, url_for
 from flask_login import current_user
 from flask_oauthlib.client import OAuthRemoteApp
@@ -85,6 +86,28 @@ from invenio_oauthclient.handlers.rest import response_handler
 from invenio_oauthclient.handlers.utils import require_more_than_one_external_account
 from invenio_oauthclient.models import RemoteAccount
 from invenio_oauthclient.oauth import oauth_link_external_id, oauth_unlink_external_id
+
+OAUTHCLIENT_EOSC_AAI_JWT_DECODE_PARAMS = dict(
+    options=dict(
+        verify_signature=False,
+        verify_aud=False,
+    ),
+    algorithms=[
+        "RS256",
+        "RS384",
+        "RS512",
+        "ES256",
+        "ES384",
+        "ES512",
+        "PS256",
+        "PS384",
+        "PS512",
+        "HS256",
+        "HS384",
+        "HS512",
+    ],
+)
+"""EOSC AAI JWT decoding parameters."""
 
 
 class EOSCAAIOAuthRemoteApp(OAuthRemoteApp):
@@ -262,8 +285,6 @@ def account_info_serializer(remote, resp, **kwargs):
             "email": resp.get("email"),
             "profile": {
                 "full_name": resp.get("name"),
-                "given_name": resp.get("given_name"),
-                "family_name": resp.get("family_name"),
             },
         },
         "active": True,
@@ -295,6 +316,30 @@ def account_info(remote, resp):
     :param resp: The response of the `authorized` endpoint.
     :returns: A dictionary with the user information.
     """
+    # Get user info from userinfo endpoint since profile data is not in ID token
+    userinfo_resp = remote.get("OIDC/userinfo")
+
+    if userinfo_resp.status == 200:
+        userinfo_data = userinfo_resp.data
+        # Update the original response with userinfo data so it's available in account_setup
+        resp.update(userinfo_data)
+    else:
+        # Fallback: decode JWT id_token to ensure we have the 'sub' claim
+        if "id_token" in resp:
+            try:
+                id_token_data = jwt.decode(
+                    resp["id_token"],
+                    **current_app.config.get(
+                        "OAUTHCLIENT_EOSC_AAI_JWT_DECODE_PARAMS",
+                        OAUTHCLIENT_EOSC_AAI_JWT_DECODE_PARAMS,
+                    ),
+                )
+                # Update response with decoded token data
+                resp.update(id_token_data)
+            except Exception:
+                # If JWT decoding fails, continue with whatever data we have
+                pass
+
     handlers = current_oauthclient.signup_handlers[remote.name]
     # `remote` param automatically injected via `make_handler` helper
     return handlers["info_serializer"](resp)
