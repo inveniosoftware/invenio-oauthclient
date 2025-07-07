@@ -44,7 +44,7 @@ def auto_redirect_login(*args, **kwargs):
     """Handles automatic redirect to external auth service.
 
     The login endpoint will redirect automatically to the external
-    auth service is the following conditions are met:
+    auth service if the following conditions are met:
 
     * local login is disabled
     * redirect to external login is enabled

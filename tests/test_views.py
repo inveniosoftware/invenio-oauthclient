@@ -91,7 +91,7 @@ def test_redirect_uri(views_fixture):
 
         check_response_redirect_url(resp, urlparse(test_url).path)
 
-        app.config.update({"TRUSTED_HOSTS": ["inveniosoftware.org"]})
+        app.config.update({"TRUSTED_HOSTS": ["localhost", "inveniosoftware.org"]})
 
         resp = client.get(
             url_for("invenio_oauthclient.login", remote_app="test", next=test_url)

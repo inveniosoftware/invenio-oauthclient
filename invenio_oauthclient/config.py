@@ -355,5 +355,5 @@ OAUTHCLIENT_AUTO_REDIRECT_TO_EXTERNAL_LOGIN = False
 If this option is enabled and there is exactly one external authentication
 service enabled (i.e. one OAuthClient remote app is configured, and local
 login is disabled), the login view function will automatically redirect to
-this external authentication service.
+that external authentication service.
 """

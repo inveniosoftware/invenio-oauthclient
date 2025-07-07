@@ -87,7 +87,7 @@ def test_redirect_uri(app_rest):
 
         check_response_redirect_url(resp, urlparse(test_url).path)
 
-        app_rest.config.update({"TRUSTED_HOSTS": ["inveniosoftware.org"]})
+        app_rest.config.update({"TRUSTED_HOSTS": ["localhost", "inveniosoftware.org"]})
 
         resp = client.get(
             url_for("invenio_oauthclient.rest_login", remote_app="test", next=test_url)
