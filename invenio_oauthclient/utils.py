@@ -103,7 +103,7 @@ def get_safe_redirect_target(arg="next"):
     :param arg: URL argument.
     :returns: The redirect target or ``None``.
     """
-    allowed_hosts = current_app.config.get("APP_ALLOWED_HOSTS") or []
+    allowed_hosts = current_app.config.get("TRUSTED_HOSTS") or []
     for target in request.args.get(arg), request.referrer:
         if target:
             redirect_uri = urisplit(target)

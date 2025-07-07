@@ -2,7 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -79,7 +79,7 @@ def test_redirect_uri(views_fixture):
             check_response_redirect_url(resp, url)
 
         # Assert that absolute redirects are allowed only if
-        # `APP_ALLOWED_HOSTS` is set and includes them. Otherwise, the relative
+        # `TRUSTED_HOSTS` is set and includes them. Otherwise, the relative
         # path of the url is extracted and returned. Note if you need to
         # redirect to index page you should pass '/' as next parameter.
 
@@ -91,7 +91,7 @@ def test_redirect_uri(views_fixture):
 
         check_response_redirect_url(resp, urlparse(test_url).path)
 
-        app.config.update({"APP_ALLOWED_HOSTS": ["inveniosoftware.org"]})
+        app.config.update({"TRUSTED_HOSTS": ["localhost", "inveniosoftware.org"]})
 
         resp = client.get(
             url_for("invenio_oauthclient.login", remote_app="test", next=test_url)
