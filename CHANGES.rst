@@ -9,6 +9,18 @@
 Changes
 =======
 
+Version v5.2.0 (released 2025-07-17)
+
+- i18n: pulled translations
+- i18n: push translations
+- fix app allowed hosts (#356)
+- fix: pkg_resources DeprecationWarning
+- fix: setuptools require underscores instead of dashes
+- i18n: removed deprecated messages
+- fix: i18n-unrelated keycloak test missing app fixture
+- Fix: i18n: added gettext to places where it was missing
+- inline(docs): fix
+
 Version 5.1.0 (released 2024-12-12)
 
 - fix: DeprecationWarning:
