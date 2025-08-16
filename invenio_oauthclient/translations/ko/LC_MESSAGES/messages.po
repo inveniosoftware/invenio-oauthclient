@@ -5,8 +5,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 # 
 # Translators:
-# Tibor Simko <tibor.simko@cern.ch>, 2021
-# Theodoros Theodoropoulos, 2024
+# Minjae Kwon, 2024
 # 
 #, fuzzy
 msgid ""
@@ -15,22 +14,22 @@ msgstr ""
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
 "POT-Creation-Date: 2025-07-08 19:46+0000\n"
 "PO-Revision-Date: 2016-08-18 15:19+0000\n"
-"Last-Translator: Theodoros Theodoropoulos, 2024\n"
-"Language-Team: Greek (https://app.transifex.com/inveniosoftware/teams/23537/el/)\n"
+"Last-Translator: Minjae Kwon, 2024\n"
+"Language-Team: Korean (https://app.transifex.com/inveniosoftware/teams/23537/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
-"Language: el\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ko\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: invenio_oauthclient/admin.py:54
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #: invenio_oauthclient/admin.py:55
 msgid "User ID"
-msgstr "ID Χρήστη"
+msgstr "사용자 ID"
 
 #: invenio_oauthclient/admin.py:56
 msgid "Client ID"
@@ -42,7 +41,7 @@ msgstr ""
 
 #: invenio_oauthclient/admin.py:92 invenio_oauthclient/admin.py:100
 msgid "User Management"
-msgstr "Διαχείριση Χρήστη"
+msgstr "유저 관리"
 
 #: invenio_oauthclient/admin.py:93 invenio_oauthclient/ext.py:260
 #: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:12
@@ -207,7 +206,7 @@ msgstr ""
 #: invenio_oauthclient/templates/invenio_oauthclient/login_user.html:21
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:26
 msgid "OR"
-msgstr "Ή"
+msgstr "OR"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/signup.html:24
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:29
@@ -247,7 +246,7 @@ msgstr ""
 
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:39
 msgid "Forgot password?"
-msgstr "Ξεχάσατε τον κωδικό σας;"
+msgstr "비밀번호를 분실하였습니까?"
 
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:45
 msgid "Resend confirmation email"

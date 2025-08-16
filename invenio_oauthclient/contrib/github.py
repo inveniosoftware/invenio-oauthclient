@@ -73,6 +73,7 @@ import github3
 from flask import current_app, redirect, url_for
 from flask_login import current_user
 from invenio_db import db
+from invenio_i18n import lazy_gettext as _
 
 from invenio_oauthclient import current_oauthclient
 from invenio_oauthclient.contrib.settings import OAuthSettingsHelper
@@ -105,8 +106,8 @@ class GitHubOAuthSettingsHelper(OAuthSettingsHelper):
     ):
         """Constructor."""
         super().__init__(
-            title or "GitHub",
-            description or "Software collaboration platform.",
+            title or _("GitHub"),
+            description or _("Software collaboration platform."),
             base_url or "https://api.github.com/",
             app_key or "GITHUB_APP_CREDENTIALS",
             icon=icon or "fa fa-github",
@@ -261,7 +262,7 @@ def authorized(resp, remote):
             return redirect(url_for("invenio_oauthclient.login", remote_app="github"))
         elif resp["error"] in ["incorrect_client_credentials", "redirect_uri_mismatch"]:
             raise OAuthResponseError(
-                "Application mis-configuration in GitHub", remote, resp
+                _("Application mis-configuration in GitHub"), remote, resp
             )
 
     return authorized_signup_handler(resp, remote)
@@ -283,7 +284,7 @@ def authorized_rest(resp, remote):
             )
         elif resp["error"] in ["incorrect_client_credentials", "redirect_uri_mismatch"]:
             raise OAuthResponseError(
-                "Application mis-configuration in GitHub", remote, resp
+                _("Application mis-configuration in GitHub"), remote, resp
             )
 
     return authorized_signup_rest_handler(resp, remote)

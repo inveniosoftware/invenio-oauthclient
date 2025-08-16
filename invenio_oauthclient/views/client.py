@@ -44,7 +44,7 @@ def auto_redirect_login(*args, **kwargs):
     """Handles automatic redirect to external auth service.
 
     The login endpoint will redirect automatically to the external
-    auth service is the following conditions are met:
+    auth service if the following conditions are met:
 
     * local login is disabled
     * redirect to external login is enabled
@@ -60,12 +60,19 @@ def auto_redirect_login(*args, **kwargs):
     )
     would_redirect = auto_redirect_enabled and not local_login_enabled
     remote_apps = list(current_oauthclient.oauth.remote_apps)
+    remote_app_configs = current_app.config["OAUTHCLIENT_REMOTE_APPS"]
 
-    if would_redirect and len(remote_apps) == 1:
+    visible_remote_apps = [
+        remote_app
+        for remote_app in remote_apps
+        if not remote_app_configs.get(remote_app, {}).get("hide", False)
+    ]
+
+    if would_redirect and len(visible_remote_apps) == 1:
         redirect_args = {
             # if local login is disabled and we only have one OAuth2 remote app
             # configured, we forward directly to that
-            "remote_app": remote_apps[0],
+            "remote_app": visible_remote_apps[0],
         }
         next_url = request.args.get("next")
         if next_url:
@@ -109,6 +116,13 @@ def _login(remote_app, authorized_view_name):
 @blueprint.route("/login/<remote_app>/")
 def login(remote_app):
     """Send user to remote application for authentication."""
+    if (
+        current_app.config["OAUTHCLIENT_REMOTE_APPS"]
+        .get(remote_app, {})
+        .get("hide", False)
+    ):
+        abort(404)
+
     try:
         return _login(remote_app, ".authorized")
     except OAuthRemoteNotFound:
@@ -118,6 +132,13 @@ def login(remote_app):
 @rest_blueprint.route("/login/<remote_app>/")
 def rest_login(remote_app):
     """Send user to remote application for authentication."""
+    if (
+        current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"]
+        .get(remote_app, {})
+        .get("hide", False)
+    ):
+        abort(404)
+
     try:
         return _login(remote_app, ".rest_authorized")
     except OAuthRemoteNotFound:

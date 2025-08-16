@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2019 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -11,7 +12,6 @@
 from functools import partial, wraps
 
 from flask import (
-    Markup,
     current_app,
     flash,
     redirect,
@@ -23,6 +23,7 @@ from flask import (
 from flask_security.utils import do_flash, get_message
 from invenio_db import db
 from invenio_i18n import gettext as _
+from markupsafe import Markup
 
 from ..errors import (
     AlreadyLinkedError,
@@ -162,7 +163,9 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
         do_flash(
             Markup(
                 _(
-                    f"A confirmation email has already been sent to {exc.user.email}. Didn't receive it? Click <strong><a href=\"{url_for('security.send_confirmation')}\">here</a></strong> to resend it."
+                    'A confirmation email has already been sent to %(email)s. Didn\'t receive it? Click <strong><a href="%(url)s">here</a></strong> to resend it.',
+                    email=exc.user.email,
+                    url=url_for("security.send_confirmation"),
                 )
             ),
             category="success",

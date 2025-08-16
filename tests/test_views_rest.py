@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2024-2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -16,8 +17,8 @@ from flask import url_for
 from flask_oauthlib.client import OAuth as FlaskOAuth
 from helpers import check_response_redirect_url, check_response_redirect_url_args
 from invenio_accounts.testutils import login_user_via_session
+from invenio_base.jws import TimedJSONWebSignatureSerializer
 from invenio_db import db
-from itsdangerous import TimedJSONWebSignatureSerializer
 from mock import MagicMock
 from simplejson import JSONDecodeError
 
@@ -74,7 +75,7 @@ def test_redirect_uri(app_rest):
             check_response_redirect_url(resp, url)
 
         # Assert that absolute redirects are allowed only if
-        # `APP_ALLOWED_HOSTS` is set and includes them. Otherwise, the relative
+        # `TRUSTED_HOSTS` is set and includes them. Otherwise, the relative
         # path of the url is extracted and returned. Note if you need to
         # redirect to index page you should pass '/' as next parameter.
 
@@ -86,7 +87,7 @@ def test_redirect_uri(app_rest):
 
         check_response_redirect_url(resp, urlparse(test_url).path)
 
-        app_rest.config.update({"APP_ALLOWED_HOSTS": ["inveniosoftware.org"]})
+        app_rest.config.update({"TRUSTED_HOSTS": ["localhost", "inveniosoftware.org"]})
 
         resp = client.get(
             url_for("invenio_oauthclient.rest_login", remote_app="test", next=test_url)

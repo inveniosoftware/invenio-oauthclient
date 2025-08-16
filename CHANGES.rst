@@ -1,12 +1,68 @@
 ..
     This file is part of Invenio.
     Copyright (C) 2015-2023 CERN.
+    Copyright (C) 2024 Graz University of Technology.
 
     Invenio is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 Changes
 =======
+
+Version v5.2.0 (released 2025-07-17)
+
+- i18n: pulled translations
+- i18n: push translations
+- fix app allowed hosts (#356)
+- fix: pkg_resources DeprecationWarning
+- fix: setuptools require underscores instead of dashes
+- i18n: removed deprecated messages
+- fix: i18n-unrelated keycloak test missing app fixture
+- Fix: i18n: added gettext to places where it was missing
+- inline(docs): fix
+
+Version 5.1.0 (released 2024-12-12)
+
+- fix: DeprecationWarning:
+- fix: TypeError
+- setup: move to flask-oauthlib-invenio
+
+Version 5.0.0 (released 2024-12-06)
+
+- fix: sqlalchemy.exc.ArgumentError:
+- global: use invenio_base.jws not itsdangerous
+- tests: apply changes for sqlalchemy>=2.0
+- setup: bump major dependencies
+
+Version 4.1.3 (release 2024-12-03)
+
+- utils: improve and fix creation/update of groups
+
+Version 4.1.2 (release 2024-11-30)
+
+- setup: pin dependencies
+- ci: use reusable workflow when publishing
+
+Version 4.1.0 (released 2024-11-07)
+
+- handlers: add basic error handling for roles creation
+- fix: compat for flask-oauthlib
+
+Version 4.1.0 (released 2024-11-07)
+
+- setup: remove upper pins oauthlib,requests-oauthlib
+- global: jws use from invenio-base
+- fix: for flask >= 3.0.0 compatibility
+
+Version 4.0.2 (released 2024-09-17)
+
+- fix: inverted check for visible remote apps
+
+Version 4.0.1 (released 2024-09-11)
+
+- i18n: push translations
+- keycloak: add `legacy_url_path` parameter to the `KeycloakSettingsHelper`
+- global: explicitly set and use `hide` attribute for config
 
 Version 4.0.0 (released 2024-03-23)
 

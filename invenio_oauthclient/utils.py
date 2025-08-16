@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2023 CERN.
+# Copyright (C) 2024-2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -9,10 +10,9 @@
 """Utility methods."""
 
 from flask import current_app, request, session
-from flask_login import current_user
-from flask_principal import RoleNeed, UserNeed
+from flask_principal import RoleNeed
+from invenio_base.jws import TimedJSONWebSignatureSerializer
 from invenio_db.utils import rebuild_encrypted_properties
-from itsdangerous import TimedJSONWebSignatureSerializer
 from uritools import uricompose, urisplit
 from werkzeug.local import LocalProxy
 from werkzeug.utils import import_string
@@ -103,7 +103,7 @@ def get_safe_redirect_target(arg="next"):
     :param arg: URL argument.
     :returns: The redirect target or ``None``.
     """
-    allowed_hosts = current_app.config.get("APP_ALLOWED_HOSTS") or []
+    allowed_hosts = current_app.config.get("TRUSTED_HOSTS") or []
     for target in request.args.get(arg), request.referrer:
         if target:
             redirect_uri = urisplit(target)
@@ -192,9 +192,9 @@ def _get_csrf_disabled_param():
     `meta={csrf: True/False}`.
     """
     import flask_wtf
-    from pkg_resources import parse_version
+    from packaging.version import Version
 
-    supports_meta = parse_version(flask_wtf.__version__) >= parse_version("0.14.0")
+    supports_meta = Version(flask_wtf.__version__) >= Version("0.14.0")
     return dict(meta={"csrf": False}) if supports_meta else dict(csrf_enabled=False)
 
 

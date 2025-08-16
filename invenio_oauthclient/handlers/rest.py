@@ -23,6 +23,7 @@ from flask import (
 )
 from flask_login import current_user
 from invenio_db import db
+from invenio_i18n import gettext as _
 
 from ..errors import (
     AlreadyLinkedError,
@@ -87,16 +88,20 @@ def _oauth_error_handler(remote, f, *args, **kwargs):
         return response_handler(
             remote,
             remote_app_config["error_redirect_url"],
-            payload=dict(message="Authorization with remote service failed.", code=400),
+            payload=dict(
+                message=_("Authorization with remote service failed."), code=400
+            ),
         )
     except OAuthRejectedRequestError:
         return response_handler(
             remote,
             remote_app_config["error_redirect_url"],
-            payload=dict(message="You rejected the authentication request.", code=400),
+            payload=dict(
+                message=_("You rejected the authentication request."), code=400
+            ),
         )
     except AlreadyLinkedError:
-        msg = "External service is already linked to another account."
+        msg = _("External service is already linked to another account.")
         return response_handler(
             remote,
             remote_app_config["error_redirect_url"],
@@ -106,14 +111,14 @@ def _oauth_error_handler(remote, f, *args, **kwargs):
         return response_handler(
             remote,
             remote_app_config["error_redirect_url"],
-            payload=dict(message="Unauthorized.", code=401),
+            payload=dict(message=_("Unauthorized."), code=401),
         )
     except OAuthClientAlreadyAuthorized:
         return response_handler(
             remote,
             remote_app_config["authorized_redirect_url"],
             payload=dict(
-                message="Successfully signed up.",
+                message=_("Successfully signed up."),
                 code=200,
             ),
         )
@@ -122,14 +127,14 @@ def _oauth_error_handler(remote, f, *args, **kwargs):
             remote,
             remote_app_config["error_redirect_url"],
             payload=dict(
-                message="Token not found.",
+                message=_("Token not found."),
                 code=400,
             ),
         )
     except OAuthClientUserNotRegistered:
         abort(make_response(jsonify(message="Form validation error."), 400))
     except OAuthClientTokenNotSet:
-        raise OAuthError("Could not create token for user.", remote)
+        raise OAuthError(_("Could not create token for user."), remote)
     except OAuthClientMustRedirectSignup as e:
         return redirect(
             url_for(
@@ -222,7 +227,7 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
     """
     remote_app_config = current_app.config["OAUTHCLIENT_REST_REMOTE_APPS"][remote.name]
     next_url = authorized_handler(resp, remote, *args, **kwargs)
-    response_payload = dict(message="Successfully authorized.", code=200)
+    response_payload = dict(message=_("Successfully authorized."), code=200)
     if next_url:
         response_payload["next_url"] = next_url
 
@@ -252,7 +257,7 @@ def disconnect_handler(remote, *args, **kwargs):
         remote,
         redirect_url,
         payload=dict(
-            message="Successfully disconnected.",
+            message=_("Successfully disconnected."),
             code=200,
         ),
     )
@@ -296,7 +301,7 @@ def signup_handler(remote, *args, **kwargs):
         except OAuthClientUnAuthorized:
             abort(401)
 
-        response_payload = dict(message="Successfully signed up.", code=200)
+        response_payload = dict(message=_("Successfully signed up."), code=200)
         if next_url:
             response_payload["next_url"] = next_url
         return jsonify(response_payload)

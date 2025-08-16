@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -19,6 +20,7 @@ from invenio_db import InvenioDB, db
 from sqlalchemy_utils.functions import create_database, database_exists
 
 from invenio_oauthclient import InvenioOAuthClient
+from invenio_oauthclient.contrib.keycloak.settings import KeycloakSettingsHelper
 from invenio_oauthclient.contrib.orcid import REMOTE_APP
 
 
@@ -110,10 +112,14 @@ def test_db(request):
     request.addfinalizer(teardown)
 
     with app.app_context():
-        is_sqllite = str(db.engine.url) == "sqlite://"
-        db_exists = database_exists(str(db.engine.url))
+        is_sqllite = (
+            str(db.engine.url.render_as_string(hide_password=False)) == "sqlite://"
+        )
+        db_exists = database_exists(
+            str(db.engine.url.render_as_string(hide_password=False))
+        )
         if not is_sqllite and not db_exists:
-            create_database(str(db.engine.url))
+            create_database(str(db.engine.url.render_as_string(hide_password=False)))
         db.create_all()
         tables = list(
             filter(
@@ -143,3 +149,22 @@ def test_alembic(app):
         ext.alembic.downgrade(target="96e796392533")
         ext.alembic.upgrade()
         assert not ext.alembic.compare_metadata()
+
+
+@pytest.mark.parametrize("hide_when", [True, False, lambda: True, lambda: False])
+def test_remote_app_factory_hide_when(base_app, hide_when):
+    """Test standard remote_app class hide_when attribute."""
+    base_url, realm = "http://localhost:8080", "test"
+    helper = KeycloakSettingsHelper(
+        title="Keycloak",
+        description="",
+        base_url=base_url,
+        realm=realm,
+        hide_when=hide_when,
+    )
+    KEYCLOAK_REMOTE_APP = helper.remote_app
+    base_app.config.update(OAUTHCLIENT_REMOTE_APPS=dict(remote_app=KEYCLOAK_REMOTE_APP))
+    FlaskOAuth(base_app)
+    InvenioOAuthClient(base_app)
+    config_app = base_app.config["OAUTHCLIENT_REMOTE_APPS"]["remote_app"]
+    assert config_app["hide"] == (hide_when() if callable(hide_when) else hide_when)

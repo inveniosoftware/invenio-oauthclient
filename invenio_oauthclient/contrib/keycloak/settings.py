@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2020-2021 TU Wien.
+# Copyright (C)      2024 Graz University of Technology.
 #
 # Invenio-Keycloak is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -38,6 +39,7 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
         app_key=None,
         icon=None,
         scopes="openid",
+        legacy_url_path=True,  # for keycloak versions < 17
         **kwargs
     ):
         """The constructor takes two arguments.
@@ -45,11 +47,18 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
         :param base_url: The base URL on which Keycloak is running
                             (e.g. "http://localhost:8080")
         :param realm: Realm in which the invenio client application is defined
+        :param legacy_url_path: Add "/auth/" between the base URL and realm names for generated Keycloak URLs (default: True, for Keycloak up to v17)
         """
         app_key = app_key or "KEYCLOAK_APP_CREDENTIALS"
         base_url = "{}/".format(base_url.rstrip("/"))  # add leading `/`
 
-        self._realm_url = "{}auth/realms/{}".format(base_url, realm)
+        # Keycloak versions < 17 have default realm url of <base_url>/auth/realms/
+        # Newer version omit the /auth portion per default.
+        self._realm_url = "{base_url}{realms_part}/{realm}".format(
+            base_url=base_url,
+            realms_part="auth/realms" if legacy_url_path else "realms",
+            realm=realm,
+        )
 
         access_token_url = self.make_url(self._realm_url, "token")
         authorize_url = self.make_url(self._realm_url, "auth")
