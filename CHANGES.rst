@@ -10,6 +10,12 @@
 Changes
 =======
 
+Version v6.0.0 (released 2025-XX-XX)
+
+- perf(models): changed SQL column type of `extra_data` to `JSONB` instead of `JSON` for PostgreSQL
+
+  - This migration could flood the WAL when run on very large `oauthclient_remoteaccount` tables (~50k+ rows) as well as causing a full lock that lasts several minutes and stops users from being able to log in with third-party accounts. This won't happen in the majority of cases. For instances not meeting this size criteria, the automated Alembic migration will suffice. However, for tables above this size, please use instead the step-by-step instructions in the upgrade guide (included in the documentation of this module).
+
 Version v5.3.1 (released 2025-10-21)
 
 - i18n: pulled translations

@@ -14,7 +14,7 @@ from .ext import InvenioOAuthClient, InvenioOAuthClientREST
 from .oauth import oauth_link_external_id, oauth_unlink_external_id
 from .proxies import current_oauthclient
 
-__version__ = "5.3.1"
+__version__ = "6.0.0"
 
 __all__ = (
     "__version__",
