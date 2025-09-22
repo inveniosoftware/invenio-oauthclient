@@ -16,6 +16,7 @@ from flask import current_app
 # here, means previous imports won't break.
 from invenio_accounts.models import User, UserIdentity
 from invenio_db import db
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import backref
 from sqlalchemy_utils import JSONType, StringEncryptedType, Timestamp
@@ -45,7 +46,15 @@ class RemoteAccount(db.Model, Timestamp):
     client_id = db.Column(db.String(255), nullable=False)
     """Client ID of remote application (defined in OAUTHCLIENT_REMOTE_APPS)."""
 
-    extra_data = db.Column(MutableDict.as_mutable(JSONType), nullable=False)
+    extra_data = db.Column(
+        MutableDict.as_mutable(
+            db.JSON()
+            .with_variant(postgresql.JSONB(), "postgresql")
+            .with_variant(JSONType(), "sqlite")
+            .with_variant(JSONType(), "mysql")
+        ),
+        nullable=False,
+    )
     """Extra data associated with this linked account."""
 
     #
