@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version v5.3.0 (released 2025-09-24)
+
+- feat(contrib): add EOSC EU Node AAI OIDC provider
+
 Version v5.2.0 (released 2025-07-17)
 
 - i18n: pulled translations
