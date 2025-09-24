@@ -22,6 +22,7 @@ Invenio-OAuthClient.
   configuration
   usage
   examplesapp
+  upgrading
 
 API Reference
 =============
