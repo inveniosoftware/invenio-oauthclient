@@ -22,7 +22,9 @@ def upgrade():
     """Upgrade database."""
     op.add_column(
         "oauthclient_remotetoken",
-        sa.Column("refresh_token", sqlalchemy_utils.EncryptedType(), nullable=True),
+        sa.Column(
+            "refresh_token", sqlalchemy_utils.StringEncryptedType(), nullable=True
+        ),
     )
     op.add_column(
         "oauthclient_remotetoken", sa.Column("expires_at", sa.DateTime(), nullable=True)

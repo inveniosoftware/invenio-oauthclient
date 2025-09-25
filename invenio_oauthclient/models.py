@@ -9,7 +9,7 @@
 
 """Models for storing access tokens and links between users and remote apps."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from flask import current_app
 
@@ -123,7 +123,7 @@ class RemoteToken(db.Model, Timestamp):
     """Access token to remote application."""
 
     refresh_token = db.Column(
-        EncryptedType(type_in=db.Text, key=_secret_key), nullable=True
+        StringEncryptedType(type_in=db.Text, key=_secret_key), nullable=True
     )
     """Refresh token to remote application."""
 
@@ -149,7 +149,7 @@ class RemoteToken(db.Model, Timestamp):
 
         leeway = current_app.config.get("OAUTHCLIENT_TOKEN_EXPIRES_LEEWAY", 10)
         expiration_with_leeway = self.expires_at - timedelta(seconds=leeway)
-        return expiration_with_leeway < datetime.utcnow()
+        return expiration_with_leeway < datetime.now(tz=timezone.utc)
 
     def __repr__(self):
         """String representation for model."""
@@ -174,7 +174,7 @@ class RemoteToken(db.Model, Timestamp):
             self.access_token != token
             or self.secret != secret
             or self.refresh_token != refresh_token
-            or self.expiration != expires_at
+            or self.expires_at != expires_at
         ):
             with db.session.begin_nested():
                 self.access_token = token

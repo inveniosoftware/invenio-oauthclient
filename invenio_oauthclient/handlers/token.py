@@ -7,7 +7,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Funcs to manage tokens."""
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import partial
 
 from flask import current_app, session
@@ -125,7 +125,7 @@ def make_expiration_time(expires_in):
     """
     if expires_in is None:
         return None
-    return datetime.utcnow() + timedelta(seconds=expires_in)
+    return datetime.now(tz=timezone.utc) + timedelta(seconds=expires_in)
 
 
 def token_setter(
@@ -210,15 +210,16 @@ def token_getter(remote, token=""):
         # Store token and secret in session
         session[session_key] = remote_token.token()
 
-    ret = session.get(session_key, None)
-    if ret:
-        if len(ret) == 2:
-            # no refresh token nor expiration time
-            return ret[0], ret[1], None, None
-        if ret[3] is not None:
-            # refresh token and expiration time
-            return ret[0], ret[1], ret[2], datetime.fromisoformat(ret[3])
-    return ret
+    values = session.get(session_key, None)
+    if values:
+        # Continue supporting the old tuple for backwards-compatibility with existing sessions
+        if len(values) == 2:
+            # access_token, secret
+            return values[0], values[1], None, None
+        if values[3] is not None:
+            # access_token, secret, refresh_token, expires_at
+            return values[0], values[1], values[2], datetime.fromisoformat(values[3])
+    return values
 
 
 def token_delete(remote, token=""):
