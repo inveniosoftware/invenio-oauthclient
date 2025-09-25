@@ -69,3 +69,6 @@ examples/*.crt
 
 # Vscode
 .vscode/
+
+# Pycharm venv
+.venv

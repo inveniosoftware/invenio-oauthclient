@@ -9,6 +9,8 @@
 
 """Models for storing access tokens and links between users and remote apps."""
 
+from datetime import datetime, timedelta, timezone
+
 from flask import current_app
 
 # UserIdentity imported for backward compatibility. UserIdentity was originally
@@ -120,6 +122,14 @@ class RemoteToken(db.Model, Timestamp):
     )
     """Access token to remote application."""
 
+    refresh_token = db.Column(
+        StringEncryptedType(type_in=db.Text, key=_secret_key), nullable=True
+    )
+    """Refresh token to remote application."""
+
+    expires_at = db.Column(db.DateTime, nullable=True)
+    """Access token expiration date."""
+
     secret = db.Column(db.Text(), default="", nullable=False)
     """Used only by OAuth 1."""
 
@@ -130,6 +140,21 @@ class RemoteToken(db.Model, Timestamp):
         RemoteAccount, backref=backref("remote_tokens", cascade="all, delete-orphan")
     )
     """SQLAlchemy relationship to RemoteAccount objects."""
+
+    @property
+    def is_expired(self):
+        """Check if access token has expired."""
+        if not self.expires_at:
+            return False
+
+        leeway = current_app.config.get("OAUTHCLIENT_TOKEN_EXPIRES_LEEWAY", 10)
+        expiration_with_leeway = (self.expires_at - timedelta(seconds=leeway)).replace(
+            # see https://docs.sqlalchemy.org/en/13/core/type_basics.html#sqlalchemy.types.DateTime
+            # We store datetimes in the DB as UTC but without timezone metadata. So to make comparison
+            # possible, we need to mark this as UTC.
+            tzinfo=timezone.utc
+        )
+        return expiration_with_leeway < datetime.now(tz=timezone.utc)
 
     def __repr__(self):
         """String representation for model."""
@@ -142,17 +167,36 @@ class RemoteToken(db.Model, Timestamp):
         """Get token as expected by Flask-OAuthlib."""
         return (self.access_token, self.secret)
 
-    def update_token(self, token, secret):
+    def update_token(self, token, secret, refresh_token=None, expires_at=None):
         """Update token with new values.
 
         :param token: The token value.
         :param secret: The secret key.
+        :param refresh_token: The refresh token
+        :param expires_at: Time when the access token expires
         """
-        if self.access_token != token or self.secret != secret:
+        if (
+            self.access_token != token
+            or self.secret != secret
+            or self.refresh_token != refresh_token
+            or self.expires_at != expires_at
+        ):
             with db.session.begin_nested():
                 self.access_token = token
                 self.secret = secret
+                self.refresh_token = refresh_token
+                self.expires_at = expires_at
                 db.session.add(self)
+
+    def refresh_access_token(self):
+        """Refresh the access token."""
+        if not self.refresh_token:
+            raise ValueError("No refresh token available")
+        from .handlers.refresh import refresh_access_token
+
+        access_token, refresh_token, secret, expires_at = refresh_access_token(self)
+        self.update_token(access_token, refresh_token, secret, expires_at)
+        db.session.commit()
 
     @classmethod
     def get(cls, user_id, client_id, token_type="", access_token=None):
@@ -202,7 +246,17 @@ class RemoteToken(db.Model, Timestamp):
         )
 
     @classmethod
-    def create(cls, user_id, client_id, token, secret, token_type="", extra_data=None):
+    def create(
+        cls,
+        user_id,
+        client_id,
+        token,
+        secret,
+        token_type="",
+        extra_data=None,
+        refresh_token=None,
+        expires_at=None,
+    ):
         """Create a new access token.
 
         .. note:: Creates RemoteAccount as well if it does not exists.
@@ -214,6 +268,8 @@ class RemoteToken(db.Model, Timestamp):
         :param token_type: The token type. (Default: ``''``)
         :param extra_data: Extra data to set in the remote account if the
             remote account doesn't exists. (Default: ``None``)
+        :param refresh_token: The refresh token.
+        :param expires_at: Expiration of the token
         :returns: A :class:`invenio_oauthclient.models.RemoteToken` instance.
 
         """
@@ -233,6 +289,8 @@ class RemoteToken(db.Model, Timestamp):
                 remote_account=account,
                 access_token=token,
                 secret=secret,
+                refresh_token=refresh_token,
+                expires_at=expires_at,
             )
             db.session.add(token)
         return token

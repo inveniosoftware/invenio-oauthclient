@@ -73,7 +73,7 @@ class KeycloakSettingsHelper(OAuthSettingsHelper):
             request_token_params={"scope": scopes},
             access_token_url=access_token_url,
             authorize_url=authorize_url,
-            **kwargs
+            **kwargs,
         )
 
         self._handlers = dict(

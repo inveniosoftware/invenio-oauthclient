@@ -9,6 +9,10 @@
 Changes
 =======
 
+Version v5.4.0 (released 2025-XX-XX)
+
+- feat: support for refresh tokens
+
 Version v5.3.0 (released 2025-09-24)
 
 - feat(contrib): add EOSC EU Node AAI OIDC provider
