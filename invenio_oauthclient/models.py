@@ -148,7 +148,12 @@ class RemoteToken(db.Model, Timestamp):
             return False
 
         leeway = current_app.config.get("OAUTHCLIENT_TOKEN_EXPIRES_LEEWAY", 10)
-        expiration_with_leeway = self.expires_at - timedelta(seconds=leeway)
+        expiration_with_leeway = (self.expires_at - timedelta(seconds=leeway)).replace(
+            # see https://docs.sqlalchemy.org/en/13/core/type_basics.html#sqlalchemy.types.DateTime
+            # We store datetimes in the DB as UTC but without timezone metadata. So to make comparison
+            # possible, we need to mark this as UTC.
+            tzinfo=timezone.utc
+        )
         return expiration_with_leeway < datetime.now(tz=timezone.utc)
 
     def __repr__(self):

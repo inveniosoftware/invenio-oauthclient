@@ -357,3 +357,9 @@ service enabled (i.e. one OAuthClient remote app is configured, and local
 login is disabled), the login view function will automatically redirect to
 that external authentication service.
 """
+
+OAUTHCLIENT_TOKEN_EXPIRES_LEEWAY = 10
+"""The number of seconds before the actual expiration of an access token from which it is considered expired.
+
+This ensures that it won't cause issues if some time passes between the check for whether the token is expired and any requests that the token is then used in.
+"""

@@ -8,7 +8,7 @@
 
 """Test handlers."""
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 from helpers import mock_remote_http_request
 
@@ -27,7 +27,7 @@ def test_refresh(models_fixture, app):
         "mytoken",
         "mysecret",
         refresh_token="myrefreshtoken",
-        expires_at=datetime.utcnow(),
+        expires_at=datetime.now(tz=timezone.utc),
     )
     assert rt.is_expired is True
 
