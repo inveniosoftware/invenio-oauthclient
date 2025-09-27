@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -135,7 +136,7 @@ For more details you can play with a :doc:`working example <examplesapp>`.
 
 import copy
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from warnings import warn
 
 from flask import Blueprint, current_app, flash, g, redirect, session, url_for
@@ -332,7 +333,7 @@ def fetch_extra_data(resource):
 
 def account_groups_and_extra_data(account, resource, refresh_timedelta=None):
     """Fetch account groups and extra data from resource if necessary."""
-    updated = datetime.utcnow()
+    updated = datetime.now(timezone.utc)
     modified_since = updated
     if refresh_timedelta is not None:
         modified_since += refresh_timedelta

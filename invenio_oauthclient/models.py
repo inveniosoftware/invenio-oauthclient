@@ -2,7 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2025 CERN.
-# Copyright (C) 2024 Graz University of Technology.
+# Copyright (C) 2024-2026 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -21,7 +21,7 @@ from invenio_db import db
 from sqlalchemy.dialects import mysql, postgresql
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import backref
-from sqlalchemy_utils import JSONType, StringEncryptedType, Timestamp
+from sqlalchemy_utils import JSONType, StringEncryptedType
 
 
 def _secret_key():
@@ -29,7 +29,7 @@ def _secret_key():
     return current_app.config["SECRET_KEY"]
 
 
-class RemoteAccount(db.Model, Timestamp):
+class RemoteAccount(db.Model, db.Timestamp):
     """Storage for remote linked accounts."""
 
     __tablename__ = "oauthclient_remoteaccount"
@@ -105,7 +105,7 @@ class RemoteAccount(db.Model, Timestamp):
         return "Remote Account <id={0.id}, user_id={0.user.id}>".format(self)
 
 
-class RemoteToken(db.Model, Timestamp):
+class RemoteToken(db.Model, db.Timestamp):
     """Storage for the access tokens for linked accounts."""
 
     __tablename__ = "oauthclient_remotetoken"
@@ -136,9 +136,7 @@ class RemoteToken(db.Model, Timestamp):
     )
     """Refresh token to remote application."""
 
-    expires = db.Column(
-        db.DateTime().with_variant(mysql.DATETIME(fsp=6), "mysql"), nullable=True
-    )
+    expires = db.Column(db.UTCDateTime(), nullable=True)
     """Access token expiration date."""
 
     secret = db.Column(db.Text(), default="", nullable=False)
