@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2023 CERN.
+# Copyright (C) 2025 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -64,7 +65,7 @@ In templates you can add a sign in/up link:
     </a>
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from flask import Blueprint, current_app, flash, g, redirect, session, url_for
 from flask_login import current_user
@@ -187,7 +188,7 @@ def fetch_extra_data(resource):
 
 def account_roles_and_extra_data(account, resource, refresh_timedelta=None):
     """Fetch account roles and extra data from resource if necessary."""
-    updated = datetime.utcnow()
+    updated = datetime.now(timezone.utc)
     modified_since = updated
     if refresh_timedelta is not None:
         modified_since += refresh_timedelta
