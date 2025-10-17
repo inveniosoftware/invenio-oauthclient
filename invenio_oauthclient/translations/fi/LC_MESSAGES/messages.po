@@ -1,0 +1,270 @@
+# Translations template for invenio-oauthclient.
+# Copyright (C) 2025 CERN
+# This file is distributed under the same license as the invenio-oauthclient
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# 
+# Translators:
+# Matti Lassila <matti.lassila@gmail.com>, 2025
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: invenio-oauthclient 5.1.0\n"
+"Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
+"POT-Creation-Date: 2025-07-08 19:46+0000\n"
+"PO-Revision-Date: 2016-08-18 15:19+0000\n"
+"Last-Translator: Matti Lassila <matti.lassila@gmail.com>, 2025\n"
+"Language-Team: Finnish (https://app.transifex.com/inveniosoftware/teams/23537/fi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+"Language: fi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: invenio_oauthclient/admin.py:54
+msgid "ID"
+msgstr "Tunnus"
+
+#: invenio_oauthclient/admin.py:55
+msgid "User ID"
+msgstr "Käyttäjän tunnus"
+
+#: invenio_oauthclient/admin.py:56
+msgid "Client ID"
+msgstr "Client-tunnus"
+
+#: invenio_oauthclient/admin.py:85
+msgid "ID Remote Account"
+msgstr "Etätilin tunnus"
+
+#: invenio_oauthclient/admin.py:92 invenio_oauthclient/admin.py:100
+msgid "User Management"
+msgstr "Käyttäjähallinta"
+
+#: invenio_oauthclient/admin.py:93 invenio_oauthclient/ext.py:260
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:12
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:12
+msgid "Linked accounts"
+msgstr "Linkitetyt tilit"
+
+#: invenio_oauthclient/admin.py:101
+msgid "Linked account tokens"
+msgstr "Linkitettyjen tilien tunnukset"
+
+#: invenio_oauthclient/ext.py:250
+#, python-format
+msgid "%(icon)s Linked accounts"
+msgstr "%(icon)s Linkitetyt tilit"
+
+#: invenio_oauthclient/contrib/cern.py:410
+#, python-format
+msgid "Identity class %(identity_class)s is not one of [%(valid_identities)s]"
+msgstr ""
+"Identiteettiluokka %(identity_class)s ei ole joukossa [%(valid_identities)s]"
+
+#: invenio_oauthclient/contrib/cern.py:441
+#: invenio_oauthclient/contrib/cern_openid.py:305
+msgid "CERN account not allowed."
+msgstr "CERN-tili ei ole sallittu."
+
+#: invenio_oauthclient/contrib/cern_openid.py:278
+#, python-format
+msgid "User roles %(cern_roles)s are not one of %(valid_roles)s"
+msgstr "Käyttäjäroolit %(cern_roles)s eivät kuulu joukkoon %(valid_roles)s"
+
+#: invenio_oauthclient/contrib/github.py:109
+msgid "GitHub"
+msgstr "GitHub"
+
+#: invenio_oauthclient/contrib/github.py:110
+msgid "Software collaboration platform."
+msgstr "Ohjelmistoyhteistyöalusta."
+
+#: invenio_oauthclient/contrib/github.py:265
+#: invenio_oauthclient/contrib/github.py:287
+msgid "Application mis-configuration in GitHub"
+msgstr "Sovelluksen virheellinen konfigurointi GitHubissa"
+
+#: invenio_oauthclient/contrib/globus.py:95
+msgid "Globus"
+msgstr "Globus"
+
+#: invenio_oauthclient/contrib/globus.py:96
+msgid "Research data management simplified."
+msgstr "Tutkimusdatan hallinta yksinkertaistettuna."
+
+#: invenio_oauthclient/contrib/globus.py:168
+msgid "Application mis-configuration in Globus"
+msgstr "Sovelluksen virheellinen konfigurointi Globuksessa"
+
+#: invenio_oauthclient/contrib/globus.py:203
+msgid "Failed to fetch user id, likely server mis-configuration"
+msgstr ""
+"Käyttäjätunnuksen noutaminen epäonnistui, todennäköisesti palvelimen "
+"virheellinen konfiguraatio"
+
+#: invenio_oauthclient/contrib/openaire_aai.py:105
+#: invenio_oauthclient/contrib/openaire_aai.py:170
+msgid "OpenAIRE"
+msgstr "OpenAIRE"
+
+#: invenio_oauthclient/contrib/openaire_aai.py:106
+#: invenio_oauthclient/contrib/openaire_aai.py:171
+msgid "Open Science Services."
+msgstr "Avoimen tieteen palvelut."
+
+#: invenio_oauthclient/contrib/orcid.py:113
+msgid "ORCID"
+msgstr "ORCID"
+
+#: invenio_oauthclient/contrib/orcid.py:114
+msgid "Connecting Research and Researchers."
+msgstr "Yhdistää tutkimuksen ja tutkijat."
+
+#: invenio_oauthclient/contrib/keycloak/helpers.py:32
+#, python-format
+msgid ""
+"Invalid app name %(app_name)s. It should only contain letters, numbers, "
+"dashes and underscores"
+msgstr ""
+"Virheellinen sovelluksen nimi %(app_name)s. Sen tulee sisältää vain "
+"kirjaimia, numeroita, viivoja ja alaviivoja"
+
+#: invenio_oauthclient/handlers/rest.py:91
+#: invenio_oauthclient/handlers/token.py:71
+#: invenio_oauthclient/handlers/ui.py:242
+msgid "Authorization with remote service failed."
+msgstr "Valtuutus etäpalvelussa epäonnistui."
+
+#: invenio_oauthclient/handlers/rest.py:99
+#: invenio_oauthclient/handlers/ui.py:65
+msgid "You rejected the authentication request."
+msgstr "Hylkäsit todennuspyynnön."
+
+#: invenio_oauthclient/handlers/rest.py:103
+#: invenio_oauthclient/handlers/ui.py:60
+msgid "External service is already linked to another account."
+msgstr "Ulkoinen palvelu on jo linkitetty toiseen tiliin."
+
+#: invenio_oauthclient/handlers/rest.py:113
+msgid "Unauthorized."
+msgstr "Luvaton."
+
+#: invenio_oauthclient/handlers/rest.py:120
+#: invenio_oauthclient/handlers/rest.py:290
+msgid "Successfully signed up."
+msgstr "Rekisteröityminen onnistui."
+
+#: invenio_oauthclient/handlers/rest.py:129
+msgid "Token not found."
+msgstr "Tunnusta ei löytynyt."
+
+#: invenio_oauthclient/handlers/rest.py:136
+msgid "Could not create token for user."
+msgstr "Käyttäjälle ei voitu luoda tunnusta."
+
+#: invenio_oauthclient/handlers/rest.py:216
+msgid "Successfully authorized."
+msgstr "Valtuutus onnistui."
+
+#: invenio_oauthclient/handlers/rest.py:246
+msgid "Successfully disconnected."
+msgstr "Yhteyden purku onnistui."
+
+#: invenio_oauthclient/handlers/token.py:62
+msgid "User rejected request."
+msgstr "Käyttäjä hylkäsi pyynnön."
+
+#: invenio_oauthclient/handlers/token.py:75
+msgid "Bad OAuth authorized request"
+msgstr "Virheellinen OAuth-valtuutuspyyntö"
+
+#: invenio_oauthclient/handlers/ui.py:157
+#, python-format
+msgid ""
+"A confirmation email has already been sent to %(email)s. Didn't receive it? "
+"Click <strong><a href=\"%(url)s\">here</a></strong> to resend it."
+msgstr ""
+"Vahvistussähköposti on jo lähetetty osoitteeseen %(email)s. Etkö saanut "
+"sitä? Lähetä uudelleen napsauttamalla <strong><a "
+"href=\"%(url)s”>tästä</a></strong>."
+
+#: invenio_oauthclient/handlers/utils.py:126
+#, python-format
+msgid ""
+"Error while syncing roles: A managed role with id: %(group_id)s already "
+"exists"
+msgstr ""
+"Virhe rooleja synkronoitaessa: Hallittu rooli tunnuksella %(group_id)s on jo"
+" olemassa"
+
+#: invenio_oauthclient/handlers/utils.py:136
+#, python-format
+msgid ""
+"Error while syncing roles: A managed role with name: %(group_name)s already "
+"exists"
+msgstr ""
+"Virhe rooleja synkronoitaessa: Hallittu rooli nimellä %(group_name)s on jo "
+"olemassa"
+
+#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:25
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/_macros.html:60
+#, python-format
+msgid "Sign in with %(title)s"
+msgstr "Kirjaudu sisään palvelulla %(title)s"
+
+#: invenio_oauthclient/templates/invenio_oauthclient/login_user.html:21
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:26
+msgid "OR"
+msgstr "TAI"
+
+#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:24
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:29
+#, python-format
+msgid "Sign-up with %(title)s!"
+msgstr "Rekisteröidy palvelulla %(title)s!"
+
+#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:25
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:32
+msgid ""
+"Fill in your details to complete your registration. You only have to do this"
+" once."
+msgstr ""
+"Täytä tietosi rekisteröinnin viimeistelemiseksi. Tämä tarvitsee tehdä vain "
+"kerran."
+
+#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:33
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:45
+msgid "Complete registration"
+msgstr "Viimeistele rekisteröinti"
+
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:20
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:21
+#, python-format
+msgid ""
+"Tired of entering password for %(sitename)s every time you sign in? Set up "
+"single sign-on with one or more of the services below:"
+msgstr ""
+"Kyllästyttääkö salasanan syöttäminen palveluun %(sitename)s aina "
+"kirjautuessa? Ota käyttöön kertakirjautuminen yhden tai useamman alla olevan"
+" palvelun avulla:"
+
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:53
+msgid "Disconnect"
+msgstr "Pura yhteys"
+
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:33
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:62
+msgid "Connect"
+msgstr "Yhdistä"
+
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:39
+msgid "Forgot password?"
+msgstr "Unohditko salasanan?"
+
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:45
+msgid "Resend confirmation email"
+msgstr "Lähetä vahvistussähköposti uudelleen"
