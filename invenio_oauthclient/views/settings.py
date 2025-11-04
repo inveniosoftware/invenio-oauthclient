@@ -44,6 +44,7 @@ def index():
                     title=conf["title"],
                     icon=conf.get("icon", None),
                     description=conf.get("description", None),
+                    link_only=conf.get("link_only", False),
                     account=None,
                 )
             )

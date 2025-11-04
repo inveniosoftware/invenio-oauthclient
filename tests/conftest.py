@@ -343,6 +343,11 @@ def views_fixture(base_app, params, models_fixture):
                 title="Hidden",
                 hide=True,
             ),
+            link_only=dict(
+                params=params("linkonlyid"),
+                title="Link only",
+                link_only=True,
+            ),
         )
     )
 
@@ -388,6 +393,15 @@ def views_fixture_rest(base_app, params, models_fixture):
                 error_redirect_url="/",
                 title="Hidden",
                 hide=True,
+            ),
+            link_only=dict(
+                params=params("linkonlyid"),
+                authorized_redirect_url="/",
+                disconnect_redirect_url="/",
+                signup_redirect_url="/",
+                error_redirect_url="/",
+                title="Link only",
+                link_only=True,
             ),
         )
     )

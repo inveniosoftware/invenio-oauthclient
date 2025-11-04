@@ -65,7 +65,10 @@ def auto_redirect_login(*args, **kwargs):
     visible_remote_apps = [
         remote_app
         for remote_app in remote_apps
-        if not remote_app_configs.get(remote_app, {}).get("hide", False)
+        if not (remote_app_config := remote_app_configs.get(remote_app, {})).get(
+            "hide", False
+        )
+        and not remote_app_config.get("link_only", False)
     ]
 
     if would_redirect and len(visible_remote_apps) == 1:

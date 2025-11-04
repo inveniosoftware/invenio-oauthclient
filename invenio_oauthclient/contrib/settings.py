@@ -33,6 +33,7 @@ class OAuthSettingsHelper:
         signup_options=None,
         logout_url=None,
         hide_when=False,
+        link_only=False,
         **kwargs,
     ):
         """The constructor."""
@@ -65,6 +66,7 @@ class OAuthSettingsHelper:
             hide=LocalProxy(
                 lambda: self.hide_when() if callable(hide_when) else self.hide_when
             ),
+            link_only=link_only,
             params=dict(
                 base_url=self.base_url,
                 request_token_params=request_token_params,

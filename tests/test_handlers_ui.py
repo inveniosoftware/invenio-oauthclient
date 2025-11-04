@@ -20,7 +20,7 @@ from invenio_accounts.proxies import current_datastore
 from werkzeug.routing import BuildError
 
 from invenio_oauthclient import InvenioOAuthClient, current_oauthclient
-from invenio_oauthclient.errors import AlreadyLinkedError
+from invenio_oauthclient.errors import AlreadyLinkedError, OAuthClientLinkOnlySignup
 from invenio_oauthclient.handlers import (
     authorized_signup_handler,
     disconnect_handler,
@@ -201,6 +201,14 @@ def test_unauthorized_disconnect(app, remote):
     """Test disconnect handler when user is not authenticated."""
     resp = disconnect_handler(remote)
     check_redirect_location(resp, lambda x: x.startswith("/login/"))
+
+
+def test_link_only_signin_exception(app, remote):
+    """Test redirect to the login page when the user tries to log in with a link-only account."""
+    example_response = {"access_token": "test_access_token"}
+    app.config["OAUTHCLIENT_REMOTE_APPS"][remote.name] = {"link_only": True}
+    resp = authorized_signup_handler(example_response, remote)
+    check_redirect_location(resp, "/login/")
 
 
 def test_dummy_handler(base_app):
