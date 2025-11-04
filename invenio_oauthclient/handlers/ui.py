@@ -29,6 +29,7 @@ from ..errors import (
     AlreadyLinkedError,
     OAuthClientAlreadyAuthorized,
     OAuthClientError,
+    OAuthClientLinkOnlySignup,
     OAuthClientMustRedirectLogin,
     OAuthClientMustRedirectSignup,
     OAuthClientTokenNotFound,
@@ -86,6 +87,14 @@ def _oauth_error_handler(remote, f, *args, **kwargs):
                 remote_app=remote.name,
             )
         )
+    except OAuthClientLinkOnlySignup as e:
+        flash(
+            _(
+                "You can only link %(remote_name)s if you have already signed in through a different method.",
+                remote_name=e.remote_name,
+            )
+        )
+        return redirect(url_for("security.login"))
 
 
 #

@@ -16,6 +16,7 @@ from invenio_db import db
 
 from ..errors import (
     OAuthClientAlreadyAuthorized,
+    OAuthClientLinkOnlySignup,
     OAuthClientMustRedirectSignup,
     OAuthClientTokenNotFound,
     OAuthClientTokenNotSet,
@@ -53,6 +54,19 @@ def authorized_handler(resp, remote, *args, **kwargs):
     # Returned token is None when anonymous user
     token = response_token_setter(remote, resp)
 
+    # In the normal OAuth flow, the user is not yet authenticated. However, it the user
+    # is already logged in, and goes to 'Linked accounts', clicks 'Connect' on another
+    # remote app, `authorized` will be called with the new remote.
+    is_normal_oauth_flow = not current_user.is_authenticated
+    if is_normal_oauth_flow:
+        remote_config = current_app.config["OAUTHCLIENT_REMOTE_APPS"].get(
+            remote.name, {}
+        )
+        if remote_config.get("link_only", False):
+            # If the user is not already signed in, we refuse to attempt signing in with a link-only remote app.
+            # Users can only sign in with these if they're already authenticated through some other means.
+            raise OAuthClientLinkOnlySignup(remote_config.get("title", remote.name))
+
     # Set the remote in the user session to know how the user logged in.
     # Useful on log out, so that we can logout on remote too, when needed.
     session["OAUTHCLIENT_SESSION_REMOTE_NAME"] = remote.name
@@ -80,10 +94,6 @@ def authorized_handler(resp, remote, *args, **kwargs):
             # sys admins should not know the external groups of a user.
             session["unmanaged_roles_ids"] = set(group["id"] for group in groups)
 
-    # In the normal OAuth flow, the user is not yet authenticated. However, it the user
-    # is already logged in, and goes to 'Linked accounts', clicks 'Connect' on another
-    # remote app, `authorized` will be called with the new remote.
-    is_normal_oauth_flow = not current_user.is_authenticated
     if is_normal_oauth_flow:
         # get the user from the DB using the current remote
         user = oauth_get_user(

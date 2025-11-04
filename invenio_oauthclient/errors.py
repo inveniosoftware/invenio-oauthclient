@@ -102,6 +102,15 @@ class OAuthClientMustRedirectLogin(Exception):
     """Define exception for forcing redirection to login view."""
 
 
+class OAuthClientLinkOnlySignup(Exception):
+    """Define exception for trying to create a new account using a link-only remote."""
+
+    def __init__(self, remote_name: str, *args) -> None:
+        """Constructor."""
+        super().__init__(*args)
+        self.remote_name = remote_name
+
+
 class OAuthRemoteNotFound(Exception):
     """Define exception for remote app not found."""
 

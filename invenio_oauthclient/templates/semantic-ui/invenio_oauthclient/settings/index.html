@@ -11,7 +11,8 @@
 
 {% set panel_title = _("Linked accounts") %}
 {% set panel_icon = "linkify icon" %}
-{% set num_linked_services = services|selectattr("account")|list|length %}
+{# Count the number of linked accounts that are not link-only (we cannot disconnect the user's only non-link-only account) #}
+{% set num_linked_services = services|selectattr("link_only", "eq", False)|selectattr("account")|list|length %}
 {% set can_disconnect = (num_linked_services > 1 or not only_external_login) %}
 
 {% block settings_body %}
@@ -43,7 +44,8 @@
 
         {% block oauth_controls scoped %}
           {# we'll only show the "disconnect" button if it's not the only way for the user to log in #}
-          {%- if s.account and can_disconnect -%}
+          {# Link-only accounts can always be disconnected #}
+          {%- if s.account and (can_disconnect or s.link_only) -%}
             <a
               role="button"
               href="{{url_for('invenio_oauthclient.disconnect', remote_app=s.appid)}}"
