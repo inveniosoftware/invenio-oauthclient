@@ -10,6 +10,11 @@
 Changes
 =======
 
+Version v6.1.0 (released 2025-XX-XX)
+
+- feat: support for refresh tokens
+- feat: link-only remotes
+
 Version v6.0.0 (released 2025-11-03)
 
 - perf(models): changed SQL column type of `extra_data` to `JSONB` instead of `JSON` for PostgreSQL
