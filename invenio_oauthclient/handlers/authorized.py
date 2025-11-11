@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2023 CERN.
+# Copyright (C) 2023-2025 CERN.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -198,6 +198,7 @@ def extra_signup_handler(remote, form, *args, **kwargs):
     oauth_token = token_getter(remote)
     if not oauth_token:
         raise OAuthClientTokenNotFound()
+    access_token, secret, refresh_token, expires = oauth_token
 
     session_prefix = token_session_key(remote.name)
 
@@ -211,7 +212,14 @@ def extra_signup_handler(remote, form, *args, **kwargs):
         user = _register_user(response, remote, account_info, form)
 
         # Link account and set session data
-        token = token_setter(remote, oauth_token[0], secret=oauth_token[1], user=user)
+        token = token_setter(
+            remote,
+            access_token,
+            secret=secret,
+            user=user,
+            refresh_token=refresh_token,
+            expires=expires,
+        )
         if token is None:
             raise OAuthClientTokenNotSet()
 

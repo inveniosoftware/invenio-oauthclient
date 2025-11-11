@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2015-2025 CERN.
 # Copyright (C) 2024 Graz University of Technology.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Models for storing access tokens and links between users and remote apps."""
+
+from datetime import datetime, timedelta, timezone
 
 from flask import current_app
 
@@ -16,7 +18,7 @@ from flask import current_app
 # here, means previous imports won't break.
 from invenio_accounts.models import User, UserIdentity
 from invenio_db import db
-from sqlalchemy.dialects import postgresql
+from sqlalchemy.dialects import mysql, postgresql
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import backref
 from sqlalchemy_utils import JSONType, StringEncryptedType, Timestamp
@@ -24,7 +26,7 @@ from sqlalchemy_utils import JSONType, StringEncryptedType, Timestamp
 
 def _secret_key():
     """Return secret key from current application."""
-    return current_app.config.get("SECRET_KEY")
+    return current_app.config["SECRET_KEY"]
 
 
 class RemoteAccount(db.Model, Timestamp):
@@ -129,6 +131,16 @@ class RemoteToken(db.Model, Timestamp):
     )
     """Access token to remote application."""
 
+    refresh_token = db.Column(
+        StringEncryptedType(type_in=db.Text, key=_secret_key), nullable=True
+    )
+    """Refresh token to remote application."""
+
+    expires = db.Column(
+        db.DateTime().with_variant(mysql.DATETIME(fsp=6), "mysql"), nullable=True
+    )
+    """Access token expiration date."""
+
     secret = db.Column(db.Text(), default="", nullable=False)
     """Used only by OAuth 1."""
 
@@ -139,6 +151,21 @@ class RemoteToken(db.Model, Timestamp):
         RemoteAccount, backref=backref("remote_tokens", cascade="all, delete-orphan")
     )
     """SQLAlchemy relationship to RemoteAccount objects."""
+
+    @property
+    def is_expired(self):
+        """Check if access token has expired."""
+        if not self.expires:
+            return False
+
+        leeway = current_app.config.get("OAUTHCLIENT_TOKEN_EXPIRES_LEEWAY", 10)
+        expiration_with_leeway = (self.expires - timedelta(seconds=leeway)).replace(
+            # see https://docs.sqlalchemy.org/en/13/core/type_basics.html#sqlalchemy.types.DateTime
+            # We store datetimes in the DB as UTC but without timezone metadata. So to make comparison
+            # possible, we need to mark this as UTC.
+            tzinfo=timezone.utc
+        )
+        return expiration_with_leeway < datetime.now(tz=timezone.utc)
 
     def __repr__(self):
         """String representation for model."""
@@ -151,17 +178,47 @@ class RemoteToken(db.Model, Timestamp):
         """Get token as expected by Flask-OAuthlib."""
         return (self.access_token, self.secret)
 
-    def update_token(self, token, secret):
+    def update_token(self, token, secret, refresh_token=None, expires=None):
         """Update token with new values.
 
         :param token: The token value.
         :param secret: The secret key.
+        :param refresh_token: The refresh token
+        :param expires: Time when the access token expires
         """
-        if self.access_token != token or self.secret != secret:
+        if (
+            self.access_token != token
+            or self.secret != secret
+            or self.refresh_token != refresh_token
+            or self.expires != expires
+        ):
             with db.session.begin_nested():
                 self.access_token = token
                 self.secret = secret
+                self.refresh_token = refresh_token
+                self.expires = expires
                 db.session.add(self)
+
+    def refresh_access_token(self):
+        """Refresh the access token.
+
+        Warning: due to the irreversibility of the OAuth refresh call, this method calls `db.session.commit()`. Make sure
+        to call this method _before_ any business logic that is intended to be rollbackable, as this call may inadvertently
+        commit unrelated transactions.
+        """
+        if not self.refresh_token:
+            raise ValueError("No refresh token available")
+        from .handlers.refresh import refresh_access_token
+
+        access_token, refresh_token, expires = refresh_access_token(self)
+        # Refresh tokens are a feature only in OAuth 2.0, so we never store a secret.
+        self.update_token(access_token, "", refresh_token, expires)
+        # Refreshing the token is an operation that cannot be rolled back. The old access token is usually not invalidated
+        # (this is not required by the RFC but is allowed), but e.g. if the server issues a new refresh token that is something
+        # we cannot undo. The old token may be revoked. Therefore, we must commit the update straight away: rolling back the
+        # token update would create an inconsistency and we risk permanently losing access to the remote account.
+        # See RFC 6749 Section 6 for more details.
+        db.session.commit()
 
     @classmethod
     def get(cls, user_id, client_id, token_type="", access_token=None):
@@ -211,7 +268,17 @@ class RemoteToken(db.Model, Timestamp):
         )
 
     @classmethod
-    def create(cls, user_id, client_id, token, secret, token_type="", extra_data=None):
+    def create(
+        cls,
+        user_id,
+        client_id,
+        token,
+        secret,
+        token_type="",
+        extra_data=None,
+        refresh_token=None,
+        expires=None,
+    ):
         """Create a new access token.
 
         .. note:: Creates RemoteAccount as well if it does not exists.
@@ -223,6 +290,8 @@ class RemoteToken(db.Model, Timestamp):
         :param token_type: The token type. (Default: ``''``)
         :param extra_data: Extra data to set in the remote account if the
             remote account doesn't exists. (Default: ``None``)
+        :param refresh_token: The refresh token.
+        :param expires: Expiration of the token
         :returns: A :class:`invenio_oauthclient.models.RemoteToken` instance.
 
         """
@@ -242,6 +311,8 @@ class RemoteToken(db.Model, Timestamp):
                 remote_account=account,
                 access_token=token,
                 secret=secret,
+                refresh_token=refresh_token,
+                expires=expires,
             )
             db.session.add(token)
         return token

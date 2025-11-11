@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2015-2025 CERN.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -38,6 +38,11 @@ def mock_response(oauth, remote_app="test", data=None):
 def mock_remote_get(oauth, remote_app="test", data=None):
     """Mock the oauth remote get response."""
     oauth.remote_apps[remote_app].get = MagicMock(return_value=data)
+
+
+def mock_remote_http_request(oauth, remote_app="test", data=None):
+    """Mock the oauth remote get response."""
+    oauth.remote_apps[remote_app].http_request = MagicMock(return_value=data)
 
 
 def check_redirect_location(resp, loc):
