@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2016-2018 CERN.
+# Copyright (C) 2016-2025 CERN.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -51,4 +51,4 @@ def test_token_getter(remote, models_fixture, app):
     # Populated RemoteToken
     RemoteToken.create(user.id, "testkey", "mytoken", "mysecret")
     oauth_authenticate("dev", user)
-    assert token_getter(remote) == ("mytoken", "mysecret")
+    assert token_getter(remote) == ("mytoken", "mysecret", None, None)
