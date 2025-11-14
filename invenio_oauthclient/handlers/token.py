@@ -125,6 +125,16 @@ def make_expiration_time(expires_in):
     """
     if expires_in is None:
         return None
+
+    if isinstance(expires_in, str):
+        # RFC 6749 5.1 requires the response type to the access token request to be application/json.
+        # However, some non-compliant implementations (e.g. GitHub) instead use application/x-www-form-urlencoded.
+        # This only supports strings, so the response dict is coerced into strings. We need to convert
+        # `expires_in` (the only int parameter) back into an int.
+        expires_in = int(expires_in)
+
+    # Just in case any other unexpected types might have come out of the parser
+    assert isinstance(expires_in, int)
     return datetime.now(tz=timezone.utc) + timedelta(seconds=expires_in)
 
 
