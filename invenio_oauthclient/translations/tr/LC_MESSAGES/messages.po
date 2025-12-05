@@ -8,6 +8,7 @@
 # Berat Aldemir <berataldemir@gmail.com>, 2024
 # BEN TERCÜME, 2025
 # Ben Translation and Interpreting Services <info@bentercume.com>, 2025
+# Eylül-1 -, 2025
 # 
 #, fuzzy
 msgid ""
@@ -16,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
 "POT-Creation-Date: 2025-07-08 19:46+0000\n"
 "PO-Revision-Date: 2016-08-18 15:19+0000\n"
-"Last-Translator: Ben Translation and Interpreting Services <info@bentercume.com>, 2025\n"
+"Last-Translator: Eylül-1 -, 2025\n"
 "Language-Team: Turkish (https://app.transifex.com/inveniosoftware/teams/23537/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -64,6 +65,8 @@ msgstr "%(icon)s Bağlı hesaplar"
 #, python-format
 msgid "Identity class %(identity_class)s is not one of [%(valid_identities)s]"
 msgstr ""
+"%(identity_class)s kimlik sınıfı, geçerli [%(valid_identities)s] "
+"sınıflarından biri değil."
 
 #: invenio_oauthclient/contrib/cern.py:441
 #: invenio_oauthclient/contrib/cern_openid.py:305
@@ -74,6 +77,8 @@ msgstr "CERN hesabına izin verilmemekte."
 #, python-format
 msgid "User roles %(cern_roles)s are not one of %(valid_roles)s"
 msgstr ""
+"%(cern_roles)s kullanıcı rolleri, geçerli %(valid_roles)s rollerinden biri "
+"değil."
 
 #: invenio_oauthclient/contrib/github.py:109
 msgid "GitHub"
@@ -81,38 +86,39 @@ msgstr "GitHub"
 
 #: invenio_oauthclient/contrib/github.py:110
 msgid "Software collaboration platform."
-msgstr ""
+msgstr "Yazılım ortak çalışma platformu."
 
 #: invenio_oauthclient/contrib/github.py:265
 #: invenio_oauthclient/contrib/github.py:287
 msgid "Application mis-configuration in GitHub"
-msgstr ""
+msgstr "GitHub'da uygulama yanlış yapılandırması"
 
 #: invenio_oauthclient/contrib/globus.py:95
 msgid "Globus"
-msgstr ""
+msgstr "Globus"
 
 #: invenio_oauthclient/contrib/globus.py:96
 msgid "Research data management simplified."
-msgstr ""
+msgstr "Araştırma veri yönetimi basitleştirildi."
 
 #: invenio_oauthclient/contrib/globus.py:168
 msgid "Application mis-configuration in Globus"
-msgstr ""
+msgstr "Globus'ta uygulama yanlış yapılandırması"
 
 #: invenio_oauthclient/contrib/globus.py:203
 msgid "Failed to fetch user id, likely server mis-configuration"
 msgstr ""
+"Kullanıcı kimliği getirilemedi, muhtemelen sunucu yanlış yapılandırılmış"
 
 #: invenio_oauthclient/contrib/openaire_aai.py:105
 #: invenio_oauthclient/contrib/openaire_aai.py:170
 msgid "OpenAIRE"
-msgstr ""
+msgstr "OpenAIRE"
 
 #: invenio_oauthclient/contrib/openaire_aai.py:106
 #: invenio_oauthclient/contrib/openaire_aai.py:171
 msgid "Open Science Services."
-msgstr ""
+msgstr "Açık Bilim Hizmetleri."
 
 #: invenio_oauthclient/contrib/orcid.py:113
 msgid "ORCID"
@@ -120,7 +126,7 @@ msgstr "ORCID"
 
 #: invenio_oauthclient/contrib/orcid.py:114
 msgid "Connecting Research and Researchers."
-msgstr ""
+msgstr "Araştırma ve araştırmacıları birbirine bağlamak."
 
 #: invenio_oauthclient/contrib/keycloak/helpers.py:32
 #, python-format
@@ -128,6 +134,8 @@ msgid ""
 "Invalid app name %(app_name)s. It should only contain letters, numbers, "
 "dashes and underscores"
 msgstr ""
+"%(app_name)s uygulama adı geçersiz. Yalnızca harfler, rakamlar, tire ve alt "
+"çizgi içermelidir."
 
 #: invenio_oauthclient/handlers/rest.py:91
 #: invenio_oauthclient/handlers/token.py:71
@@ -147,36 +155,36 @@ msgstr "Harici hizmet zaten başka bir hesaba bağlı."
 
 #: invenio_oauthclient/handlers/rest.py:113
 msgid "Unauthorized."
-msgstr ""
+msgstr "Yetkilendirilmedi."
 
 #: invenio_oauthclient/handlers/rest.py:120
 #: invenio_oauthclient/handlers/rest.py:290
 msgid "Successfully signed up."
-msgstr ""
+msgstr "Başarıyla kaydolundu."
 
 #: invenio_oauthclient/handlers/rest.py:129
 msgid "Token not found."
-msgstr ""
+msgstr "Belirteç bulunamadı."
 
 #: invenio_oauthclient/handlers/rest.py:136
 msgid "Could not create token for user."
-msgstr ""
+msgstr "Kullanıcı için belirteç oluşturulamadı."
 
 #: invenio_oauthclient/handlers/rest.py:216
 msgid "Successfully authorized."
-msgstr ""
+msgstr "Başarıyla yetkilendirildi."
 
 #: invenio_oauthclient/handlers/rest.py:246
 msgid "Successfully disconnected."
-msgstr ""
+msgstr "Bağlantı başarıyla kesildi."
 
 #: invenio_oauthclient/handlers/token.py:62
 msgid "User rejected request."
-msgstr ""
+msgstr "Kullanıcı isteği reddetti."
 
 #: invenio_oauthclient/handlers/token.py:75
 msgid "Bad OAuth authorized request"
-msgstr ""
+msgstr "Hatalı OAuth yetkilendirilmiş isteği"
 
 #: invenio_oauthclient/handlers/ui.py:157
 #, python-format
@@ -184,6 +192,9 @@ msgid ""
 "A confirmation email has already been sent to %(email)s. Didn't receive it? "
 "Click <strong><a href=\"%(url)s\">here</a></strong> to resend it."
 msgstr ""
+"%(email)s. adresine bir onay e-postası zaten gönderildi. Almadınız mı? "
+"Yeniden göndermek için <strong><a href=\"%(url)s\">buraya</a></strong> "
+"tıklayın."
 
 #: invenio_oauthclient/handlers/utils.py:126
 #, python-format
@@ -191,6 +202,8 @@ msgid ""
 "Error while syncing roles: A managed role with id: %(group_id)s already "
 "exists"
 msgstr ""
+"Rolleri eşitlerken hata oluştu: %(group_id)s kimliğine sahip bir yönetilen "
+"rol zaten mevcut."
 
 #: invenio_oauthclient/handlers/utils.py:136
 #, python-format
@@ -198,6 +211,8 @@ msgid ""
 "Error while syncing roles: A managed role with name: %(group_name)s already "
 "exists"
 msgstr ""
+"Rolleri eşitlerken hata oluştu: %(group_name)s adına sahip bir yönetilen rol"
+" zaten mevcut."
 
 #: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:25
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/_macros.html:60
