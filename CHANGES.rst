@@ -10,6 +10,11 @@
 Changes
 =======
 
+Version v6.1.1 (released 2025-12-08)
+
+- i18n: pulled translations
+- fix(refresh): allow non-compliant access token response type
+
 Version v6.1.0 (released 2025-XX-XX)
 
 - feat: support for refresh tokens
