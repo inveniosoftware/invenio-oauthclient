@@ -8,6 +8,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Test handlers."""
+
 import json
 from datetime import datetime, timezone
 
