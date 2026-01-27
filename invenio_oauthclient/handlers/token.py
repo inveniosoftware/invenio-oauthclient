@@ -7,6 +7,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Funcs to manage tokens."""
+
 from datetime import datetime, timedelta, timezone
 from functools import partial
 
