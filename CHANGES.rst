@@ -10,6 +10,12 @@
 Changes
 =======
 
+Version v7.0.0 (released 2026-01-29)
+
+- chore(tests): add admin
+- chore(setup): bump dependencies
+- fix(chore): DeprecationWarning stdlib
+
 Version v6.1.2 (released 2026-01-27)
 
 - chore(black): update formatting to >= 26.0
