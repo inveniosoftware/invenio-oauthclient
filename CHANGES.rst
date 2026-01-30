@@ -10,6 +10,10 @@
 Changes
 =======
 
+Version v6.1.3 (released 2026-01-30)
+
+- fix(logout): remove unmanage_roles from session
+
 Version v6.1.2 (released 2026-01-27)
 
 - chore(black): update formatting to >= 26.0
