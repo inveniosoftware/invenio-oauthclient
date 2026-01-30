@@ -235,10 +235,20 @@ def token_delete(remote, token=""):
 
 
 def oauth_logout_handler(sender_app, user=None):
-    """Remove all access tokens from session on logout."""
+    """Remove all access tokens and OAuth session data on logout.
+
+    This includes:
+    - OAuth tokens for all remote apps
+    - Unmanaged roles (groups) from the session
+    """
     oauth = current_oauthclient.oauth
     for remote in oauth.remote_apps.values():
         token_delete(remote)
+
+    # Clear unmanaged roles (groups) from session
+    # These are set during OAuth login when a groups handler is configured
+    session.pop("unmanaged_roles_ids", None)
+
     db.session.commit()
 
 

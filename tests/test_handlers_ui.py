@@ -227,3 +227,56 @@ def test_dummy_handler(base_app):
     base_app.test_client().get(
         url_for("invenio_oauthclient.signup", remote_app="github", next="/someurl/")
     )
+
+
+def test_logout_clears_unmanaged_roles(remote, app, models_fixture):
+    """Test that logout handler clears unmanaged_roles_ids from session."""
+    datastore = app.extensions["invenio-accounts"].datastore
+    existing_email = "existing@inveniosoftware.org"
+    user = datastore.find_user(email=existing_email)
+
+    example_groups = [
+        {
+            "id": "cern-group-1",
+            "name": "cern-group-1",
+            "description": "CERN test group 1",
+        },
+        {
+            "id": "cern-group-2",
+            "name": "cern-group-2",
+            "description": "CERN test group 2",
+        },
+    ]
+    example_response = {"access_token": "test_access_token"}
+    example_account_info = {
+        "user": {
+            "email": existing_email,
+        },
+        "external_id": "1234",
+        "external_method": "test_method",
+    }
+
+    # Mock remote app's handler with groups
+    current_oauthclient.signup_handlers[remote.name] = {
+        "info": lambda resp: example_account_info,
+        "groups": lambda resp: example_groups,
+    }
+
+    _security.confirmable = True
+    _security.login_without_confirmation = False
+    user.confirmed_at = None
+
+    # Perform login with groups
+    authorized_signup_handler(example_response, remote)
+
+    # Verify that groups are in session after login
+    assert "unmanaged_roles_ids" in session
+    assert len(session["unmanaged_roles_ids"]) == 2
+    assert "cern-group-1" in session["unmanaged_roles_ids"]
+    assert "cern-group-2" in session["unmanaged_roles_ids"]
+
+    # Perform logout
+    logout_user()
+
+    # Verify that groups are cleared from session after logout
+    assert "unmanaged_roles_ids" not in session
