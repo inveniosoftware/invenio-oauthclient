@@ -273,7 +273,6 @@ a given authorize request.
                        ":authorized_signup_handler",
             disconnect_handler="invenio_oauthclient.handlers"
                        ":disconnect_handler",
-            )
             signup_handler=dict(
                 info="invenio_oauthclient.contrib.orcid:account_info",
                 info_serializer="invenio_oauthclient.contrib.orcid:account_info_serializer",
