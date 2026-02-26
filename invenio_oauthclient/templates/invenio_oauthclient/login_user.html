@@ -15,7 +15,7 @@
 {%- block form_outer %}
   {% if config.OAUTHCLIENT_REMOTE_APPS %}
     {% for name, config in config.OAUTHCLIENT_REMOTE_APPS.items() if not config.hide %}
-      {{ oauth_button(name, next=request.args.get('next')) }}
+      {{ oauth_button(name, next=request.args.get('next'), icon=config.get('icon', name)) }}
     {% endfor %}
     {%- if config.ACCOUNTS_LOCAL_LOGIN_ENABLED %}
       <h3 align="center">&mdash; {{ _("OR") }} &mdash;</h3>
