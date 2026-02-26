@@ -1320,3 +1320,166 @@ def test_keycloak_logout_url_fallback_without_discovery():
 
     # The base_app logout_url should also use the fallback
     assert helper.base_app["logout_url"] == f"{issuer}/logout"
+
+
+# ---------------------------------------------------------------------------
+# Basic auth tests
+# ---------------------------------------------------------------------------
+
+
+def test_oidc_basic_auth_disabled_by_default():
+    """Test that HTTP Basic Auth is NOT used by default (use_basic_auth=False)."""
+    from invenio_oauthclient.contrib.oidc import OIDCSettingsHelper
+
+    helper = OIDCSettingsHelper(
+        issuer="https://auth.example.com",
+        use_discovery=False,
+    )
+
+    # token_endpoint_auth_method must not be set when basic auth is disabled
+    assert "token_endpoint_auth_method" not in helper.base_app["params"]
+
+
+def test_oidc_basic_auth_enabled():
+    """Test that use_basic_auth=True sets client_secret_basic on the token endpoint."""
+    from invenio_oauthclient.contrib.oidc import OIDCSettingsHelper
+
+    helper = OIDCSettingsHelper(
+        issuer="https://auth.example.com",
+        use_discovery=False,
+        use_basic_auth=True,
+    )
+
+    assert (
+        helper.base_app["params"]["token_endpoint_auth_method"] == "client_secret_basic"
+    )
+
+
+def test_oidc_basic_auth_propagated_to_remote_app():
+    """Test that basic auth setting is present in remote_app and remote_rest_app."""
+    from invenio_oauthclient.contrib.oidc import OIDCSettingsHelper
+
+    helper = OIDCSettingsHelper(
+        issuer="https://auth.example.com",
+        use_discovery=False,
+        use_basic_auth=True,
+    )
+
+    assert (
+        helper.remote_app["params"]["token_endpoint_auth_method"]
+        == "client_secret_basic"
+    )
+    assert (
+        helper.remote_rest_app["params"]["token_endpoint_auth_method"]
+        == "client_secret_basic"
+    )
+
+
+def test_oidc_basic_auth_not_propagated_when_disabled():
+    """Test that token_endpoint_auth_method is absent when basic auth is off."""
+    from invenio_oauthclient.contrib.oidc import OIDCSettingsHelper
+
+    helper = OIDCSettingsHelper(
+        issuer="https://auth.example.com",
+        use_discovery=False,
+        use_basic_auth=False,
+    )
+
+    assert "token_endpoint_auth_method" not in helper.remote_app["params"]
+    assert "token_endpoint_auth_method" not in helper.remote_rest_app["params"]
+
+
+def test_oidc_basic_auth_from_flask_config(base_app):
+    """Test that OIDC_USE_BASIC_AUTH=True in Flask config enables basic auth."""
+    from invenio_oauthclient.contrib.oidc import _get_oidc_app
+
+    base_app.config["OIDC_ISSUER"] = "http://localhost:9000"
+    base_app.config["OIDC_USE_BASIC_AUTH"] = True
+
+    with base_app.app_context():
+        oidc_app = _get_oidc_app()
+        assert oidc_app is not None
+        assert (
+            oidc_app.base_app["params"]["token_endpoint_auth_method"]
+            == "client_secret_basic"
+        )
+
+
+def test_oidc_basic_auth_false_from_flask_config(base_app):
+    """Test that OIDC_USE_BASIC_AUTH=False in Flask config leaves basic auth off."""
+    from invenio_oauthclient.contrib.oidc import _get_oidc_app
+
+    base_app.config["OIDC_ISSUER"] = "http://localhost:9000"
+    base_app.config["OIDC_USE_BASIC_AUTH"] = False
+
+    with base_app.app_context():
+        oidc_app = _get_oidc_app()
+        assert oidc_app is not None
+        assert "token_endpoint_auth_method" not in oidc_app.base_app["params"]
+
+
+def test_oidc_basic_auth_from_env(monkeypatch, base_app):
+    """Test that OIDC_USE_BASIC_AUTH env variable enables basic auth."""
+    from invenio_oauthclient.contrib.oidc import _get_oidc_app
+
+    monkeypatch.setenv("OIDC_USE_BASIC_AUTH", "true")
+    base_app.config["OIDC_ISSUER"] = "http://localhost:9000"
+    # Remove key from Flask config so env variable is the source of truth
+    base_app.config.pop("OIDC_USE_BASIC_AUTH", None)
+
+    with base_app.app_context():
+        oidc_app = _get_oidc_app()
+        assert oidc_app is not None
+        assert (
+            oidc_app.base_app["params"]["token_endpoint_auth_method"]
+            == "client_secret_basic"
+        )
+
+
+def test_oidc_basic_auth_with_discovery():
+    """Test use_basic_auth=True works alongside OIDC discovery."""
+    import json
+
+    import httpretty
+
+    from invenio_oauthclient.contrib.oidc import OIDCSettingsHelper, _discovery_cache
+
+    issuer = "https://auth.example.com/realms/test"
+    discovery_url = f"{issuer}/.well-known/openid-configuration"
+    discovery_doc = {
+        "issuer": issuer,
+        "authorization_endpoint": f"{issuer}/protocol/openid-connect/auth",
+        "token_endpoint": f"{issuer}/protocol/openid-connect/token",
+        "userinfo_endpoint": f"{issuer}/protocol/openid-connect/userinfo",
+        "jwks_uri": f"{issuer}/protocol/openid-connect/certs",
+    }
+
+    httpretty.enable()
+    try:
+        httpretty.register_uri(
+            httpretty.GET,
+            discovery_url,
+            body=json.dumps(discovery_doc),
+            content_type="application/json",
+        )
+
+        helper = OIDCSettingsHelper(
+            issuer=issuer,
+            use_discovery=True,
+            use_basic_auth=True,
+        )
+
+        # Discovery endpoints should be used
+        assert (
+            helper.base_app["params"]["access_token_url"]
+            == f"{issuer}/protocol/openid-connect/token"
+        )
+        # Basic auth should be set
+        assert (
+            helper.base_app["params"]["token_endpoint_auth_method"]
+            == "client_secret_basic"
+        )
+    finally:
+        _discovery_cache.clear()
+        httpretty.disable()
+        httpretty.reset()

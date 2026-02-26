@@ -56,6 +56,13 @@ OIDC-compliant identity provider such as Authentik, Keycloak, Auth0, Okta, etc.
 
         OIDC_ISSUER = 'https://your-oidc-provider.com'
 
+   Some OIDC providers require HTTP Basic Authentication for the token endpoint
+   instead of sending credentials in the POST body. Enable it with:
+
+   .. code-block:: python
+
+        OIDC_USE_BASIC_AUTH = True
+
    For Keycloak with realms:
 
    .. code-block:: python
@@ -169,6 +176,7 @@ class OIDCSettingsHelper(OAuthSettingsHelper):
         precedence_mask=None,
         signup_options=None,
         use_discovery=True,
+        use_basic_auth=False,
         scope="openid profile email",
     ):
         """Constructor.
@@ -188,6 +196,11 @@ class OIDCSettingsHelper(OAuthSettingsHelper):
         :param signup_options: Dict with signup configuration options.
         :param use_discovery: Whether to use OIDC discovery (RFC 8414) to
                       auto-configure endpoints. Defaults to True.
+        :param use_basic_auth: Whether to use HTTP Basic Authentication
+                      (client_secret_basic) for the token endpoint instead of
+                      sending credentials in the request body
+                      (client_secret_post). Some OIDC providers require this.
+                      Defaults to False.
         :param scope: OAuth scope to request. Defaults to "openid profile email".
         """
         if not issuer:
@@ -300,6 +313,14 @@ class OIDCSettingsHelper(OAuthSettingsHelper):
             "send_register_msg": False,
         }
 
+        # Build extra kwargs for the OAuth library
+        extra_params = {}
+        if use_basic_auth:
+            # Instructs the OAuth library (Authlib) to send client credentials
+            # via the HTTP Authorization header (RFC 6749 §2.3.1) rather than
+            # in the POST body ('client_secret_post').
+            extra_params["token_endpoint_auth_method"] = "client_secret_basic"
+
         super().__init__(
             title or _("OpenID Connect (OIDC)"),
             description
@@ -316,6 +337,7 @@ class OIDCSettingsHelper(OAuthSettingsHelper):
             content_type="application/json",
             precedence_mask=precedence_mask,
             signup_options=signup_options,
+            **extra_params,
         )
 
         self._handlers = dict(
@@ -535,7 +557,20 @@ def _get_oidc_app():
         # OIDC not configured, return None to disable
         return None
 
-    return OIDCSettingsHelper(issuer=issuer)
+    try:
+        use_basic_auth = current_app.config.get(
+            "OIDC_USE_BASIC_AUTH",
+            os.environ.get("OIDC_USE_BASIC_AUTH", "false").lower()
+            in ("1", "true", "yes"),
+        )
+    except RuntimeError:
+        use_basic_auth = os.environ.get("OIDC_USE_BASIC_AUTH", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+
+    return OIDCSettingsHelper(issuer=issuer, use_basic_auth=use_basic_auth)
 
 
 # Module-level helper functions for lazy-loaded configuration
