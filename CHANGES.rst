@@ -10,6 +10,10 @@
 Changes
 =======
 
+Version v7.0.1 (released 2026-05-13)
+
+- fix(logout): remove unmanage_roles from session
+
 Version v7.0.0 (released 2026-01-29)
 
 - chore(tests): add admin
