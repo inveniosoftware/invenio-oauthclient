@@ -250,7 +250,7 @@ def init_index_menu(app):
             "%(icon)s Linked accounts",
             icon=LazyString(lambda: f'<i class="{current_theme_icons.link}"></i>'),
         ),
-        order=3,
+        order=9,  # VCS are allocated 10-19
         active_when=active_when,
         visible_when=visible_when,
     )
