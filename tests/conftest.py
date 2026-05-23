@@ -1,12 +1,7 @@
-# -*- coding: utf-8 -*-
-#
-# This file is part of Invenio.
-# Copyright (C) 2015-2025 CERN.
-# Copyright (C) 2018 University of Chicago.
-# Copyright (C) 2023-2025 Graz University of Technology.
-#
-# Invenio is free software; you can redistribute it and/or modify it
-# under the terms of the MIT License; see LICENSE file for more details.
+# SPDX-FileCopyrightText: 2015-2025 CERN.
+# SPDX-FileCopyrightText: 2018 University of Chicago.
+# SPDX-FileCopyrightText: 2023-2025 Graz University of Technology.
+# SPDX-License-Identifier: MIT
 
 """Pytest configuration."""
 

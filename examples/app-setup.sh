@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-FileCopyrightText: 2017 CERN.
+# SPDX-License-Identifier: MIT
 
 # quit on errors:
 set -o errexit
