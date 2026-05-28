@@ -10,6 +10,12 @@
 Changes
 =======
 
+Version v8.0.0 (released 2026-05-28)
+
+- chore(setup): bump dependencies
+- fix: bad downstream dependency in alembic
+- fix(ui): reorder menu in user settings
+
 Version v7.0.1 (released 2026-05-13)
 
 - fix(logout): remove unmanage_roles from session
