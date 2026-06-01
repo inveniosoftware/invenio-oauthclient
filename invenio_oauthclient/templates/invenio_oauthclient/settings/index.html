@@ -15,12 +15,15 @@
 {% set can_disconnect = (num_linked_services > 1 or not only_external_login) %}
 
 {% block settings_body %}
+{# we'll only show the message if it's not the only way for the user to log in #}
+{%- if can_disconnect -%}
 <div class="panel-body">
     {% block oauth_body_text %}
     <p>{{ _('Tired of entering password for %(sitename)s every time you sign in? Set up single sign-on with one or more of the services below:',
             sitename=config.THEME_SITENAME) }}</p>
     {% endblock oauth_body_text %}
 </div>
+{%- endif -%}
 <ul class="list-group">
     {%- for s in services %}
     <li class="list-group-item">
