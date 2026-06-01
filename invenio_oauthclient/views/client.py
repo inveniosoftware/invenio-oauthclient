@@ -8,7 +8,10 @@
 
 """Client blueprint used to handle OAuth callbacks."""
 
+from urllib.parse import urlencode, urlparse, urlunparse, parse_qs
+
 from flask import Blueprint, abort, current_app, redirect, request, session, url_for
+from flask_login import current_user
 from flask_oauthlib.client import OAuthException
 from invenio_accounts.views import login as base_login
 from invenio_db import db
@@ -16,6 +19,7 @@ from itsdangerous import BadData
 
 from .._compat import _create_identifier
 from ..errors import OAuthRemoteNotFound
+from ..models import RemoteAccount
 from ..handlers import set_session_next_url
 from ..handlers.rest import response_handler
 from ..proxies import current_oauthclient
@@ -305,6 +309,24 @@ def post_logout():
             "logout_url"
         )
         if logout_url:
+            # Append id_token_hint if available (enables RP-initiated logout
+            # without Keycloak showing a confirmation page)
+            if current_user.is_authenticated:
+                remote_app = current_oauthclient.oauth.remote_apps.get(remote_name)
+                if remote_app:
+                    account = RemoteAccount.get(
+                        user_id=current_user.get_id(),
+                        client_id=remote_app.consumer_key,
+                    )
+                    if account and isinstance(account.extra_data, dict):
+                        id_token = account.extra_data.get("id_token")
+                        if id_token:
+                            parsed = urlparse(logout_url)
+                            params = parse_qs(parsed.query)
+                            params["id_token_hint"] = [id_token]
+                            logout_url = urlunparse(
+                                parsed._replace(query=urlencode(params, doseq=True))
+                            )
             return redirect(logout_url, code=302)
 
     return redirect("/")

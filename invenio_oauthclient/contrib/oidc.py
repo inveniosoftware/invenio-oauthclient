@@ -822,6 +822,11 @@ def account_setup(remote, token, resp):
             if orcid:
                 extra_data["orcid"] = orcid
 
+            # Store id_token for use as id_token_hint during RP-initiated logout
+            id_token = resp.get("id_token") if resp else None
+            if id_token:
+                extra_data["id_token"] = id_token
+
             token.remote_account.extra_data = extra_data
 
             # Create user <-> external id link using 'sub' claim
