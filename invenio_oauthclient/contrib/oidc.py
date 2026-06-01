@@ -139,7 +139,7 @@ import os
 from urllib.parse import urlparse
 
 import requests
-from flask import current_app, redirect, url_for
+from flask import current_app, redirect, session, url_for
 from flask_login import current_user
 from invenio_db import db
 from invenio_i18n import lazy_gettext as _
@@ -826,6 +826,9 @@ def account_setup(remote, token, resp):
             id_token = resp.get("id_token") if resp else None
             if id_token:
                 extra_data["id_token"] = id_token
+                # Also keep in the session so post_logout() can use it after
+                # logout_user() has cleared the user identity (but not the session).
+                session["OAUTHCLIENT_OIDC_ID_TOKEN"] = id_token
 
             token.remote_account.extra_data = extra_data
 
