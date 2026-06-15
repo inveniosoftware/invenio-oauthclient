@@ -294,11 +294,18 @@ class OIDCSettingsHelper(OAuthSettingsHelper):
             # For these, endpoints should be at /application/o/ (without the app name)
             endpoint_base = self._get_endpoint_base(self.issuer)
 
-            # Most OIDC providers follow the standard paths, but some providers
-            # may have different structures. Configure endpoints manually if needed.
-            access_token_url = access_token_url or f"{endpoint_base}/token"
-            authorize_url = authorize_url or f"{endpoint_base}/authorize"
-            logout_url = logout_url or f"{endpoint_base}/logout"
+            # Keycloak uses /protocol/openid-connect/{auth,token,logout}
+            if "/realms/" in self.issuer:
+                oidc_base = f"{self.issuer.rstrip('/')}/protocol/openid-connect"
+                access_token_url = access_token_url or f"{oidc_base}/token"
+                authorize_url = authorize_url or f"{oidc_base}/auth"
+                logout_url = logout_url or f"{oidc_base}/logout"
+            else:
+                # Most OIDC providers follow the standard paths, but some providers
+                # may have different structures. Configure endpoints manually if needed.
+                access_token_url = access_token_url or f"{endpoint_base}/token"
+                authorize_url = authorize_url or f"{endpoint_base}/authorize"
+                logout_url = logout_url or f"{endpoint_base}/logout"
 
         precedence_mask = precedence_mask or {
             "email": True,
