@@ -49,11 +49,16 @@
 {% endmacro %}
 
 {% macro oauth_button(name, next=None) %}
+{%- set remote_app = config.OAUTHCLIENT_REMOTE_APPS[name] %}
 <div class="field">
   <a class="fluid ui basic button large"
      href="{{url_for('invenio_oauthclient.login', remote_app=name, next=next or request.referrer)}}">
-    <i class="{{ name|lower() }} icon"></i> {{
-      _('Sign in with %(title)s', title=config.OAUTHCLIENT_REMOTE_APPS[name]['title'])
+    {%- if remote_app.get('icon_image') %}
+    <img src="{{ url_for('static', filename=remote_app['icon_image']) }}" alt="" aria-hidden="true" style="max-height: 1em; max-width: 1.25em; margin-right: 0.5em; vertical-align: middle;">
+    {%- else %}
+    <i class="{{ name|lower() }} icon"></i>
+    {%- endif %} {{
+      _('Sign in with %(title)s', title=remote_app['title'])
     }}
   </a>
 </div>

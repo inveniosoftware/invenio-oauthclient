@@ -89,6 +89,7 @@ class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
         app_key=None,
         precedence_mask=None,
         signup_options=None,
+        icon_image=None,
     ):
         """Constructor."""
         base_url = base_url or "https://aai.openaire.eu"
@@ -101,6 +102,7 @@ class OpenAIREAuthSettingsHelper(OAuthSettingsHelper):
             description or _("Open Science Services."),
             base_url,
             app_key or "OPENAIRE_APP_CREDENTIALS",
+            icon_image=icon_image or "images/oauthclient/openaire.svg",
             request_token_params={"scope": "openid profile email orcid"},
             access_token_url=f"{base_url}/oidc/token",
             authorize_url=f"{base_url}/oidc/authorize",
@@ -168,6 +170,7 @@ _openaire_aai_sandbox_app = KeycloakSettingsHelper(
     realm="openaire",
     scopes="openid profile email eduperson_entitlement orcid",
     app_key="OPENAIRE_APP_CREDENTIALS",
+    icon_image="images/oauthclient/openaire.svg",
 )
 REMOTE_SANDBOX_APP = _openaire_aai_sandbox_app.remote_app
 """OpenAIRE Sandbox Remote Application."""

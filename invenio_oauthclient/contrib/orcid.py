@@ -92,6 +92,7 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
         authorize_url=None,
         precedence_mask=None,
         signup_options=None,
+        icon_image=None,
     ):
         """Constructor."""
         access_token_url = access_token_url or "https://orcid.org/oauth/token"
@@ -109,6 +110,7 @@ class ORCIDOAuthSettingsHelper(OAuthSettingsHelper):
             description or _("Connecting Research and Researchers."),
             base_url or "https://pub.orcid.org/v1.2/",
             app_key or "ORCID_APP_CREDENTIALS",
+            icon_image=icon_image or "images/oauthclient/orcid.svg",
             request_token_params={"scope": "/authenticate", "show_login": "true"},
             access_token_url=access_token_url,
             authorize_url=authorize_url,

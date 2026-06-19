@@ -156,6 +156,7 @@ class EOSCAAIOAuthSettingsHelper(OAuthSettingsHelper):
         app_key=None,
         precedence_mask=None,
         signup_options=None,
+        icon_image=None,
     ):
         """Constructor."""
         precedence_mask = precedence_mask or {
@@ -174,6 +175,7 @@ class EOSCAAIOAuthSettingsHelper(OAuthSettingsHelper):
             ),
             base_url=base_url,
             app_key=app_key or "EOSC_AAI_APP_CREDENTIALS",
+            icon_image=icon_image or "images/oauthclient/eosc.svg",
             request_token_params={
                 "scope": "openid profile email entitlements",
             },
