@@ -14,10 +14,11 @@
 {% endmacro %}
 
 
-{% macro oauth_button(name, next=None) %}
+{% macro oauth_button(name, next=None, icon=None) %}
+  {% set label = icon if icon else name %}
   <a class="btn btn-default btn-lg btn-block"
      href="{{url_for('invenio_oauthclient.login', remote_app=name, next=next or request.referrer)}}">
-    <i class="fa fa-{{ name|lower() }}"></i> {{
+    <i class="fa fa-{{ label|lower() }}"></i> {{
       _('Sign in with %(title)s', title=config.OAUTHCLIENT_REMOTE_APPS[name]['title'])
     }}
   </a>
