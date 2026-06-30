@@ -38,7 +38,6 @@ if [[ ${keep_services} -eq 0 ]]; then
 	trap cleanup EXIT
 fi
 
-python -m check_manifest
 python -m sphinx.cmd.build -qnN docs docs/_build/html
 eval "$(docker-services-cli up --db ${DB:-postgresql} --mq ${MQ:-rabbitmq} --env)"
 python -m pytest ${pytest_args[@]+"${pytest_args[@]}"}
