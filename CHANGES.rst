@@ -7,6 +7,10 @@
 Changes
 =======
 
+Version v9.1.0 (released 2026-06-30)
+
+- feat(login): support provider logo images on sign-in buttons
+
 Version v9.0.0 (released 2026-06-16)
 
 - chore(setup): bump dependencies
