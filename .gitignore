@@ -69,3 +69,4 @@ examples/*.crt
 
 # Vscode
 .vscode/
+uv.lock
