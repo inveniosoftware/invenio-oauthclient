@@ -25,12 +25,13 @@ from .ui import (
     authorized_signup_handler,
     disconnect_handler,
     oauth2_handle_error,
-)
-from .ui import oauth_resp_remote_error_handler as oauth_error_handler
-from .ui import (
+    oauth_resp_remote_error_handler,
     signup_handler,
 )
 from .utils import authorized_handler, make_handler
+
+# settle the disagreement between isort and black by renaming here
+oauth_error_handler = oauth_resp_remote_error_handler
 
 __all__ = (
     "authorized_default_handler_rest",
