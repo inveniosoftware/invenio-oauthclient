@@ -1,253 +1,272 @@
 # Translations template for invenio-oauthclient.
-# Copyright (C) 2025 CERN
+# Copyright (C) 2026 CERN
 # This file is distributed under the same license as the invenio-oauthclient
 # project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 # 
 # Translators:
-# Minjae Kwon, 2024
+# Minjae Kwon, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: invenio-oauthclient 5.1.0\n"
+"Project-Id-Version: invenio-oauthclient 8.0.0\n"
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
-"POT-Creation-Date: 2025-07-08 19:46+0000\n"
+"POT-Creation-Date: 2026-06-22 20:38+0000\n"
 "PO-Revision-Date: 2016-08-18 15:19+0000\n"
-"Last-Translator: Minjae Kwon, 2024\n"
+"Last-Translator: Minjae Kwon, 2026\n"
 "Language-Team: Korean (https://app.transifex.com/inveniosoftware/teams/23537/ko/)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 "Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: invenio_oauthclient/admin.py:54
+#: invenio_oauthclient/admin.py:49
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
-#: invenio_oauthclient/admin.py:55
+#: invenio_oauthclient/admin.py:50
 msgid "User ID"
 msgstr "사용자 ID"
 
-#: invenio_oauthclient/admin.py:56
+#: invenio_oauthclient/admin.py:51
 msgid "Client ID"
-msgstr ""
+msgstr "클라이언트 ID"
 
-#: invenio_oauthclient/admin.py:85
+#: invenio_oauthclient/admin.py:80
 msgid "ID Remote Account"
-msgstr ""
+msgstr "원격 계정 ID"
 
-#: invenio_oauthclient/admin.py:92 invenio_oauthclient/admin.py:100
+#: invenio_oauthclient/admin.py:87 invenio_oauthclient/admin.py:95
 msgid "User Management"
 msgstr "유저 관리"
 
-#: invenio_oauthclient/admin.py:93 invenio_oauthclient/ext.py:260
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:12
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:12
+#: invenio_oauthclient/admin.py:88 invenio_oauthclient/ext.py:255
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:8
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:8
 msgid "Linked accounts"
-msgstr ""
+msgstr "연결된 계정"
 
-#: invenio_oauthclient/admin.py:101
+#: invenio_oauthclient/admin.py:96
 msgid "Linked account tokens"
-msgstr ""
+msgstr "연결된 계정 토큰"
 
-#: invenio_oauthclient/ext.py:250
+#: invenio_oauthclient/ext.py:245
 #, python-format
 msgid "%(icon)s Linked accounts"
-msgstr ""
+msgstr "%(icon)s 연결된 계정"
 
-#: invenio_oauthclient/contrib/cern.py:410
+#: invenio_oauthclient/contrib/cern.py:406
 #, python-format
 msgid "Identity class %(identity_class)s is not one of [%(valid_identities)s]"
-msgstr ""
+msgstr "ID 클래스 %(identity_class)s은(는) [%(valid_identities)s] 중 하나가 아닙니다"
 
-#: invenio_oauthclient/contrib/cern.py:441
-#: invenio_oauthclient/contrib/cern_openid.py:305
+#: invenio_oauthclient/contrib/cern.py:437
+#: invenio_oauthclient/contrib/cern_openid.py:301
 msgid "CERN account not allowed."
-msgstr ""
+msgstr "CERN 계정은 허용되지 않습니다."
 
-#: invenio_oauthclient/contrib/cern_openid.py:278
+#: invenio_oauthclient/contrib/cern_openid.py:274
 #, python-format
 msgid "User roles %(cern_roles)s are not one of %(valid_roles)s"
-msgstr ""
+msgstr "사용자 역할 %(cern_roles)s은(는) %(valid_roles)s 중 하나가 아닙니다"
 
-#: invenio_oauthclient/contrib/github.py:109
+#: invenio_oauthclient/contrib/eosc_aai.py:170
+msgid "EOSC AAI"
+msgstr "EOSC AAI"
+
+#: invenio_oauthclient/contrib/eosc_aai.py:173
+msgid ""
+"European Open Science Cloud Authentication and Authorization Infrastructure."
+msgstr "European Open Science Cloud 인증·인가 인프라입니다."
+
+#: invenio_oauthclient/contrib/github.py:104
 msgid "GitHub"
-msgstr ""
+msgstr "GitHub"
 
-#: invenio_oauthclient/contrib/github.py:110
+#: invenio_oauthclient/contrib/github.py:105
 msgid "Software collaboration platform."
-msgstr ""
+msgstr "소프트웨어 협업 플랫폼입니다."
 
-#: invenio_oauthclient/contrib/github.py:265
-#: invenio_oauthclient/contrib/github.py:287
+#: invenio_oauthclient/contrib/github.py:260
+#: invenio_oauthclient/contrib/github.py:282
 msgid "Application mis-configuration in GitHub"
-msgstr ""
+msgstr "GitHub 어플리케이션 구성 오류"
 
-#: invenio_oauthclient/contrib/globus.py:95
+#: invenio_oauthclient/contrib/globus.py:90
 msgid "Globus"
-msgstr ""
+msgstr "Globus"
 
-#: invenio_oauthclient/contrib/globus.py:96
+#: invenio_oauthclient/contrib/globus.py:91
 msgid "Research data management simplified."
-msgstr ""
+msgstr "연구 데이터 관리를 간소화합니다."
 
-#: invenio_oauthclient/contrib/globus.py:168
+#: invenio_oauthclient/contrib/globus.py:163
 msgid "Application mis-configuration in Globus"
-msgstr ""
+msgstr "Globus 어플리케이션 구성 오류"
 
-#: invenio_oauthclient/contrib/globus.py:203
+#: invenio_oauthclient/contrib/globus.py:198
 msgid "Failed to fetch user id, likely server mis-configuration"
-msgstr ""
+msgstr "사용자 ID를 가져오지 못했습니다. 서버 구성 오류일 수 있습니다"
 
-#: invenio_oauthclient/contrib/openaire_aai.py:105
-#: invenio_oauthclient/contrib/openaire_aai.py:170
+#: invenio_oauthclient/contrib/openaire_aai.py:100
+#: invenio_oauthclient/contrib/openaire_aai.py:165
 msgid "OpenAIRE"
-msgstr ""
+msgstr "OpenAIRE"
 
-#: invenio_oauthclient/contrib/openaire_aai.py:106
-#: invenio_oauthclient/contrib/openaire_aai.py:171
+#: invenio_oauthclient/contrib/openaire_aai.py:101
+#: invenio_oauthclient/contrib/openaire_aai.py:166
 msgid "Open Science Services."
-msgstr ""
+msgstr "오픈 사이언스 서비스입니다."
 
-#: invenio_oauthclient/contrib/orcid.py:113
+#: invenio_oauthclient/contrib/orcid.py:108
 msgid "ORCID"
-msgstr ""
+msgstr "ORCID"
 
-#: invenio_oauthclient/contrib/orcid.py:114
+#: invenio_oauthclient/contrib/orcid.py:109
 msgid "Connecting Research and Researchers."
-msgstr ""
+msgstr "연구와 연구자를 연결합니다."
 
-#: invenio_oauthclient/contrib/keycloak/helpers.py:32
+#: invenio_oauthclient/contrib/keycloak/helpers.py:28
 #, python-format
 msgid ""
 "Invalid app name %(app_name)s. It should only contain letters, numbers, "
 "dashes and underscores"
-msgstr ""
+msgstr "잘못된 앱 이름 %(app_name)s입니다. 영문자, 숫자, 대시, 밑줄만 사용할 수 있습니다"
 
-#: invenio_oauthclient/handlers/rest.py:91
-#: invenio_oauthclient/handlers/token.py:71
-#: invenio_oauthclient/handlers/ui.py:242
+#: invenio_oauthclient/handlers/rest.py:86
+#: invenio_oauthclient/handlers/token.py:67
+#: invenio_oauthclient/handlers/ui.py:246
 msgid "Authorization with remote service failed."
-msgstr ""
+msgstr "원격 서비스 인가에 실패했습니다."
 
-#: invenio_oauthclient/handlers/rest.py:99
-#: invenio_oauthclient/handlers/ui.py:65
+#: invenio_oauthclient/handlers/rest.py:94
+#: invenio_oauthclient/handlers/ui.py:61
 msgid "You rejected the authentication request."
-msgstr ""
+msgstr "인증 요청을 거부했습니다."
 
-#: invenio_oauthclient/handlers/rest.py:103
-#: invenio_oauthclient/handlers/ui.py:60
+#: invenio_oauthclient/handlers/rest.py:98
+#: invenio_oauthclient/handlers/ui.py:56
 msgid "External service is already linked to another account."
-msgstr ""
+msgstr "외부 서비스가 이미 다른 계정에 연결되어 있습니다."
 
-#: invenio_oauthclient/handlers/rest.py:113
+#: invenio_oauthclient/handlers/rest.py:108
 msgid "Unauthorized."
-msgstr ""
+msgstr "권한이 없습니다."
 
-#: invenio_oauthclient/handlers/rest.py:120
-#: invenio_oauthclient/handlers/rest.py:290
+#: invenio_oauthclient/handlers/rest.py:115
+#: invenio_oauthclient/handlers/rest.py:285
 msgid "Successfully signed up."
-msgstr ""
+msgstr "가입이 완료되었습니다."
 
-#: invenio_oauthclient/handlers/rest.py:129
+#: invenio_oauthclient/handlers/rest.py:124
 msgid "Token not found."
-msgstr ""
+msgstr "토큰을 찾을 수 없습니다."
 
-#: invenio_oauthclient/handlers/rest.py:136
+#: invenio_oauthclient/handlers/rest.py:131
 msgid "Could not create token for user."
-msgstr ""
+msgstr "사용자의 토큰을 만들 수 없습니다."
 
-#: invenio_oauthclient/handlers/rest.py:216
+#: invenio_oauthclient/handlers/rest.py:211
 msgid "Successfully authorized."
-msgstr ""
+msgstr "인가가 완료되었습니다."
 
-#: invenio_oauthclient/handlers/rest.py:246
+#: invenio_oauthclient/handlers/rest.py:241
 msgid "Successfully disconnected."
-msgstr ""
+msgstr "연결이 해제되었습니다."
 
-#: invenio_oauthclient/handlers/token.py:62
+#: invenio_oauthclient/handlers/token.py:58
 msgid "User rejected request."
-msgstr ""
+msgstr "사용자가 요청을 거부했습니다."
 
-#: invenio_oauthclient/handlers/token.py:75
+#: invenio_oauthclient/handlers/token.py:71
 msgid "Bad OAuth authorized request"
-msgstr ""
+msgstr "잘못된 OAuth 인가 요청"
 
-#: invenio_oauthclient/handlers/ui.py:157
+#: invenio_oauthclient/handlers/ui.py:88
+#, python-format
+msgid ""
+"You can only link %(remote_name)s if you have already signed in through a "
+"different method."
+msgstr "%(remote_name)s은(는) 다른 방법으로 이미 로그인한 경우에만 연결할 수 있습니다."
+
+#: invenio_oauthclient/handlers/ui.py:161
 #, python-format
 msgid ""
 "A confirmation email has already been sent to %(email)s. Didn't receive it? "
 "Click <strong><a href=\"%(url)s\">here</a></strong> to resend it."
 msgstr ""
+"확인 이메일을 이미 %(email)s(으)로 보냈습니다. 받지 못하셨나요? 다시 보내려면 <strong><a "
+"href=\"%(url)s\">여기</a></strong>를 클릭하십시오."
 
-#: invenio_oauthclient/handlers/utils.py:126
+#: invenio_oauthclient/handlers/utils.py:121
 #, python-format
 msgid ""
 "Error while syncing roles: A managed role with id: %(group_id)s already "
 "exists"
-msgstr ""
+msgstr "역할을 동기화하는 중 오류: ID가 %(group_id)s인 관리 역할이 이미 있습니다"
 
-#: invenio_oauthclient/handlers/utils.py:136
+#: invenio_oauthclient/handlers/utils.py:131
 #, python-format
 msgid ""
 "Error while syncing roles: A managed role with name: %(group_name)s already "
 "exists"
-msgstr ""
+msgstr "역할을 동기화하는 중 오류: 이름이 %(group_name)s인 관리 역할이 이미 있습니다"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:25
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/_macros.html:60
+#: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:21
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/_macros.html:56
 #, python-format
 msgid "Sign in with %(title)s"
-msgstr ""
+msgstr "%(title)s(으)로 로그인"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/login_user.html:21
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:26
+#: invenio_oauthclient/templates/invenio_oauthclient/login_user.html:17
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:22
 msgid "OR"
 msgstr "OR"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:24
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:29
+#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:20
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:25
 #, python-format
 msgid "Sign-up with %(title)s!"
-msgstr ""
+msgstr "%(title)s(으)로 가입하기."
 
-#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:25
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:32
+#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:21
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:28
 msgid ""
 "Fill in your details to complete your registration. You only have to do this"
 " once."
-msgstr ""
+msgstr "가입을 완료하려면 정보를 입력하십시오. 이 작업은 한 번만 하면 됩니다."
 
-#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:33
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:45
+#: invenio_oauthclient/templates/invenio_oauthclient/signup.html:29
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/signup.html:41
 msgid "Complete registration"
-msgstr ""
+msgstr "가입 완료"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:20
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:21
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:16
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:18
 #, python-format
 msgid ""
 "Tired of entering password for %(sitename)s every time you sign in? Set up "
 "single sign-on with one or more of the services below:"
 msgstr ""
+"%(sitename)s에 로그인할 때마다 비밀번호를 입력하기가 번거로우신가요? 아래 서비스 중 하나 이상으로 싱글 사인온을 설정하십시오:"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:31
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:53
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:27
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:51
 msgid "Disconnect"
-msgstr ""
+msgstr "연결 해제"
 
-#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:33
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:62
+#: invenio_oauthclient/templates/invenio_oauthclient/settings/index.html:29
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/settings/index.html:60
 msgid "Connect"
-msgstr ""
+msgstr "연결"
 
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:39
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:35
 msgid "Forgot password?"
 msgstr "비밀번호를 분실하였습니까?"
 
-#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:45
+#: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/login_user.html:41
 msgid "Resend confirmation email"
-msgstr ""
+msgstr "확인 이메일 다시 보내기"
