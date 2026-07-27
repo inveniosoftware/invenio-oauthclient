@@ -7,6 +7,15 @@
 Changes
 =======
 
+Version v8.0.1 (released 2026-07-27)
+
+- chore(setup): migrate from setuptools to hatchling
+- chore(cleanup): remove outdated and unnecessary file
+- chore(format): settle disagreement between isort and black
+- chore(format): reformat with black
+- chore(licenses): fix some SPDX license headers
+- chore(licenses): update license headers to use SPDX
+
 Version v8.0.0 (released 2026-05-28)
 
 - chore(setup): bump dependencies
