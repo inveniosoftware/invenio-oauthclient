@@ -7,6 +7,11 @@
 Changes
 =======
 
+Version v8.1.0 (released 2026-07-28)
+
+- fix(build): include mo files
+- i18n: pulled translations
+
 Version v8.0.1 (released 2026-07-27)
 
 - chore(setup): migrate from setuptools to hatchling
