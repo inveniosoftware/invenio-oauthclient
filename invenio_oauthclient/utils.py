@@ -198,6 +198,9 @@ def load_user_role_needs(identity):
     if identity.id is None:
         # no user is logged in
         return
+    if not request:
+        # session is request-bound; nothing to load outside a request.
+        return
 
     needs = set()
 
