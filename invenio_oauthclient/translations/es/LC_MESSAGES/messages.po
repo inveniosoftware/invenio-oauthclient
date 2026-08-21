@@ -6,7 +6,7 @@
 # 
 # Translators:
 # Tibor Simko <tibor.simko@cern.ch>, 2021
-# Jesús Martín <jesusmartin@sallep.net>, 2025
+# Jesús Martín <jesusmartin@sallep.net>, 2026
 # 
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: info@inveniosoftware.org\n"
 "POT-Creation-Date: 2026-06-22 20:38+0000\n"
 "PO-Revision-Date: 2016-08-18 15:19+0000\n"
-"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2025\n"
+"Last-Translator: Jesús Martín <jesusmartin@sallep.net>, 2026\n"
 "Language-Team: Spanish (https://app.transifex.com/inveniosoftware/teams/23537/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -63,6 +63,7 @@ msgstr "%(icon)s Cuentas enlazadas"
 #, python-format
 msgid "Identity class %(identity_class)s is not one of [%(valid_identities)s]"
 msgstr ""
+"La clase identidad %(identity_class)s no es una de [%(valid_identities)s]"
 
 #: invenio_oauthclient/contrib/cern.py:437
 #: invenio_oauthclient/contrib/cern_openid.py:301
@@ -72,16 +73,17 @@ msgstr "Cuenta CERN no permitida."
 #: invenio_oauthclient/contrib/cern_openid.py:274
 #, python-format
 msgid "User roles %(cern_roles)s are not one of %(valid_roles)s"
-msgstr ""
+msgstr "Los roles del usuario %(cern_roles)s no son uno de %(valid_roles)s"
 
 #: invenio_oauthclient/contrib/eosc_aai.py:170
 msgid "EOSC AAI"
-msgstr ""
+msgstr "EOSC AAI"
 
 #: invenio_oauthclient/contrib/eosc_aai.py:173
 msgid ""
 "European Open Science Cloud Authentication and Authorization Infrastructure."
 msgstr ""
+"European Open Science Cloud Authentication y Authorization Infrastructure."
 
 #: invenio_oauthclient/contrib/github.py:104
 msgid "GitHub"
@@ -89,38 +91,40 @@ msgstr "GitHub"
 
 #: invenio_oauthclient/contrib/github.py:105
 msgid "Software collaboration platform."
-msgstr ""
+msgstr "Plataforma de colaboración de software."
 
 #: invenio_oauthclient/contrib/github.py:260
 #: invenio_oauthclient/contrib/github.py:282
 msgid "Application mis-configuration in GitHub"
-msgstr ""
+msgstr "Configuración incorrecta de la aplicación en GitHub"
 
 #: invenio_oauthclient/contrib/globus.py:90
 msgid "Globus"
-msgstr ""
+msgstr "Globus"
 
 #: invenio_oauthclient/contrib/globus.py:91
 msgid "Research data management simplified."
-msgstr ""
+msgstr "Gestión simplificada de datos de investigación."
 
 #: invenio_oauthclient/contrib/globus.py:163
 msgid "Application mis-configuration in Globus"
-msgstr ""
+msgstr "Configuración incorrecta de la aplicación en Globus"
 
 #: invenio_oauthclient/contrib/globus.py:198
 msgid "Failed to fetch user id, likely server mis-configuration"
 msgstr ""
+"No se pudo obtener el ID de usuario, probablemente debido a una "
+"configuración incorrecta del servidor."
 
 #: invenio_oauthclient/contrib/openaire_aai.py:100
 #: invenio_oauthclient/contrib/openaire_aai.py:165
 msgid "OpenAIRE"
-msgstr ""
+msgstr "OpenAIRE"
 
 #: invenio_oauthclient/contrib/openaire_aai.py:101
 #: invenio_oauthclient/contrib/openaire_aai.py:166
 msgid "Open Science Services."
-msgstr ""
+msgstr "Servicios de Open Science."
 
 #: invenio_oauthclient/contrib/orcid.py:108
 msgid "ORCID"
@@ -128,7 +132,7 @@ msgstr "ORCID"
 
 #: invenio_oauthclient/contrib/orcid.py:109
 msgid "Connecting Research and Researchers."
-msgstr ""
+msgstr "Conectando investigación e investigadores."
 
 #: invenio_oauthclient/contrib/keycloak/helpers.py:28
 #, python-format
@@ -136,6 +140,8 @@ msgid ""
 "Invalid app name %(app_name)s. It should only contain letters, numbers, "
 "dashes and underscores"
 msgstr ""
+"Nombre de aplicación no válido %(app_name)s. Solo debe contener letras, "
+"números, guiones y guiones bajos."
 
 #: invenio_oauthclient/handlers/rest.py:86
 #: invenio_oauthclient/handlers/token.py:67
@@ -155,36 +161,36 @@ msgstr "El servicio externo ya está enlazado a otra cuenta."
 
 #: invenio_oauthclient/handlers/rest.py:108
 msgid "Unauthorized."
-msgstr ""
+msgstr "No autorizado."
 
 #: invenio_oauthclient/handlers/rest.py:115
 #: invenio_oauthclient/handlers/rest.py:285
 msgid "Successfully signed up."
-msgstr ""
+msgstr "Registro exitoso."
 
 #: invenio_oauthclient/handlers/rest.py:124
 msgid "Token not found."
-msgstr ""
+msgstr "Token no encontrado."
 
 #: invenio_oauthclient/handlers/rest.py:131
 msgid "Could not create token for user."
-msgstr ""
+msgstr "No se pudo crear el token para el usuario."
 
 #: invenio_oauthclient/handlers/rest.py:211
 msgid "Successfully authorized."
-msgstr ""
+msgstr "Autorizado con éxito."
 
 #: invenio_oauthclient/handlers/rest.py:241
 msgid "Successfully disconnected."
-msgstr ""
+msgstr "Desconexión exitosa."
 
 #: invenio_oauthclient/handlers/token.py:58
 msgid "User rejected request."
-msgstr ""
+msgstr "El usuario rechazó la solicitud."
 
 #: invenio_oauthclient/handlers/token.py:71
 msgid "Bad OAuth authorized request"
-msgstr ""
+msgstr "Solicitud de autorización OAuth incorrecta"
 
 #: invenio_oauthclient/handlers/ui.py:88
 #, python-format
@@ -192,6 +198,8 @@ msgid ""
 "You can only link %(remote_name)s if you have already signed in through a "
 "different method."
 msgstr ""
+"Solo puede enlazar %(remote_name)s si ya ha iniciado sesión mediante otro "
+"método."
 
 #: invenio_oauthclient/handlers/ui.py:161
 #, python-format
@@ -199,6 +207,8 @@ msgid ""
 "A confirmation email has already been sent to %(email)s. Didn't receive it? "
 "Click <strong><a href=\"%(url)s\">here</a></strong> to resend it."
 msgstr ""
+"Ya se ha enviado un correo de confirmación a %(email)s. ¿No lo ha recibido? "
+"Pulse <strong><a href=\"%(url)s\">aquí</a></strong> para reenviarlo."
 
 #: invenio_oauthclient/handlers/utils.py:121
 #, python-format
@@ -206,6 +216,8 @@ msgid ""
 "Error while syncing roles: A managed role with id: %(group_id)s already "
 "exists"
 msgstr ""
+"Error al sincronizar roles: ya existe un rol administrado con "
+"ID:%(group_id)s "
 
 #: invenio_oauthclient/handlers/utils.py:131
 #, python-format
@@ -213,6 +225,8 @@ msgid ""
 "Error while syncing roles: A managed role with name: %(group_name)s already "
 "exists"
 msgstr ""
+"Error al sincronizar roles: ya existe un rol administrado con "
+"nombre%(group_name)s"
 
 #: invenio_oauthclient/templates/invenio_oauthclient/_macros.html:21
 #: invenio_oauthclient/templates/semantic-ui/invenio_oauthclient/_macros.html:56
