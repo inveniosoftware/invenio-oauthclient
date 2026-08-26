@@ -1,11 +1,15 @@
 ..
     SPDX-FileCopyrightText: 2015-2025 CERN.
     SPDX-FileCopyrightText: 2024-2026 Graz University of Technology.
-    SPDX-FileCopyrightText: 2025 KTH Royal Institute of Technology.
+    SPDX-FileCopyrightText: 2025-2026 KTH Royal Institute of Technology.
     SPDX-License-Identifier: MIT
 
 Changes
 =======
+
+Version v8.1.1 (released 2026-08-26)
+
+- i18n: pulled translations
 
 Version v8.1.0 (released 2026-07-28)
 
