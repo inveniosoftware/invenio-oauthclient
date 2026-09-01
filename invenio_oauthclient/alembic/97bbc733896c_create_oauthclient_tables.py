@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2016-2018 CERN.
-# SPDX-FileCopyrightText: 2024 Graz University of Technology.
+# SPDX-FileCopyrightText: 2024-2026 Graz University of Technology.
 # SPDX-License-Identifier: MIT
 
 """Create oauthclient tables."""
@@ -7,7 +7,7 @@
 import sqlalchemy as sa
 import sqlalchemy_utils
 from alembic import op
-from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy import inspect
 
 # revision identifiers, used by Alembic.
 revision = "97bbc733896c"
@@ -68,7 +68,7 @@ def upgrade():
 def downgrade():
     """Downgrade database."""
     ctx = op.get_context()
-    insp = Inspector.from_engine(ctx.connection.engine)
+    insp = inspect(ctx.connection.engine)
 
     op.drop_table("oauthclient_remotetoken")
 
