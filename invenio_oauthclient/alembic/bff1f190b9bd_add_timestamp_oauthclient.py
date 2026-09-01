@@ -1,10 +1,10 @@
 # SPDX-FileCopyrightText: 2016-2018 CERN.
-# SPDX-FileCopyrightText: 2024 Graz University of Technology.
+# SPDX-FileCopyrightText: 2024-2026 Graz University of Technology.
 # SPDX-License-Identifier: MIT
 
 """Add Timestamp to oauthclient tables."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 import sqlalchemy as sa
 from alembic import op
@@ -19,7 +19,8 @@ depends_on = None
 
 def upgrade():
     """Upgrade database."""
-    current_date = datetime.utcnow()
+    # remove the warning, but keep the old behavior
+    current_date = datetime.now(timezone.utc).replace(tzinfo=None)
 
     # Add 'created' and 'updated' columns to RemoteAccount
     _add_created_updated_columns("oauthclient_remoteaccount", current_date)
