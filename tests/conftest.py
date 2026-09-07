@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2015-2025 CERN.
 # SPDX-FileCopyrightText: 2018 University of Chicago.
 # SPDX-FileCopyrightText: 2023-2025 Graz University of Technology.
+# SPDX-FileCopyrightText: 2026 KTH Royal Institute of Technology.
 # SPDX-License-Identifier: MIT
 
 """Pytest configuration."""
@@ -65,7 +66,6 @@ def base_app(request):
         TESTING=True,
         WTF_CSRF_ENABLED=False,
         LOGIN_DISABLED=False,
-        CACHE_TYPE="simple",
         CELERY_TASK_ALWAYS_EAGER=True,
         OAUTHCLIENT_SIGNUP_FORM=_create_registrationform,
         OAUTHCLIENT_REMOTE_APPS=dict(
