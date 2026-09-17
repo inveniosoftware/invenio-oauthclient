@@ -43,9 +43,26 @@ def refresh_access_token(token: RemoteToken):
         data=to_bytes(request_body, remote.encoding),
         method="POST",
     )
+    # This response corresponds to the format described in RFC 6749 Section 5.1 or 5.2
     resp = OAuthResponse(resp, content, remote.content_type)
+
+    error = resp.data.get("error")
+    if error is not None:
+        raise ValueError(
+            f"Error {error} received for token refresh request. "
+            f"Description: {resp.data.get('error_description')}. "
+            f"URI: {resp.data.get('error_uri')}"
+        )
+
+    access_token = resp.data.get("access_token")
+    if access_token is None:
+        raise ValueError(
+            "The OAuth app did not return an access token for the refresh request. "
+            "The response therefore cannot be parsed."
+        )
+
     return (
-        resp.data.get("access_token"),
+        access_token,
         # As per the RFC, the server MAY issue a new refresh token of an identical scope, which we must save.
         resp.data.get("refresh_token"),
         make_expiration_time(resp.data.get("expires_in")),
