@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version v9.1.2 (released 2026-09-17)
+
+- fix(refresh): raise error if `access_token` is None
+
 Version v9.1.1 (released 2026-07-16)
 
 - chore(setup): migrate from setuptools to hatchling
