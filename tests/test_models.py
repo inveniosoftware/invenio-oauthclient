@@ -3,6 +3,8 @@
 
 """Test case for models."""
 
+from datetime import datetime, timedelta, timezone
+
 from invenio_db import db
 
 from invenio_oauthclient.models import RemoteAccount, RemoteToken
@@ -70,6 +72,39 @@ def test_get_regression(app, models_fixture):
         RemoteToken.get(user3.id, "dev").remote_account.user_id
         == t4.remote_account.user_id
     )
+
+
+def test_existing_remote_account_and_token_rows_remain_compatible(app, models_fixture):
+    """Existing remote account/token rows keep legacy token semantics."""
+    datastore = app.extensions["invenio-accounts"].datastore
+    user = datastore.find_user(email="existing@inveniosoftware.org")
+    expires = datetime.now(timezone.utc) + timedelta(hours=1)
+
+    account = RemoteAccount.create(user.id, "legacy-remote", {"sub": "12345"})
+    token = RemoteToken.create(
+        user.id,
+        "legacy-remote",
+        "legacy-access",
+        "legacy-secret",
+        token_type="",
+    )
+    token.update_token(
+        "legacy-access",
+        "legacy-secret",
+        refresh_token="legacy-refresh",
+        expires=expires,
+    )
+
+    stored_account = RemoteAccount.get(user.id, "legacy-remote")
+    stored_token = RemoteToken.get(user.id, "legacy-remote")
+
+    assert stored_account.id == account.id
+    assert stored_account.extra_data == {"sub": "12345"}
+    assert stored_token.id_remote_account == account.id
+    assert stored_token.token() == ("legacy-access", "legacy-secret")
+    assert stored_token.refresh_token == "legacy-refresh"
+    assert stored_token.expires == expires
+    assert not stored_token.is_expired
 
 
 def test_repr(app, models_fixture):
