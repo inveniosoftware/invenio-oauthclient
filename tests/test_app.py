@@ -15,8 +15,8 @@ from invenio_db import InvenioDB, db
 from sqlalchemy_utils.functions import create_database, database_exists
 
 from invenio_oauthclient import InvenioOAuthClient
+from invenio_oauthclient.contrib import cern_openid, github, globus, orcid
 from invenio_oauthclient.contrib.keycloak.settings import KeycloakSettingsHelper
-from invenio_oauthclient.contrib.orcid import REMOTE_APP
 
 
 def test_version():
@@ -51,7 +51,7 @@ class _CustomOAuthRemoteApp(OAuthRemoteApp):
 
 def test_standard_remote_app_factory(base_app):
     """Test standard remote_app class."""
-    base_app.config.update(OAUTHCLIENT_REMOTE_APPS=dict(custom_app=REMOTE_APP))
+    base_app.config.update(OAUTHCLIENT_REMOTE_APPS=dict(custom_app=orcid.REMOTE_APP))
     FlaskOAuth(base_app)
     InvenioOAuthClient(base_app)
     assert isinstance(
@@ -67,7 +67,7 @@ def test_remote_app_factory_global_customization(base_app):
     """Test remote_app override with global variable."""
     base_app.config.update(
         OAUTHCLIENT_REMOTE_APP=_CustomOAuthRemoteApp,
-        OAUTHCLIENT_REMOTE_APPS=dict(custom_app=REMOTE_APP),
+        OAUTHCLIENT_REMOTE_APPS=dict(custom_app=orcid.REMOTE_APP),
     )
     FlaskOAuth(base_app)
     InvenioOAuthClient(base_app)
@@ -79,7 +79,7 @@ def test_remote_app_factory_global_customization(base_app):
 
 def test_remote_app_factory_local_customization(base_app):
     """Test custom remote_app for one app only."""
-    config_for_one_app = deepcopy(REMOTE_APP)
+    config_for_one_app = deepcopy(orcid.REMOTE_APP)
     config_for_one_app["remote_app"] = _CustomOAuthRemoteApp
     base_app.config.update(OAUTHCLIENT_REMOTE_APPS=dict(custom_app=config_for_one_app))
     FlaskOAuth(base_app)
@@ -88,6 +88,47 @@ def test_remote_app_factory_local_customization(base_app):
         base_app.extensions["oauthlib.client"].remote_apps["custom_app"],
         _CustomOAuthRemoteApp,
     )
+
+
+def test_real_provider_remote_apps_register_with_authlib_shell(base_app):
+    """Representative provider configs load through the compatibility shell."""
+    keycloak_helper = KeycloakSettingsHelper(
+        title="Keycloak",
+        description="",
+        base_url="http://localhost:8080",
+        realm="test",
+    )
+    remote_apps = dict(
+        orcid=orcid.REMOTE_APP,
+        cern_openid=cern_openid.REMOTE_APP,
+        keycloak=keycloak_helper.remote_app,
+        github=github.REMOTE_APP,
+        globus=globus.REMOTE_APP,
+    )
+    base_app.config.update(
+        OAUTHCLIENT_REMOTE_APPS=remote_apps,
+        ORCID_APP_CREDENTIALS={"consumer_key": "orcid-key", "consumer_secret": "s"},
+        CERN_APP_OPENID_CREDENTIALS={
+            "consumer_key": "cern-key",
+            "consumer_secret": "s",
+        },
+        KEYCLOAK_APP_CREDENTIALS={
+            "consumer_key": "keycloak-key",
+            "consumer_secret": "s",
+        },
+        GITHUB_APP_CREDENTIALS={"consumer_key": "github-key", "consumer_secret": "s"},
+        GLOBUS_APP_CREDENTIALS={"consumer_key": "globus-key", "consumer_secret": "s"},
+    )
+    FlaskOAuth(base_app)
+    InvenioOAuthClient(base_app)
+
+    registered = base_app.extensions["oauthlib.client"].remote_apps
+    assert set(remote_apps).issubset(registered)
+    for name in remote_apps:
+        remote = registered[name]
+        assert isinstance(remote, OAuthRemoteApp)
+        assert remote.consumer_key.endswith("-key")
+        assert remote.authorize_url == remote_apps[name]["params"]["authorize_url"]
 
 
 def test_db(request):
