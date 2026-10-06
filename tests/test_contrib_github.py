@@ -12,25 +12,17 @@ from flask import session, url_for
 from flask_login import current_user
 from flask_security import login_user
 from flask_security.utils import hash_password
-from helpers import check_redirect_location, mock_response
+from helpers import check_redirect_location, get_state, mock_response
 from invenio_accounts.models import User
 from invenio_db import db
 
-from invenio_oauthclient._compat import _create_identifier
 from invenio_oauthclient.contrib.github import authorized
 from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken, UserIdentity
-from invenio_oauthclient.views.client import serializer
 
 
 def _get_state():
-    return serializer.dumps(
-        {
-            "app": "github",
-            "sid": _create_identifier(),
-            "next": None,
-        }
-    )
+    return get_state("github")
 
 
 def test_login(app):
@@ -139,6 +131,7 @@ def test_authorized_signup_valid_user(app, example_github):
         # User login with another email ('info2')
         with mock.patch("github3.login") as MockLogin:
             MockLogin.return_value = MockGh(email="info2@inveniosoftware.org")
+            c.get(url_for("invenio_oauthclient.login", remote_app="github"))
 
             # User authorized the requests and is redirect back
             resp = c.get(

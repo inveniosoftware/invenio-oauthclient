@@ -12,24 +12,16 @@ from flask_login import current_user
 from flask_oauthlib.client import OAuthResponse
 from flask_security import login_user
 from flask_security.utils import hash_password
-from helpers import mock_remote_get, mock_response
+from helpers import get_state, mock_remote_get, mock_response
 from invenio_accounts.models import User
 from invenio_db import db
 
-from invenio_oauthclient._compat import _create_identifier
 from invenio_oauthclient.errors import OAuthResponseError
 from invenio_oauthclient.models import RemoteAccount, RemoteToken, UserIdentity
-from invenio_oauthclient.views.client import serializer
 
 
 def _get_state():
-    return serializer.dumps(
-        {
-            "app": "globus",
-            "sid": _create_identifier(),
-            "next": None,
-        }
-    )
+    return get_state("globus")
 
 
 def test_login(app):
@@ -121,6 +113,7 @@ def test_authorized_signup_valid_user(app, example_globus):
         assert RemoteAccount.query.filter_by(user_id=user.id).count() == 0
         assert RemoteToken.query.count() == 0
 
+        c.get(url_for("invenio_oauthclient.login", remote_app="globus"))
         # User authorized the requests and is redirect back
         resp = c.get(
             url_for(

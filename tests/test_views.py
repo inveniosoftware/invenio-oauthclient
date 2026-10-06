@@ -30,7 +30,7 @@ from invenio_oauthclient.views.settings import blueprint as blueprint_settings
 def mock_response(oauth, remote_app="test", data=None):
     """Mock the oauth response to use the remote."""
     # Mock oauth remote application
-    oauth.remote_apps[remote_app].handle_oauth2_response = MagicMock(
+    oauth.remote_apps[remote_app]._fetch_oauth2_token = MagicMock(
         return_value=data
         or {"access_token": "test_access_token", "scope": "", "token_type": "bearer"}
     )
@@ -57,8 +57,11 @@ def test_redirect_uri(views_fixture):
         assert params["redirect_uri"]
         assert params["state"]
 
-        # Verify next parameter in state token does not allow blanco redirects
-        state = serializer.loads(params["state"][0])
+        # Invenio application state is stored server-side and keyed by
+        # Authlib's protocol state.
+        with client.session_transaction() as sess:
+            signed_state = sess[f"oauthclient_state_{params['state'][0]}"]
+        state = serializer.loads(signed_state)
         assert state["next"] is None
 
         # Assert redirect uri does not have any parameters.
@@ -71,7 +74,7 @@ def test_redirect_uri(views_fixture):
             resp = client.get(
                 url_for("invenio_oauthclient.login", remote_app="test", next=url)
             )
-            check_response_redirect_url(resp, url)
+            check_response_redirect_url(client, resp, url)
 
         # Assert that absolute redirects are allowed only if
         # `TRUSTED_HOSTS` is set and includes them. Otherwise, the relative
@@ -84,7 +87,7 @@ def test_redirect_uri(views_fixture):
             url_for("invenio_oauthclient.login", remote_app="test", next=test_url)
         )
 
-        check_response_redirect_url(resp, urlparse(test_url).path)
+        check_response_redirect_url(client, resp, urlparse(test_url).path)
 
         app.config.update({"TRUSTED_HOSTS": ["localhost", "inveniosoftware.org"]})
 
@@ -92,7 +95,7 @@ def test_redirect_uri(views_fixture):
             url_for("invenio_oauthclient.login", remote_app="test", next=test_url)
         )
 
-        check_response_redirect_url(resp, test_url)
+        check_response_redirect_url(client, resp, test_url)
 
 
 def test_login(views_fixture):
@@ -120,6 +123,63 @@ def test_login(views_fixture):
             url_for("invenio_oauthclient.login", remote_app="hidden", next="/")
         )
         assert resp.status_code == 404
+
+
+def test_authlib_protocol_state_is_separate_from_application_state(views_fixture):
+    """Test a real Authlib state round trip through the Invenio callback."""
+    app = views_fixture
+    oauth = app.extensions["oauthlib.client"]
+
+    with app.test_client() as client:
+        response = client.get(
+            url_for("invenio_oauthclient.login", remote_app="test", next="/search")
+        )
+        protocol_state = parse_qs(urlparse(response.location).query)["state"][0]
+
+        with client.session_transaction() as flask_session:
+            signed_state = flask_session[f"oauthclient_state_{protocol_state}"]
+        application_state = serializer.loads(signed_state)
+        assert application_state["app"] == "test"
+        assert application_state["next"] == "/search"
+        assert signed_state != protocol_state
+
+        mock_response(oauth, "test")
+        response = client.get(
+            url_for(
+                "invenio_oauthclient.authorized",
+                remote_app="test",
+                code="test",
+                state=protocol_state,
+            )
+        )
+
+        assert response.status_code == 200
+        oauth.remote_apps["test"]._fetch_oauth2_token.assert_called_once()
+
+
+def test_missing_authlib_state_is_403_without_token_exchange(views_fixture):
+    """Test lost Authlib state is rejected instead of causing a 500."""
+    app = views_fixture
+    oauth = app.extensions["oauthlib.client"]
+
+    with app.test_client() as client:
+        response = client.get(url_for("invenio_oauthclient.login", remote_app="test"))
+        state = parse_qs(urlparse(response.location).query)["state"][0]
+        with client.session_transaction() as flask_session:
+            flask_session.pop(f"_state_test_{state}")
+
+        mock_response(oauth, "test")
+        response = client.get(
+            url_for(
+                "invenio_oauthclient.authorized",
+                remote_app="test",
+                code="test",
+                state=state,
+            )
+        )
+
+        assert response.status_code == 403
+        oauth.remote_apps["test"]._fetch_oauth2_token.assert_not_called()
 
 
 def test_authorized(base_app, params):
@@ -170,19 +230,15 @@ def test_authorized(base_app, params):
     with app.test_client() as client:
         # Ensure remote apps have been loaded (due to before first
         # request)
-        client.get(url_for("invenio_oauthclient.login", remote_app="test"))
+        login_response = client.get(
+            url_for("invenio_oauthclient.login", remote_app="test")
+        )
         mock_response(app.extensions["oauthlib.client"], "test")
         mock_response(app.extensions["oauthlib.client"], "test_invalid")
 
         from invenio_oauthclient.views.client import serializer
 
-        state = serializer.dumps(
-            {
-                "app": "test",
-                "sid": _create_identifier(),
-                "next": None,
-            }
-        )
+        state = parse_qs(urlparse(login_response.location).query)["state"][0]
 
         resp = client.get(
             url_for(
@@ -198,13 +254,10 @@ def test_authorized(base_app, params):
         assert not handled["kwargs"]
         assert handled["resp"]["access_token"] == "test_access_token"
 
-        state = serializer.dumps(
-            {
-                "app": "test_invalid",
-                "sid": _create_identifier(),
-                "next": None,
-            }
+        login_response = client.get(
+            url_for("invenio_oauthclient.login", remote_app="test_invalid")
         )
+        state = parse_qs(urlparse(login_response.location).query)["state"][0]
 
         # handler should return something
         # Flask>1.0 is throwing TypeError and Flask<1.0 ValueError
@@ -227,19 +280,15 @@ def test_invalid_authorized_response(views_fixture):
         # Fake an authorized request
         # Ensure remote apps have been loaded (due to before first
         # request)
-        client.get(url_for("invenio_oauthclient.login", remote_app="test"))
+        login_response = client.get(
+            url_for("invenio_oauthclient.login", remote_app="test")
+        )
 
-        oauth.remote_apps["test"].handle_oauth2_response = MagicMock(
+        oauth.remote_apps["test"]._fetch_oauth2_token = MagicMock(
             side_effect=JSONDecodeError("Expecting value", "", 0)
         )
 
-        state = serializer.dumps(
-            {
-                "app": "test",
-                "sid": _create_identifier(),
-                "next": None,
-            }
-        )
+        state = parse_qs(urlparse(login_response.location).query)["state"][0]
 
         with pytest.raises(JSONDecodeError):
             client.get(
@@ -266,17 +315,13 @@ def test_state_token(views_fixture, monkeypatch):
     with app.test_client() as client:
         # Ensure remote apps have been loaded (due to before first
         # request)
-        client.get(url_for("invenio_oauthclient.login", remote_app="test"))
+        login_response = client.get(
+            url_for("invenio_oauthclient.login", remote_app="test")
+        )
         mock_response(app.extensions["oauthlib.client"], "test")
 
         # Good state token
-        state = serializer.dumps(
-            {
-                "app": "test",
-                "sid": "1234",
-                "next": None,
-            }
-        )
+        state = parse_qs(urlparse(login_response.location).query)["state"][0]
         resp = client.get(
             url_for(
                 "invenio_oauthclient.authorized",
@@ -405,7 +450,20 @@ def test_token_getter_setter(views_fixture, monkeypatch):
         assert t.access_token == "test_access_token"
         assert RemoteToken.query.count() == 1
 
-        # Mock a new authorized request
+        # Replaying the consumed state is rejected before token exchange.
+        replay = c.get(
+            url_for(
+                "invenio_oauthclient.authorized",
+                remote_app="full",
+                code="test",
+                state=state,
+            )
+        )
+        assert replay.status_code == 403
+
+        # Start a new authorization request before exchanging another code.
+        res = c.get(url_for("invenio_oauthclient.login", remote_app="full"))
+        state = parse_qs(urlparse(res.location).query)["state"][0]
         mock_response(
             app.extensions["oauthlib.client"],
             "full",
@@ -479,9 +537,8 @@ def test_rejected(views_fixture, monkeypatch):
             app.extensions["oauthlib.client"],
             "full",
             data=dict(
-                error_uri="http://developer.github.com/v3/oauth/"
-                "#bad-verification-code",
-                error_description="The code passed is " "incorrect or expired.",
+                error_uri="http://developer.github.com/v3/oauth/#bad-verification-code",
+                error_description="The code passed is incorrect or expired.",
                 error="bad_verification_code",
             ),
         )
@@ -489,13 +546,7 @@ def test_rejected(views_fixture, monkeypatch):
         # Imitate that the user authorized our request in the remote
         # application (however, the remote app will son reply with an
         # error)
-        state = serializer.dumps(
-            {
-                "app": "full",
-                "sid": "1234",
-                "next": None,
-            }
-        )
+        state = parse_qs(urlparse(res.location).query)["state"][0]
 
         res = c.get(
             url_for(

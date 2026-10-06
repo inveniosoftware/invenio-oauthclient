@@ -124,6 +124,8 @@ def test_login(app):
     assert params["redirect_uri"]
     assert params["client_id"]
     assert params["state"]
+    assert params["code_challenge_method"] == ["S256"]
+    assert params["code_challenge"]
 
 
 def test_authorized_signup(app_with_userprofiles, example_eosc_aai):
@@ -185,6 +187,12 @@ def test_authorized_signup(app_with_userprofiles, example_eosc_aai):
             )
         )
         assert resp.status_code == 302
+        token_params = (
+            app.extensions["oauthlib.client"]
+            .remote_apps["eosc_aai"]
+            ._fetch_oauth2_token.call_args.args[0]
+        )
+        assert token_params["code_verifier"]
 
         # Check that user is redirected to signup page
         assert resp.location == url_for(

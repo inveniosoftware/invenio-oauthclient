@@ -34,4 +34,5 @@ jobs:
   Tests:
     uses: inveniosoftware/workflows/.github/workflows/tests-python.yml@master
     with:
+      python-version: '["3.10", "3.12", "3.14"]'
       extras: "tests,admin"

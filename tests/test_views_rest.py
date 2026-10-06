@@ -27,7 +27,7 @@ from invenio_oauthclient.views.client import rest_blueprint, serializer
 def mock_response(oauth, remote_app="test", data=None):
     """Mock the oauth response to use the remote."""
     # Mock oauth remote application
-    oauth.remote_apps[remote_app].handle_oauth2_response = MagicMock(
+    oauth.remote_apps[remote_app]._fetch_oauth2_token = MagicMock(
         return_value=data
         or {"access_token": "test_access_token", "scope": "", "token_type": "bearer"}
     )
@@ -53,8 +53,11 @@ def test_redirect_uri(app_rest):
         assert params["redirect_uri"]
         assert params["state"]
 
-        # Verify next parameter in state token does not allow blanco redirects
-        state = serializer.loads(params["state"][0])
+        # Invenio application state is stored server-side and keyed by
+        # Authlib's protocol state.
+        with client.session_transaction() as sess:
+            signed_state = sess[f"oauthclient_state_{params['state'][0]}"]
+        state = serializer.loads(signed_state)
         assert state["next"] is None
 
         # Assert redirect uri does not have any parameters.
@@ -67,7 +70,7 @@ def test_redirect_uri(app_rest):
             resp = client.get(
                 url_for("invenio_oauthclient.rest_login", remote_app="test", next=url)
             )
-            check_response_redirect_url(resp, url)
+            check_response_redirect_url(client, resp, url)
 
         # Assert that absolute redirects are allowed only if
         # `TRUSTED_HOSTS` is set and includes them. Otherwise, the relative
@@ -80,7 +83,7 @@ def test_redirect_uri(app_rest):
             url_for("invenio_oauthclient.rest_login", remote_app="test", next=test_url)
         )
 
-        check_response_redirect_url(resp, urlparse(test_url).path)
+        check_response_redirect_url(client, resp, urlparse(test_url).path)
 
         app_rest.config.update({"TRUSTED_HOSTS": ["localhost", "inveniosoftware.org"]})
 
@@ -88,7 +91,7 @@ def test_redirect_uri(app_rest):
             url_for("invenio_oauthclient.rest_login", remote_app="test", next=test_url)
         )
 
-        check_response_redirect_url(resp, test_url)
+        check_response_redirect_url(client, resp, test_url)
 
 
 def test_login(app_rest):
@@ -159,19 +162,15 @@ def test_authorized(base_app, params):
     with base_app.test_client() as client:
         # Ensure remote apps have been loaded (due to before first
         # request)
-        client.get(url_for("invenio_oauthclient.rest_login", remote_app="test"))
+        login_response = client.get(
+            url_for("invenio_oauthclient.rest_login", remote_app="test")
+        )
         mock_response(base_app.extensions["oauthlib.client"], "test")
         mock_response(base_app.extensions["oauthlib.client"], "test_invalid")
 
         from invenio_oauthclient.views.client import serializer
 
-        state = serializer.dumps(
-            {
-                "app": "test",
-                "sid": _create_identifier(),
-                "next": None,
-            }
-        )
+        state = parse_qs(urlparse(login_response.location).query)["state"][0]
 
         resp = client.get(
             url_for(
@@ -187,13 +186,10 @@ def test_authorized(base_app, params):
         assert not handled["kwargs"]
         assert handled["resp"]["access_token"] == "test_access_token"
 
-        state = serializer.dumps(
-            {
-                "app": "test_invalid",
-                "sid": _create_identifier(),
-                "next": None,
-            }
+        login_response = client.get(
+            url_for("invenio_oauthclient.rest_login", remote_app="test_invalid")
         )
+        state = parse_qs(urlparse(login_response.location).query)["state"][0]
 
         # handler should return something
         # Flask>1.0 is throwing TypeError and Flask<1.0 ValueError
@@ -215,19 +211,15 @@ def test_invalid_authorized_response(app_rest):
         # Fake an authorized request
         # Ensure remote apps have been loaded (due to before first
         # request)
-        client.get(url_for("invenio_oauthclient.rest_login", remote_app="test"))
+        login_response = client.get(
+            url_for("invenio_oauthclient.rest_login", remote_app="test")
+        )
 
-        oauth.remote_apps["test"].handle_oauth2_response = MagicMock(
+        oauth.remote_apps["test"]._fetch_oauth2_token = MagicMock(
             side_effect=JSONDecodeError("Expecting value", "", 0)
         )
 
-        state = serializer.dumps(
-            {
-                "app": "test",
-                "sid": _create_identifier(),
-                "next": None,
-            }
-        )
+        state = parse_qs(urlparse(login_response.location).query)["state"][0]
 
         with pytest.raises(JSONDecodeError):
             client.get(
@@ -253,17 +245,13 @@ def test_state_token(app_rest, monkeypatch):
     with app_rest.test_client() as client:
         # Ensure remote apps have been loaded (due to before first
         # request)
-        client.get(url_for("invenio_oauthclient.rest_login", remote_app="test"))
+        login_response = client.get(
+            url_for("invenio_oauthclient.rest_login", remote_app="test")
+        )
         mock_response(app_rest.extensions["oauthlib.client"], "test")
 
         # Good state token
-        state = serializer.dumps(
-            {
-                "app": "test",
-                "sid": "1234",
-                "next": None,
-            }
-        )
+        state = parse_qs(urlparse(login_response.location).query)["state"][0]
         resp = client.get(
             url_for(
                 "invenio_oauthclient.rest_authorized",
@@ -393,7 +381,20 @@ def test_token_getter_setter(app_rest, monkeypatch):
         assert t.access_token == "test_access_token"
         assert RemoteToken.query.count() == 1
 
-        # Mock a new authorized request
+        # Replaying the consumed state is rejected before token exchange.
+        replay = c.get(
+            url_for(
+                "invenio_oauthclient.rest_authorized",
+                remote_app="full",
+                code="test",
+                state=state,
+            )
+        )
+        assert replay.status_code == 302
+
+        # Start a new authorization request before exchanging another code.
+        res = c.get(url_for("invenio_oauthclient.rest_login", remote_app="full"))
+        state = parse_qs(urlparse(res.location).query)["state"][0]
         mock_response(
             app_rest.extensions["oauthlib.client"],
             "full",
@@ -468,9 +469,8 @@ def test_rejected(app_rest, monkeypatch):
             app_rest.extensions["oauthlib.client"],
             "full",
             data=dict(
-                error_uri="http://developer.github.com/v3/oauth/"
-                "#bad-verification-code",
-                error_description="The code passed is " "incorrect or expired.",
+                error_uri="http://developer.github.com/v3/oauth/#bad-verification-code",
+                error_description="The code passed is incorrect or expired.",
                 error="bad_verification_code",
             ),
         )
@@ -478,13 +478,7 @@ def test_rejected(app_rest, monkeypatch):
         # Imitate that the user authorized our request in the remote
         # application (however, the remote app will son reply with an
         # error)
-        state = serializer.dumps(
-            {
-                "app": "full",
-                "sid": "1234",
-                "next": None,
-            }
-        )
+        state = parse_qs(urlparse(res.location).query)["state"][0]
         res = c.get(
             url_for(
                 "invenio_oauthclient.rest_authorized",
