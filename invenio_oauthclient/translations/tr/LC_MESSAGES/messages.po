@@ -10,7 +10,6 @@
 # Ben Translation and Interpreting Services <info@bentercume.com>, 2025
 # Eylül-1 -, 2025
 # 
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: invenio-oauthclient 5.1.0\n"

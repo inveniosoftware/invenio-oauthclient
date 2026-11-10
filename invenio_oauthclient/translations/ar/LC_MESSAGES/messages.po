@@ -9,7 +9,6 @@
 # Bessem Aamira <bessemamira@gmail.com>, 2025
 # Salaheddine Ben Ali <salaheddine.benali@cnudst.tn>, 2025
 # 
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: invenio-oauthclient 5.1.0\n"

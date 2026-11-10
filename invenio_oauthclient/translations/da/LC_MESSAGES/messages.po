@@ -7,7 +7,6 @@
 # Translators:
 # Lars Holm Nielsen <lars.holm.nielsen@cern.ch>, 2022
 # 
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: invenio-oauthclient 5.1.0\n"
