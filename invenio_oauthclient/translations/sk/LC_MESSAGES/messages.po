@@ -8,7 +8,6 @@
 # Tibor Simko <tibor.simko@cern.ch>, 2021
 # Ivan Masár <helix84@centrum.sk>, 2025
 # 
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: invenio-oauthclient 5.1.0\n"
