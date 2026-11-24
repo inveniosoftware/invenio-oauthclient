@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2015-2025 CERN.
+# SPDX-FileCopyrightText: 2015-2026 CERN.
 # SPDX-FileCopyrightText: 2024-2026 Graz University of Technology.
 # SPDX-FileCopyrightText: 2025 KTH Royal Institute of Technology.
 # SPDX-FileCopyrightText: 2026 TU Wien.
@@ -10,7 +10,7 @@ from .ext import InvenioOAuthClient, InvenioOAuthClientREST
 from .oauth import oauth_link_external_id, oauth_unlink_external_id
 from .proxies import current_oauthclient
 
-__version__ = "9.1.2"
+__version__ = "9.2.0"
 
 __all__ = (
     "__version__",
