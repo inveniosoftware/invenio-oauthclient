@@ -1,0 +1,36 @@
+{
+    "sub": "http://cilogon.org/serverE/users/108506",
+    "idp_name": "Thomas Jefferson National Accelerator Facility",
+    "eppn": "panta@jlab.org",
+    "ou": "PADMIN",
+    "cert_subject_dn": "/DC=org/DC=cilogon/C=US/O=Thomas Jefferson National Accelerator Facility/CN=Anil Panta E108506",
+    "eptid": "https://jidp.jlab.org/idp/shibboleth!https://cilogon.org/shibboleth!panta@jlab.org",
+    "iss": "https://cilogon.org/jlab",
+    "given_name": "Anil",
+    "eduPersonAssurance": [
+        "https://refeds.org/assurance",
+        "https://refeds.org/assurance/ATP/ePA-1d",
+        "https://refeds.org/assurance/ATP/ePA-1m",
+        "https://refeds.org/assurance/ID/unique",
+        "https://refeds.org/assurance/ID/eppn-unique-no-reassign",
+        "https://refeds.org/assurance/IAP/local-enterprise",
+        "https://refeds.org/assurance/IAP/medium",
+        "https://refeds.org/assurance/profile/cappuccino"
+    ],
+    "acr": "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+    "aud": "cilogon:/client_id/14f788b154a4becc091a1b1b8274aaa3",
+    "nbf": 1725903786,
+    "idp": "https://jidp.jlab.org/idp/shibboleth",
+    "affiliation": "member@jlab.org;employee@jlab.org",
+    "name": "Anil Panta",
+    "isMemberOf": [
+        "CO:members:all",
+        "CO:COU:eic:members:all",
+        "CO:members:active",
+        "CO:COU:eic:members:active",
+        "eic computing"
+    ],
+    "family_name": "Panta",
+    "email": "panta@jlab.org",
+    "jti": "https://cilogon.org/oauth2/idToken/3ba13fe053d619ffc0e539c522cd961c/1725903786081"
+}

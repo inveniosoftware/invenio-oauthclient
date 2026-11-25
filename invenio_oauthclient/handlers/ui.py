@@ -22,6 +22,7 @@ from markupsafe import Markup
 
 from ..errors import (
     AlreadyLinkedError,
+    OAuthCilogonRejectedAccountError,
     OAuthClientAlreadyAuthorized,
     OAuthClientError,
     OAuthClientLinkOnlySignup,
@@ -90,6 +91,14 @@ def _oauth_error_handler(remote, f, *args, **kwargs):
             )
         )
         return redirect(url_for("security.login"))
+    except OAuthCilogonRejectedAccountError as e:
+        error_message = e.message
+        flash(_(error_message), category="danger")
+        redirect_url = current_app.config.get(
+            "OAUTHCLIENT_CILOGON_ROLES_ERROR_URL",
+            "/",
+            )
+        return redirect(redirect_url)
 
 
 #
