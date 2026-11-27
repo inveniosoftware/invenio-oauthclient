@@ -88,31 +88,12 @@ def test_authorized_signup_valid_user(
             )
         )
 
-        # note: because we provided an e-mail address in 'info_handler',
-        #       the user does not need to sign up
+        # note: 'info_serializer_handler' supplies both an e-mail address and
+        #       a username (derived from the e-mail when the IdP sends no
+        #       'preferred_username'), so the account is provisioned directly
+        #       and the sign-up form is skipped entirely.
         assert resp.status_code == 302
-        assert resp.location == (
-            url_for("invenio_oauthclient.signup", remote_app="cilogon")
-        )
-
-        # User load sign-up page.
-        resp = c.get(url_for("invenio_oauthclient.signup", remote_app="cilogon"))
-        assert resp.status_code == 200
-        account_info = session[token_session_key("cilogon") + "_account_info"]
-        account_info["user"]["profile"]["username"] = "panta"
-        data = {
-            "email": account_info["user"]["email"],
-            "profile.username": account_info["user"]["profile"]["username"],
-            "profile.full_name": account_info["user"]["profile"]["full_name"],
-            "profile.affiliations": "cern",
-        }
-        # User fills form to register
-        resp = c.post(
-            url_for("invenio_oauthclient.signup", remote_app="cilogon"),
-            data=data,
-        )
-
-        assert resp.status_code == 302
+        assert resp.location == url_for("invenio_oauthclient_settings.index")
         httpretty.disable()
 
         # check that the user exists
